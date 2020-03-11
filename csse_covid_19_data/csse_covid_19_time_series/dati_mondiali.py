@@ -66,8 +66,11 @@ deaths_df_reshaped = deaths_df.melt(id_vars=['Province/State', 'Country/Region',
 recovered_df_reshaped = recovered_df.melt(id_vars=['Province/State', 'Country/Region', 'Lat', 'Long'],var_name="Date", value_name='cases')
 # recovered_df_reshaped.set_index('Date', inplace=True)
 
-active_df_reshaped = confirmed_df_reshaped
-active_df_reshaped['cases'] = confirmed_df_reshaped['cases'] - recovered_df_reshaped['cases']
+active_df_reshaped = confirmed_df_reshaped.copy()
+active_cases = confirmed_df_reshaped['cases'] - recovered_df_reshaped['cases']
+active_df_reshaped['cases'] = active_cases
+
+
 
 def exp_func(x, a, b ):
     return a*np.exp(b*x)
@@ -214,7 +217,9 @@ for country in countrylist:
     ModelAndScatterPlot(country,deaths_df_reshaped,'deaths-cases',graphWidth, graphHeight,logscale=True)
     ModelAndScatterPlot(country,confirmed_df_reshaped,'confirmed-cases',graphWidth, graphHeight,logscale=True)
     ModelAndScatterPlot(country,recovered_df_reshaped,'recovered-cases',graphWidth, graphHeight,logscale=True)
+    ModelAndScatterPlot(country,active_df_reshaped,'active-cases',graphWidth, graphHeight,logscale=True)
     logscale=True
+    # logscale=False
     if logscale:
         plt.savefig('./Figures/'+country + '_fitted_log.png', dpi=100)
     else:
