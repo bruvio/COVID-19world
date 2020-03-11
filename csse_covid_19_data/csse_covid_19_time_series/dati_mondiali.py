@@ -76,7 +76,7 @@ def func(x, a, b, c): # Hill sigmoidal equation from zunzun.com
     return  a * np.power(x, b) / (np.power(c, b) + np.power(x, b))
 
 
-def print_Data_by_country(country,dataframe,label,show_fit=False):
+def print_Data_by_country(country,dataframe,label,show_fit=False,logscale=False):
     try:
         # dataframe_bycountry = dataframe.groupby(dataframe['Country/Region'])
         country_database = dataframe[dataframe['Country/Region']==country]
@@ -88,21 +88,23 @@ def print_Data_by_country(country,dataframe,label,show_fit=False):
         data = df_bydate_grouper.index.values
 
         x = np.arange(0, len(totale_casi))
+        if logscale:
+            plt.yscale('log')
         popt1, pcov1 = curve_fit(lambda t, a, b: a * np.exp(b * t), x, totale_casi)
         plt.scatter(data, totale_casi,marker='o', label="Original Data - "+country+' - '+label)
         if show_fit:
             plt.plot(data, exp_func(x, *popt1), marker='-', label="Fitted Curve -"+country+' - '+label)
         plt.xticks(rotation=15, ha="right")
         plt.legend(loc='best')
-        plt.set_yscale('log')
+
         return df_bydate_grouper
     except:
         logger.info('country {} not in database'.format(country))
         return 0
 
-def ModelAndScatterPlot(country,dataframe,label,graphWidth, graphHeight):
+def ModelAndScatterPlot(country,dataframe,label,graphWidth, graphHeight,logscale):
     # these are the same as the scipy defaults
-    initialParameters = np.array([1.0, 1.0, 1.0])
+    # initialParameters = np.array([1.0, 1.0, 1.0])
 
     country_database = dataframe[dataframe['Country/Region'] == country]
     country_database = country_database.reset_index(drop=True)
@@ -115,37 +117,58 @@ def ModelAndScatterPlot(country,dataframe,label,graphWidth, graphHeight):
     x = np.arange(0, len(totale_casi))
 
     # curve fit the test data
-    fittedParameters, pcov = curve_fit(func, x, totale_casi, initialParameters)
+    # fittedParameters, pcov = curve_fit(func, x, totale_casi, initialParameters, maxfev=5000)
+    try:
+        fittedParameters, pcov = curve_fit(func, x, totale_casi, maxfev=5000)
+        modelPredictions = func(x, *fittedParameters)
 
-    modelPredictions = func(x, *fittedParameters)
+        absError = modelPredictions - totale_casi
 
-    absError = modelPredictions - totale_casi
+        SE = np.square(absError)  # squared errors
+        MSE = np.mean(SE)  # mean squared errors
+        RMSE = np.sqrt(MSE)  # Root Mean Squared Error, RMSE
+        Rsquared = 1.0 - (np.var(absError) / np.var(totale_casi))
 
-    SE = np.square(absError)  # squared errors
-    MSE = np.mean(SE)  # mean squared errors
-    RMSE = np.sqrt(MSE)  # Root Mean Squared Error, RMSE
-    Rsquared = 1.0 - (np.var(absError) / np.var(totale_casi))
+        print('Parameters:', fittedParameters)
+        print('RMSE:', RMSE)
+        print('R-squared:', Rsquared)
 
-    print('Parameters:', fittedParameters)
-    print('RMSE:', RMSE)
-    print('R-squared:', Rsquared)
+        # first the raw data as a scatter plot
+        if logscale:
+            plt.yscale('log')
+        plt.plot(data, totale_casi, 'D', label="Original Data - " + country + ' - ' + label)
+
+        # create data for the fitted equation plot
+        xModel = np.linspace(min(x), max(x))
+        yModel = func(xModel, *fittedParameters)
+
+        # now the model as a line plot
+        plt.plot(xModel, yModel, label="Fitted Data - " + country + ' - ' + label)
+
+        plt.xlabel('X Data')  # X axis data label
+        plt.ylabel('Y Data')  # Y axis data label
+
+        plt.legend(loc='best')
+        plt.xticks(rotation=15, ha="right")
+
+    except RuntimeError:
 
 
-    # first the raw data as a scatter plot
-    plt.plot(data, totale_casi,  'D',label="Original Data - "+country+' - '+label)
 
-    # create data for the fitted equation plot
-    xModel = np.linspace(min(x), max(x))
-    yModel = func(xModel, *fittedParameters)
+        # first the raw data as a scatter plot
+        if logscale:
+            plt.yscale('log')
+        plt.plot(data, totale_casi,  'D',label="Original Data - "+country+' - '+label)
 
-    # now the model as a line plot
-    plt.plot(xModel, yModel,label="Fitted Data - "+country+' - '+label)
 
-    plt.xlabel('X Data') # X axis data label
-    plt.ylabel('Y Data') # Y axis data label
-    plt.yscale('log')
-    plt.legend(loc='best')
-    plt.xticks(rotation=15, ha="right")
+
+
+
+        plt.xlabel('X Data') # X axis data label
+        plt.ylabel('Y Data') # Y axis data label
+
+        plt.legend(loc='best')
+        plt.xticks(rotation=15, ha="right")
 
 
 
@@ -161,55 +184,44 @@ def ModelAndScatterPlot(country,dataframe,label,graphWidth, graphHeight):
 
 # graphics output section
 
-
-# df_bydate_grouper_country = print_Data_by_country('Australia',confirmed_df_reshaped,'confirmed-cases')
-# df_bydate_grouper_country = print_Data_by_country('Italy',active_df_reshaped,'active-cases',show_fit=True)
-# df_bydate_grouper_country = print_Data_by_country('US',active_df_reshaped,'active-cases',show_fit=False)
-# plt.figure()
 countrylist = list(set(confirmed_df_reshaped['Country/Region']))
+countrylist = ['UK','US','Germany','Italy','Mainland China','Singapore','Australia','France']
 # for country in countrylist:
 #     logger.info('plotting {} data'.format(country))
 #     plt.figure()
 #     df_bydate_grouper_country = print_Data_by_country(country, deaths_df_reshaped, 'death-cases',
-#                                                       show_fit=False)
+#                                                       show_fit=False,logscale=False)
 #     df_bydate_grouper_country = print_Data_by_country(country, confirmed_df_reshaped, 'confirmed-cases',
-#                                                       show_fit=False)
+#                                                       show_fit=False,logscale=False)
 #     df_bydate_grouper_country = print_Data_by_country(country, recovered_df_reshaped, 'recovered-cases',
-#                                                       show_fit=False)
-#     plt.savefig(country+'.png',dpi=100)
-
-# df_bydate_grouper_country = print_Data_by_country('Mainland China',deaths_df_reshaped,'death-cases',show_fit=False)
-# df_bydate_grouper_country = print_Data_by_country('Mainland China',confirmed_df_reshaped,'confirmed-cases',show_fit=False)
-# df_bydate_grouper_country = print_Data_by_country('Mainland China',recovered_df_reshaped,'recovered-cases',show_fit=False)
-# # df_bydate_grouper_country = print_Data_by_country('Mainland China',active_df_reshaped,'active-cases',show_fit=False)
-#
-# # df_bydate_grouper_country = print_Data_by_country('France',active_df_reshaped,'active-cases',show_fit=False)
-# # df_bydate_grouper_country = print_Data_by_country('Australia',active_df_reshaped,'active-cases',show_fit=False)
-# plt.figure()
-# df_bydate_grouper_country = print_Data_by_country('UK',deaths_df_reshaped,'death-cases',show_fit=False)
-# df_bydate_grouper_country = print_Data_by_country('UK',confirmed_df_reshaped,'confirmed-cases',show_fit=False)
-# df_bydate_grouper_country = print_Data_by_country('UK',recovered_df_reshaped,'recovered-cases',show_fit=False)
-# # df_bydate_grouper_country = print_Data_by_country('UK',active_df_reshaped,'active-cases',show_fit=False)
-# plt.figure()
-# df_bydate_grouper_country = print_Data_by_country('Italy',deaths_df_reshaped,'death-cases',show_fit=False)
-# df_bydate_grouper_country = print_Data_by_country('Italy',confirmed_df_reshaped,'confirmed-cases',show_fit=False)
-# df_bydate_grouper_country = print_Data_by_country('Italy',recovered_df_reshaped,'recovered-cases',show_fit=False)
-# # df_bydate_grouper_country = print_Data_by_country('Italy',active_df_reshaped,'active-cases',show_fit=False)
-#
+#                                                       show_fit=False,logscale=False)
+#     logscale = False
+#     if logscale:
+#         plt.savefig('./Figures/' + country + '_fitted_log.png', dpi=100)
+#     else:
+#         plt.savefig('./Figures/' + country + '_fitted.png', dpi=100)
 
 
 graphWidth = 800
 graphHeight = 600
+countrylist = ['UK','US','Germany','Italy','Mainland China','Singapore','Australia','France']
+# countrylist = ['Italy']
 for country in countrylist:
     logger.info('plotting {} data'.format(country))
-    try:
-        print(country)
-        plt.figure(figsize=(graphWidth/100.0, graphHeight/100.0), dpi=100)
-        ModelAndScatterPlot(country,deaths_df_reshaped,'deaths-cases',graphWidth, graphHeight)
-        ModelAndScatterPlot(country,confirmed_df_reshaped,'confirmed-cases',graphWidth, graphHeight)
-        ModelAndScatterPlot(country,recovered_df_reshaped,'recovered-cases',graphWidth, graphHeight)
-        plt.savefig('./Figures/'+country + '.png', dpi=100)
-    except:
-        pass
+    # try:
+    print(country)
+    plt.figure(figsize=(graphWidth/100.0, graphHeight/100.0), dpi=100)
+    ModelAndScatterPlot(country,deaths_df_reshaped,'deaths-cases',graphWidth, graphHeight,logscale=True)
+    ModelAndScatterPlot(country,confirmed_df_reshaped,'confirmed-cases',graphWidth, graphHeight,logscale=True)
+    ModelAndScatterPlot(country,recovered_df_reshaped,'recovered-cases',graphWidth, graphHeight,logscale=True)
+    logscale=True
+    if logscale:
+        plt.savefig('./Figures/'+country + '_fitted_log.png', dpi=100)
+    else:
+        plt.savefig('./Figures/' + country + '_fitted.png', dpi=100)
+
+
+    # except:
+    #     pass
 
 # plt.close('all')  # clean up after using pyplot
