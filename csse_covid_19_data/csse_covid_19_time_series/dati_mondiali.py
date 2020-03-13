@@ -76,7 +76,7 @@ countrylist_df = list(set(confirmed_df_reshaped['Country/Region']))
 
 
 
-countrylist = ['UK','US','Germany','Italy','Mainland China','Singapore','Australia','France','Switzerland','Iran','Korea, South']
+countrylist = ['United Kingdom','US','Germany','Italy','Mainland China','Singapore','Australia','France','Switzerland','Iran','Korea, South']
 
 # for country in countrylist:
 #     if 'Korea' in country.split():
@@ -239,10 +239,10 @@ def recompute_fit(dataframe,label,country,newfit):
     # now the model as a line plot
     plt.plot(xModel, yModel, label="Fitted Data - " + country + ' - ' + label, color='m')
 
-graphWidth = 800
-graphHeight = 600
+# graphWidth = 800
+# graphHeight = 600
 
-countrylist = ['Italy']
+# countrylist = ['Italy']
 for country in countrylist:
     if country in countrylist_df:
         logger.info('plotting {} data'.format(country))
@@ -255,23 +255,32 @@ for country in countrylist:
         stop_prediction_date=80
         date_prediction = np.arange(0,80)
         print(date_prediction)
-        xModel,yModel,fittedParameters_10 = fit_data(x[-20:],y[-20:],exp_func)
+        xModel,yModel,fittedParameters_10 = fit_data(x[-11:],y[-11:],exp_func)
         plt.figure(num=country)
         plot_data(date,y,country,'active','r',logscale=logscale)
-        plot_model(xModel,yModel,country,'10days-fit - active','g',marker='x',logscale=logscale)
+        plot_model(xModel,yModel,country,' 11days-fit - casi attivi','g',marker='x',logscale=logscale)
 
 
 
-        fittedParameters, pcov = curve_fit(lambda t, a, b: a/(1+np.exp(-fittedParameters_10[0]*(t-b))), x, y, maxfev=5000)
+        # fittedParameters, pcov = curve_fit(lambda t, a, b: a/(1+np.exp(-fittedParameters_10[0]*(t-b))), x, y, maxfev=5000)
+        fittedParameters, pcov = curve_fit(sigmoidal_func, x, y, maxfev=5000,p0=[1,1,-fittedParameters_10[0]])
+        # fittedParameters, pcov = curve_fit(sigmoidal_func, x, y, maxfev=5000,p0=[1,1,1])
+        # fittedParameters, pcov = curve_fit(sigmoidal_func, x, y, maxfev=5000)#[1.80742681e+04 4.77094523e+01 2.94617422e-01]
         print('Parameters:', fittedParameters)
-        modelPredictions = sigmoidal_func(y[-10:], fittedParameters[0],fittedParameters[1],fittedParameters_10[0])
+        # modelPredictions = sigmoidal_func(y[-10:], fittedParameters[0],fittedParameters[1],fittedParameters_10[0])
+        modelPredictions = sigmoidal_func(y[-10:], *fittedParameters)
         xModel = np.linspace(start_prediction_date, stop_prediction_date)
-        yModel = sigmoidal_func(xModel, fittedParameters[0],fittedParameters[1],fittedParameters_10[0])
-        plot_model(xModel, yModel, country, 'predictions - active', 'm',marker='.', logscale=logscale)
+        yModel = sigmoidal_func(xModel, *fittedParameters)
+        # yModel = sigmoidal_func(xModel, fittedParameters[0],fittedParameters[1],fittedParameters_10[0])
+        plot_model(xModel, yModel, country, 'predictions - casi attivi', 'm',marker='.', logscale=logscale)
         plt.xlabel('giorni da inizio contagio') # X axis data label
         plt.ylabel('Casi Attivi') # Y axis data label
         plt.legend(loc='best',fontsize='10')
         # plt.xticks(np.arange(22, 80, step=1))
+        if logscale:
+            plt.savefig('./Figures/' + country + '_fitted_log.png', dpi=100)
+        else:
+            plt.savefig('./Figures/' + country + '_fitted.png', dpi=100)
 
 
 #
