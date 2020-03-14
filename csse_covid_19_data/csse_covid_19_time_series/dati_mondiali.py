@@ -172,10 +172,10 @@ def fit_data(x,y,func):
         # plt.legend(loc='best')
         # plt.xticks(rotation=15, ha="right")
 
-        return xModel,yModel,fittedParameters
+        return xModel,yModel,fittedParameters,Rsquared
     except:
         print('failed to fit data')
-        return [],[],[]
+        return [],[],[],[]
 
 
 
@@ -191,8 +191,7 @@ def plot_data(Xdata,Ydata,country,label,color,logscale=False):
 
 
 def plot_model(xModel,yModel,country,label,color,marker,logscale=False):
-        # plt.xlabel('X Data') # X axis data label
-        # plt.ylabel('Y Data') # Y axis data label
+
         if logscale:
             plt.yscale('log')
 
@@ -242,43 +241,67 @@ def recompute_fit(dataframe,label,country,newfit):
 # graphWidth = 800
 # graphHeight = 600
 
-# countrylist = ['Italy']
+countrylist = ['Italy']
+# countrylist = ['United Kingdom']
 for country in countrylist:
     if country in countrylist_df:
         logger.info('plotting {} data'.format(country))
         # try:
         print(country)
-        logscale= True
-        dataframe,x,y = extract_database(country,active_df_reshaped)
+        logscale= False
+        databasename = 'confirmed cases'
+        dataframe,x,y = extract_database(country,confirmed_df_reshaped)
         date = dataframe.index.values
         start_prediction_date=date
         stop_prediction_date=80
-        date_prediction = np.arange(0,80)
-        print(date_prediction)
-        xModel,yModel,fittedParameters_10 = fit_data(x[-11:],y[-11:],exp_func)
+        date_prediction = np.arange(0,stop_prediction_date)
+        xModel, yModel, fittedParameters_10, Rsquared = fit_data(x, y, sigmoidal_func)
+        plt.figure(num=country+'_justfit')
+        plot_data(date,y,country,'active','r',logscale=logscale)
+        plot_model(xModel, yModel, country, ' fit - ' + databasename, 'g', marker='x', logscale=logscale)
+        plt.show()
+
+        plt.figure(num=country)
+        xModel,yModel,fittedParameters_10,Rsquared = fit_data(x[-10:],y[-10:],exp_func)
+        # xModel,yModel,fittedParameters_10,Rsquared = fit_data(x,y,exp_func)
         plt.figure(num=country)
         plot_data(date,y,country,'active','r',logscale=logscale)
-        plot_model(xModel,yModel,country,' 11days-fit - casi attivi','g',marker='x',logscale=logscale)
+        # if Rsquared > 0.8:
+        # plot_model(xModel,yModel,country,' 11days-fit - '+databasename,'g',marker='x',logscale=logscale)
+        # else:
 
 
-
-        # fittedParameters, pcov = curve_fit(lambda t, a, b: a/(1+np.exp(-fittedParameters_10[0]*(t-b))), x, y, maxfev=5000)
         fittedParameters, pcov = curve_fit(sigmoidal_func, x, y, maxfev=5000,p0=[1,1,-fittedParameters_10[0]])
-        # fittedParameters, pcov = curve_fit(sigmoidal_func, x, y, maxfev=5000,p0=[1,1,1])
-        # fittedParameters, pcov = curve_fit(sigmoidal_func, x, y, maxfev=5000)#[1.80742681e+04 4.77094523e+01 2.94617422e-01]
+
         print('Parameters:', fittedParameters)
-        # modelPredictions = sigmoidal_func(y[-10:], fittedParameters[0],fittedParameters[1],fittedParameters_10[0])
-        modelPredictions = sigmoidal_func(y[-10:], *fittedParameters)
+
+        modelPredictions = sigmoidal_func(y, *fittedParameters)
+
+        absError = modelPredictions[0:len(y)] - y
+
+        SE = np.square(absError)  # squared errors
+        MSE = np.mean(SE)  # mean squared errors
+        RMSE = np.sqrt(MSE)  # Root Mean Squared Error, RMSE
+        Rsquared = 1.0 - (np.var(absError) / np.var(y))
+
+        print('Parameters:', fittedParameters)
+        print('RMSE:', RMSE)
+        print('R-squared:', Rsquared)
+
         xModel = np.linspace(start_prediction_date, stop_prediction_date)
         yModel = sigmoidal_func(xModel, *fittedParameters)
-        # yModel = sigmoidal_func(xModel, fittedParameters[0],fittedParameters[1],fittedParameters_10[0])
-        plot_model(xModel, yModel, country, 'predictions - casi attivi', 'm',marker='.', logscale=logscale)
-        plt.xlabel('giorni da inizio contagio') # X axis data label
-        plt.ylabel('Casi Attivi') # Y axis data label
+        # if Rsquared > 0.5:
+        plot_model(xModel, yModel, country, 'predictions - '+databasename, 'm',marker='.', logscale=logscale)
+        # else:
+        #     print('Model did not converge')
+
+        plt.xlabel('days since it started') # X axis data label
+        plt.ylabel('confirmed cases') # Y axis data label
         plt.legend(loc='best',fontsize='10')
         # plt.xticks(np.arange(22, 80, step=1))
         if logscale:
             plt.savefig('./Figures/' + country + '_fitted_log.png', dpi=100)
+            plt.ylim(1,1e5)
         else:
             plt.savefig('./Figures/' + country + '_fitted.png', dpi=100)
 
