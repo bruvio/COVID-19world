@@ -106,6 +106,36 @@ active_df_reshaped["cases"] = active_cases
 #     if 'Korea' in country.split():
 #         print(country)
 
+def derivative(f,a,method='central',h=0.01):
+    '''Compute the difference formula for f'(a) with step size h.
+
+    Parameters
+    ----------
+    f : function
+        Vectorized function of one variable
+    a : number
+        Compute derivative at x = a
+    method : string
+        Difference formula: 'forward', 'backward' or 'central'
+    h : number
+        Step size in difference formula
+
+    Returns
+    -------
+    float
+        Difference formula:
+            central: f(a+h) - f(a-h))/2h
+            forward: f(a+h) - f(a))/h
+            backward: f(a) - f(a-h))/h
+    '''
+    if method == 'central':
+        return (f(a + h) - f(a - h))/(2*h)
+    elif method == 'forward':
+        return (f(a + h) - f(a))/h
+    elif method == 'backward':
+        return (f(a) - f(a - h))/h
+    else:
+        raise ValueError("Method must be 'central', 'forward' or 'backward'.")
 
 def exp_func(x, a, b):
     return a * np.exp(b * x)
@@ -231,7 +261,7 @@ def plot_data(Xdata, Ydata, country, label, color, logscale=False):
     # first the raw data as a scatter plot
     if logscale:
         plt.yscale("log")
-        # plt.ylim(0, 1e4)
+        plt.ylim(1, 1e4)
     # plt.plot(Xdata, Ydata, 'D', label="Original Data - " + country + ' - ' + label,color=color)
     plt.scatter(
         Xdata,
@@ -246,7 +276,7 @@ def plot_model(xModel, yModel, country, label, color, marker, logscale=False):
 
     if logscale:
         plt.yscale("log")
-        # plt.ylim(0, 1e4)
+        plt.ylim(1, 1e4)
 
     # plt.plot(xModel, yModel, label="Fitted Data - " + country + ' - ' + label, color=color,marker=marker)
     plt.scatter(
@@ -262,13 +292,16 @@ def plot_model(xModel, yModel, country, label, color, marker, logscale=False):
 
 
 def get_times(dataframe, y, prediction_days):
-    x = np.arange(0, len(y))
+
     date = dataframe.index.values
 
     # start = pd.Timestamp(dataframe['Date'].loc[0])
     start = datetime.datetime.strptime(dataframe["Date"].loc[0], "%m/%d/%y").strftime(
         "%d/%m/%y"
     )
+    day_of_the_year_start = int(start[0:2])
+    # x = np.arange(day_of_the_year_start, len(y)+day_of_the_year_start)
+    x = np.arange(0, len(y))
     start = datetime.datetime.strptime(start, "%d/%m/%y")
 
     end = datetime.datetime.strptime(dataframe["Date"].iloc[-1], "%m/%d/%y").strftime(
@@ -355,15 +388,16 @@ def main():
             )
 
             # xModel, yModel, fittedParameters_10, Rsquared = fit_data(x, y, exp_func )
-            xModel, yModel, fittedParameters_10, Rsquared = fit_data(
-                x, y, Hill_sigmoidal_func
-            )
-            # xModel, yModel, fittedParameters_10, Rsquared = fit_data(x, y, sigmoidal_func )
-            xModel_date = xModel.astype(datetime.datetime)
+            # xModel, yModel, fittedParameters_10, Rsquared = fit_data(
+            #     x, y, Hill_sigmoidal_func
+            # )
+            #
+            xModel_fit, yModel_fit, fittedParameters_10, Rsquared = fit_data(x, y, sigmoidal_func )
+            xModel_date = xModel_fit.astype(datetime.datetime)
             plt.figure(num=country + "_justfit")
             plot_model(
                 t_real,
-                yModel,
+                yModel_fit,
                 country,
                 " fit - " + databasename,
                 "g",
@@ -371,7 +405,7 @@ def main():
                 logscale=logscale,
             )
             plot_data(t_real, y, country, "confirmed cases", "r", logscale=logscale)
-            plt.ylim(1, 1e4)
+            # plt.ylim(1, 1e4)
             plt.legend(loc="best", fontsize="10")
             plt.xticks(rotation=15, ha="right")
 
@@ -389,6 +423,8 @@ def main():
                     x[-day_to_use_4_fit:], y[-day_to_use_4_fit:], exp_func1
                 )
             # xModel,yModel,fittedParameters_10,Rsquared = fit_data(x,y,exp_func)
+            ax1 = plt.subplot(211)
+
             plot_data(t_real, y, country, "confirmed cases", "r", logscale=logscale)
             # # if Rsquared > 0.8:
             plot_model(
@@ -406,12 +442,18 @@ def main():
             print("prediction from {} to {}".format(start, prediction))
             #
             fittedParameters_prediction, pcov = curve_fit(
-                sigmoidal_func, x, y, maxfev=5000, p0=[1, 1, -fittedParameters_10[-1]]
+                sigmoidal_func, x, y, maxfev=5000, p0=[1, -fittedParameters_10[-1], 1]
             )
             #
             # print('Parameters:', fittedParameters_prediction)
             #
-            modelPredictions = sigmoidal_func(x, *fittedParameters_prediction)
+            start = datetime.datetime.strptime(dataframe["Date"].loc[0], "%m/%d/%y").strftime(
+                "%d/%m/%y"
+            )
+            day_of_the_year_start = int(start[0:2])
+            x = np.arange(day_of_the_year_start, len(y)+day_of_the_year_start)
+            x_prediction = np.arange(0, len(y)+day_of_the_year_start)
+            modelPredictions = sigmoidal_func(x_prediction, *fittedParameters_prediction)
             #
             absError = modelPredictions[0 : len(y)] - y
             #
@@ -425,6 +467,7 @@ def main():
             print("R-squared:", Rsquared)
             #
             # fittedParameters_prediction = [79100,78.7, 4.63]
+            # fittedParameters_prediction = [fittedParameters_prediction[0],78.7, fittedParameters_prediction[2]]
             xModel_prediction = np.arange(0, days)
             yModel_prediction = sigmoidal_func(
                 xModel_prediction, *fittedParameters_prediction
@@ -456,8 +499,115 @@ def main():
             else:
                 plt.savefig("./Figures/" + country + "_fitted.png", dpi=100)
 
-    #
-    plt.show()
+            daily = np.diff(y)
+            a = 0
+            daily = np.concatenate([[a], daily])
+            # yy = sigmoidal_func(x, *fittedParameters_prediction)
+            a,b,c = fittedParameters_prediction
+            f = lambda x: a / (1 + np.exp(-c * (x - b)))
+            # yy = f(x)
+            ydx = derivative(f,xModel_prediction)
+
+            ax2 = plt.subplot(212, sharex=ax1)
+            # plot_model(
+            #     t_real,
+            #     yModel_fit,
+            #     country,
+            #     " fit - " + databasename,
+            #     "g",
+            #     "x",
+            #     logscale=logscale,
+            # )
+            plot_model(t_prediction,ydx , country,
+                    "daily predictions - " + databasename,
+                    "b",
+                    marker="o",
+                    logscale=logscale)
+            plot_data(t_real, daily, country, "daily confirmed cases", "r", logscale=logscale)
+            # plt.ylim(1, 1e4)
+            plt.legend(loc="best", fontsize="10")
+            plt.xticks(rotation=15, ha="right")
+            plt.show()
+
+        # plt.figure(num='daily-'+country)
+        # xModel, yModel, fittedParameters_10, Rsquared = fit_data(
+        #     x[-day_to_use_4_fit:], daily[-day_to_use_4_fit:], exp_func1
+        # )
+        # # plot_data(t_real, daily, country, "confirmed cases", "r", logscale=logscale)
+        # # # if Rsquared > 0.8:
+        # # plot_model(
+        # #     t_real[-day_to_use_4_fit:],
+        # #     yModel[-day_to_use_4_fit:],
+        # #     country,
+        # #     " 11days-fit - " + databasename,
+        # #     "g",
+        # #     marker="x",
+        # #     logscale=logscale,
+        # # )
+        #
+        # # # else:
+        #
+        # print("prediction from {} to {}".format(start, prediction))
+        # #
+        # fittedParameters_prediction, pcov = curve_fit(
+        #     sigmoidal_func, x, daily, maxfev=5000, p0=[1, -fittedParameters_10[-1], 1]
+        # )
+        # #
+        # # print('Parameters:', fittedParameters_prediction)
+        # #
+        # start = datetime.datetime.strptime(dataframe["Date"].loc[0], "%m/%d/%y").strftime(
+        #     "%d/%m/%y"
+        # )
+        # day_of_the_year_start = int(start[0:2])
+        # x = np.arange(0, len(daily))
+        # # x = np.arange(day_of_the_year_start, len(daily) + day_of_the_year_start)
+        #
+        # modelPredictions = sigmoidal_func(x, *fittedParameters_prediction)
+        # #
+        # absError = modelPredictions[0: len(daily)] - daily
+        # #
+        # SE = np.square(absError)  # squared errors
+        # MSE = np.mean(SE)  # mean squared errors
+        # RMSE = np.sqrt(MSE)  # Root Mean Squared Error, RMSE
+        # Rsquared = 1.0 - (np.var(absError) / np.var(daily))
+        # #
+        # print("Parameters:", fittedParameters_prediction)
+        # print("RMSE:", RMSE)
+        # print("R-squared:", Rsquared)
+        # #
+        # # fittedParameters_prediction = [79100,78.7, 4.63]
+        # # fittedParameters_prediction = [fittedParameters_prediction[0],78.7, fittedParameters_prediction[2]]
+        # xModel_prediction = np.arange(0, days)
+        # yModel_prediction = sigmoidal_func(
+        #     xModel_prediction, *fittedParameters_prediction
+        # )
+        # # yModel_prediction = Hill_sigmoidal_func(xModel_prediction, *fittedParameters_prediction)
+        # # # if Rsquared > 0.5:
+        # # plt.plot(xModel_prediction,yModel_prediction)
+        # # plot_model(xModel_prediction, yModel_prediction, country, 'predictions - '+databasename, 'm',marker='.', logscale=logscale)
+        # plot_model(
+        #     t_prediction,
+        #     yModel_prediction,
+        #     country,
+        #     "predictions - " + databasename,
+        #     "m",
+        #     marker=".",
+        #     logscale=logscale,
+        # )
+        # # plt.ylim(1, 1e4)
+        # plt.xticks(rotation=15, ha="right")
+        # # else:
+        # #     print('Model did not converge')
+        # #
+        # plt.xlabel("days since it started")  # X axis data label
+        # plt.ylabel("Delta confirmed cases")  # Y axis data label
+        # plt.legend(loc="best", fontsize="10")
+        # if logscale:
+        #     plt.savefig("./Figures/" + country + "_fitted_daily_log.png", dpi=100)
+        #     plt.ylim(1, 1e5)
+        # else:
+        #     plt.savefig("./Figures/" + country + "_fitted_daily.png", dpi=100)
+
 
 
 if __name__ == "__main__":
