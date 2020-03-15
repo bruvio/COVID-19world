@@ -106,8 +106,9 @@ active_df_reshaped["cases"] = active_cases
 #     if 'Korea' in country.split():
 #         print(country)
 
-def derivative(f,a,method='central',h=0.01):
-    '''Compute the difference formula for f'(a) with step size h.
+
+def derivative(f, a, method="central", h=0.01):
+    """Compute the difference formula for f'(a) with step size h.
 
     Parameters
     ----------
@@ -127,15 +128,16 @@ def derivative(f,a,method='central',h=0.01):
             central: f(a+h) - f(a-h))/2h
             forward: f(a+h) - f(a))/h
             backward: f(a) - f(a-h))/h
-    '''
-    if method == 'central':
-        return (f(a + h) - f(a - h))/(2*h)
-    elif method == 'forward':
-        return (f(a + h) - f(a))/h
-    elif method == 'backward':
-        return (f(a) - f(a - h))/h
+    """
+    if method == "central":
+        return (f(a + h) - f(a - h)) / (2 * h)
+    elif method == "forward":
+        return (f(a + h) - f(a)) / h
+    elif method == "backward":
+        return (f(a) - f(a - h)) / h
     else:
         raise ValueError("Method must be 'central', 'forward' or 'backward'.")
+
 
 def exp_func(x, a, b):
     return a * np.exp(b * x)
@@ -369,7 +371,7 @@ def main():
         "Iran",
         "Korea, South",
     ]
-    countrylist = ["Italy"]
+    # countrylist = ["Italy"]
     # countrylist = ['United Kingdom']
     # countrylist = ['Iran']
     for country in countrylist:
@@ -392,22 +394,37 @@ def main():
             #     x, y, Hill_sigmoidal_func
             # )
             #
-            xModel_fit, yModel_fit, fittedParameters_10, Rsquared = fit_data(x, y, sigmoidal_func )
+            if country == "Italy":
+                xModel_fit, yModel_fit, fittedParameters, Rsquared = fit_data(
+                    x, y, sigmoidal_func
+                )
+            elif country == "United Kingdom":
+                xModel_fit, yModel_fit, fittedParameters, Rsquared = fit_data(
+                    x, y, exp_func
+                )
+            else :
+                xModel_fit, yModel_fit, fittedParameters, Rsquared = fit_data(
+                    x, y, exp_func1
+                )
             xModel_date = xModel_fit.astype(datetime.datetime)
-            plt.figure(num=country + "_justfit")
-            plot_model(
-                t_real,
-                yModel_fit,
-                country,
-                " fit - " + databasename,
-                "g",
-                "x",
-                logscale=logscale,
-            )
-            plot_data(t_real, y, country, "confirmed cases", "r", logscale=logscale)
-            # plt.ylim(1, 1e4)
-            plt.legend(loc="best", fontsize="10")
-            plt.xticks(rotation=15, ha="right")
+            # italy Parameters: [1.06353071e+05 5.88260356e+01 2.08552443e-01]
+            # UK Parameters: [0.00114855 0.26418431]
+            # plt.figure(num=country + "_justfit")
+            # plot_model(
+            #     t_real,
+            #     yModel_fit,
+            #     country,
+            #     " fit - "
+            #     + databasename
+            #     + "  -  $  -  10635.3071 / (1 + exp^{(-0.208552443 * (x - 58.8260356e))})$",
+            #     "g",
+            #     "x",
+            #     logscale=logscale,
+            # )
+            # plot_data(t_real, y, country, "confirmed cases", "r", logscale=logscale)
+            # # plt.ylim(1, 1e4)
+            # plt.legend(loc="best", fontsize="10")
+            # plt.xticks(rotation=15, ha="right")
 
             plt.figure(num=country)
             if country == "Italy":
@@ -427,11 +444,13 @@ def main():
 
             plot_data(t_real, y, country, "confirmed cases", "r", logscale=logscale)
             # # if Rsquared > 0.8:
+            # Italy Parameters: [0.19151797]
+            #  UK Parameters: [0.12856266]
             plot_model(
                 t_real[-day_to_use_4_fit:],
                 yModel[-day_to_use_4_fit:],
                 country,
-                " 11days-fit - " + databasename,
+                " 11days-fit - " + databasename + "  -  $ exp^{0.19151797 \cdot x}$",
                 "g",
                 marker="x",
                 logscale=logscale,
@@ -447,13 +466,15 @@ def main():
             #
             # print('Parameters:', fittedParameters_prediction)
             #
-            start = datetime.datetime.strptime(dataframe["Date"].loc[0], "%m/%d/%y").strftime(
-                "%d/%m/%y"
-            )
+            start = datetime.datetime.strptime(
+                dataframe["Date"].loc[0], "%m/%d/%y"
+            ).strftime("%d/%m/%y")
             day_of_the_year_start = int(start[0:2])
-            x = np.arange(day_of_the_year_start, len(y)+day_of_the_year_start)
-            x_prediction = np.arange(0, len(y)+day_of_the_year_start)
-            modelPredictions = sigmoidal_func(x_prediction, *fittedParameters_prediction)
+            x = np.arange(day_of_the_year_start, len(y) + day_of_the_year_start)
+            x_prediction = np.arange(0, len(y) + day_of_the_year_start)
+            modelPredictions = sigmoidal_func(
+                x_prediction, *fittedParameters_prediction
+            )
             #
             absError = modelPredictions[0 : len(y)] - y
             #
@@ -465,9 +486,8 @@ def main():
             print("Parameters:", fittedParameters_prediction)
             print("RMSE:", RMSE)
             print("R-squared:", Rsquared)
-            #
-            # fittedParameters_prediction = [79100,78.7, 4.63]
-            # fittedParameters_prediction = [fittedParameters_prediction[0],78.7, fittedParameters_prediction[2]]
+            # UK Parameters: [2.15051089e+08 9.82481446e+01 2.64184732e-01]
+
             xModel_prediction = np.arange(0, days)
             yModel_prediction = sigmoidal_func(
                 xModel_prediction, *fittedParameters_prediction
@@ -480,7 +500,9 @@ def main():
                 t_prediction,
                 yModel_prediction,
                 country,
-                "predictions - " + databasename,
+                "predictions - "
+                + databasename
+                + "  -  $10635.3071 / (1 + exp^{(-0.208552443 * (x - 58.8260356e))})$",
                 "m",
                 marker=".",
                 logscale=logscale,
@@ -503,10 +525,10 @@ def main():
             a = 0
             daily = np.concatenate([[a], daily])
             # yy = sigmoidal_func(x, *fittedParameters_prediction)
-            a,b,c = fittedParameters_prediction
+            a, b, c = fittedParameters_prediction
             f = lambda x: a / (1 + np.exp(-c * (x - b)))
             # yy = f(x)
-            ydx = derivative(f,xModel_prediction)
+            ydx = derivative(f, xModel_prediction)
 
             ax2 = plt.subplot(212, sharex=ax1)
             # plot_model(
@@ -518,16 +540,22 @@ def main():
             #     "x",
             #     logscale=logscale,
             # )
-            plot_model(t_prediction,ydx , country,
-                    "daily predictions - " + databasename,
-                    "b",
-                    marker="o",
-                    logscale=logscale)
-            plot_data(t_real, daily, country, "daily confirmed cases", "r", logscale=logscale)
+            plot_model(
+                t_prediction,
+                ydx,
+                country,
+                "daily predictions - " + databasename,
+                "b",
+                marker="o",
+                logscale=logscale,
+            )
+            plot_data(
+                t_real, daily, country, "daily confirmed cases", "r", logscale=logscale
+            )
             # plt.ylim(1, 1e4)
             plt.legend(loc="best", fontsize="10")
             plt.xticks(rotation=15, ha="right")
-            plt.show()
+    plt.show()
 
         # plt.figure(num='daily-'+country)
         # xModel, yModel, fittedParameters_10, Rsquared = fit_data(
@@ -607,7 +635,6 @@ def main():
         #     plt.ylim(1, 1e5)
         # else:
         #     plt.savefig("./Figures/" + country + "_fitted_daily.png", dpi=100)
-
 
 
 if __name__ == "__main__":
