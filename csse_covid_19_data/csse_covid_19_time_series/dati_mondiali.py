@@ -376,7 +376,7 @@ def main():
     # countrylist = ["Italy"]
     # countrylist = ['United Kingdom']
     # countrylist = ['Iran']
-    if 0:
+    if 1:
         for country in countrylist:
             if country in countrylist_df:
                 logger.info("plotting {} data".format(country))
@@ -388,7 +388,7 @@ def main():
                 dataframe, y = extract_database(country, confirmed_df_reshaped)
                 y=y[0:-1]
                 prediction_dates = 75
-                day_to_use_4_fit = 6
+                day_to_use_4_fit = 3
                 t_real, t_prediction, x, start, prediction, days = get_times(
                     dataframe, y, prediction_dates
                 )
@@ -554,30 +554,36 @@ def main():
 
 
 
-    # plt.show(block=True)
-    plt.close('all')
-
-
-    plt.style.use('ggplot')
-
+    plt.show(block=True)
+    # plt.close('all')
+    #
+    #
+    # plt.style.use('ggplot')
+    #
+    # filter_col = [col for col in confirmed_df_reshaped if col in countrylist]
+    # confirmed_df_reshaped_subset = confirmed_df_reshaped[filter_col]
+    # print(confirmed_df_reshaped_subset)
+    # pdb.set_trace()
+    # width = 0.35
     # fig = plt.figure()
     # ax = fig.add_subplot(111)
-    fig, ax = plt.subplots(figsize=(15, 8))
-    def dataframe_plot(day,pos):
-        ax.bar(pos, y[day], color='blue')
-        ax.set_ylabel("Total cases")
-
-        # ax.set_xticks(0)
-        # ax.set_xticklabels(countrylist,rotation=15, ha="right")
-
-    dataframe, y = extract_database('Italy', confirmed_df_reshaped)
-    dataframe.index = list(dataframe.index)
-    # range_dates = dataframe['Date']
-    animator = animation.FuncAnimation(fig, dataframe_plot,frames=len(y),fargs = (0,),
-                              interval=100
-                                       )
-
-    plt.show()
+    # fig, ax = plt.subplots(figsize=(15, 8))
+    # def dataframe_plot(day,pos):
+    #     ax.bar(pos, y[day], color='blue')
+    #     ax.set_ylabel("Total cases")
+    #
+    #
+    #     ax.set_xticks([0])
+    #     ax.set_xticklabels('Italy',rotation=15, ha="right")
+    #
+    # dataframe, y = extract_database('Italy', confirmed_df_reshaped)
+    # dataframe.index = list(dataframe.index)
+    # # range_dates = dataframe['Date']
+    # animator = animation.FuncAnimation(fig, dataframe_plot,frames=len(y),fargs = (0,),
+    #                           interval=100
+    #                                    )
+    #
+    # plt.show()
 
     # x_pos = [i for i, _ in enumerate(countrylist )]
     #
