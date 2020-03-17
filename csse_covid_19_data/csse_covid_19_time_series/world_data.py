@@ -307,7 +307,7 @@ def main():
                 print(country)
                 databasename = "confirmed cases"
                 dataframe,x,y = select_database(dataframe_all_countries, country, 'Confirmed')
-                prediction_dates = 145
+                prediction_dates = 75
                 day_to_use_4_fit = 5
                 t_real, t_prediction, x, start, prediction, days = get_times(
                     dataframe, y, prediction_dates
