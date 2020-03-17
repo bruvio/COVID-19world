@@ -296,21 +296,28 @@ def main():
     # countrylist = ["Italy"]
     # countrylist = ['United Kingdom']
     # countrylist = ['Iran']
+    # countrylist = ['Singapore']
+    # countrylist = ['US']
+    # countrylist = ['Switzerland']
+    # countrylist = ['"Germany"']
+    # countrylist = ['"France"']
+    # countrylist = ['Australia']
+    exception_list = ['Australia','China','Australia','US','Germany','France','Switzerland','Singapore','United Kingdom']
     # logscale= True
     logscale = False
-    if 0:
+    if 1:
         for country in countrylist:
             if country in countrylist_df:
                 print(country)
                 databasename = "confirmed cases"
                 dataframe,x,y = select_database(dataframe_all_countries, country, 'Confirmed')
-                prediction_dates = 75
+                prediction_dates = 145
                 day_to_use_4_fit = 5
                 t_real, t_prediction, x, start, prediction, days = get_times(
                     dataframe, y, prediction_dates
                 )
 
-
+                # FITTING THE DATA ###########################
                 if country == "Italy":
                     xModel_fit, yModel_fit, fittedParameters, Rsquared = fit_data(
                         x, y, sigmoidal_func
@@ -319,7 +326,7 @@ def main():
 
                 elif country == "United Kingdom":
                     xModel_fit, yModel_fit, fittedParameters, Rsquared = fit_data(
-                        x, y, exp_func1
+                        x, y, expo_func
                     )
                     text_fit = '$ exp^{{ {} \cdot x}}$'.format(
                         float(fittedParameters[-1]))
@@ -330,10 +337,16 @@ def main():
                     text_fit = '$ exp^{{ {} \cdot x}}$'.format(
                         float(fittedParameters[-1]))
                 xModel_date = xModel_fit.astype(datetime.datetime)
+
+                ###########################
+
                 # italy Parameters: [1.06353071e+05 5.88260356e+01 2.08552443e-01]
                 # UK Parameters: [0.00114855 0.26418431]
 
-                plt.figure(num=country)
+
+                ################ FITTING LAST 10 DAYS OF THE DATA ###########################
+
+
                 if country == "Italy":
                     print('\n last {} days fit data\n'.format(day_to_use_4_fit))
                     xModel, yModel, fittedParameters_10, Rsquared = fit_data(
@@ -355,18 +368,17 @@ def main():
                     )
                     text_10days_fit = '$ exp^{{ {} \cdot x}}$'.format(
                         float(fittedParameters_10[-1]))
-
+                ################ PLOTTING DATA & FIT ###############
+                plt.figure(num=country)
                 ax1 = plt.subplot(211)
 
                 plot_data(t_real, y, country, "confirmed cases", "r", logscale=logscale)
 
-                text = '$ exp^{{ {} \cdot x}}$'.format(
-                    float(fittedParameters_10[-1]))
                 plot_model(
                     t_real,
                     yModel_fit,
                     country,
-                    " data fit - " + databasename + "  -  "+text_fit,
+                    " data fit - " + databasename + "  -  " + text_fit,
                     "b",
                     marker="x",
                     logscale=logscale,
@@ -376,18 +388,20 @@ def main():
                     t_real[-day_to_use_4_fit:],
                     yModel[-day_to_use_4_fit:],
                     country,
-                    " 11days-fit - " + databasename + "  -  "+text_10days_fit,
+                    " 11days-fit - " + databasename + "  -  " + text_10days_fit,
                     "g",
                     marker="x",
                     logscale=logscale,
                 )
-                plt.ylim([min(y),max(y)])
+                plt.legend(loc='best', fontsize=8)
+                plt.ylim([min(y), max(y)])
+                ###########################
 
-
+                ################ PREDICTION ###########################
                 print("prediction from {} to {}".format(start, prediction))
                 #
                 fittedParameters_prediction, pcov = curve_fit(
-                    sigmoidal_func, x, y, maxfev=5000, p0=[1, -fittedParameters_10[-1], 1]
+                    sigmoidal_func, x, y, maxfev=5000, p0=[1, fittedParameters_10[-1], 1]
                 )
 
                 # start = datetime.datetime.strptime(
@@ -396,11 +410,15 @@ def main():
                 start = dataframe["date"].iloc[0]
 
                 day_of_the_year_start = start.day
-                x = np.arange(day_of_the_year_start, len(y) + day_of_the_year_start)
+                # x = np.arange(day_of_the_year_start, len(y) + day_of_the_year_start)
                 x_prediction = np.arange(0, len(y) + day_of_the_year_start)
-                modelPredictions = sigmoidal_func(
-                    x_prediction, *fittedParameters_prediction
-                )
+                if country in exception_list:
+                    coefs = np.poly1d(np.polyfit(x, y, 5))
+                    modelPredictions = np.polyval(coefs, x_prediction)
+                else:
+                    modelPredictions = sigmoidal_func(
+                        x_prediction, *fittedParameters_prediction
+                    )
                 #
                 absError = modelPredictions[0 : len(y)] - y
                 #
@@ -416,11 +434,20 @@ def main():
                 # UK Parameters: [2.15051089e+08 9.82481446e+01 2.64184732e-01]
 
                 xModel_prediction = np.arange(0, days)
-                yModel_prediction = sigmoidal_func(
-                    xModel_prediction, *fittedParameters_prediction
-                )
+                if country in exception_list:
+                    yModel_prediction = np.polyval(coefs, xModel_prediction)
+                    f = np.poly1d(coefs)
+                    text = str(f)
+                else:
 
-                text = '${} / (1 + exp^{{(-{} * (x - {}))}})$'.format(float(fittedParameters_prediction[0]),float(fittedParameters_prediction[1]),float(fittedParameters_prediction[2]))
+                    yModel_prediction = sigmoidal_func(
+                        xModel_prediction, *fittedParameters_prediction
+                    )
+                    text = '${} / (1 + exp^{{(-{} * (x - {}))}})$'.format(float(fittedParameters_prediction[0]),
+                                                                          float(fittedParameters_prediction[1]),
+                                                                          float(fittedParameters_prediction[2]))
+
+
                 plot_model(
                     t_prediction,
                     yModel_prediction,
@@ -438,18 +465,18 @@ def main():
                 plt.xlabel("days since it started")  # X axis data label
                 plt.ylabel("confirmed cases")  # Y axis data label
                 plt.legend(loc="best", fontsize="6")
-                if logscale:
-                    plt.savefig("./Figures/" + country + "_fitted_log.png", dpi=100)
-                    plt.ylim(1, 1e5)
-                else:
-                    plt.savefig("./Figures/" + country + "_fitted.png", dpi=100)
 
+                ###########################
+                ################ DAILY PREDICTION ###########################
                 daily = np.diff(y)
                 a = 0
                 daily = np.concatenate([[a], daily])
                 # yy = sigmoidal_func(x, *fittedParameters_prediction)
                 a, b, c = fittedParameters_prediction
-                f = lambda x: a / (1 + np.exp(-c * (x - b)))
+                if country in exception_list:
+                    f = np.poly1d(coefs)
+                else:
+                    f = lambda x: a / (1 + np.exp(-c * (x - b)))
                 # yy = f(x)
                 ydx = derivative(f, xModel_prediction)
 
@@ -470,6 +497,11 @@ def main():
                 # plt.ylim(1, 1e4)
                 plt.legend(loc="best", fontsize="6")
                 plt.xticks(rotation=15, ha="right")
+                if logscale:
+                    plt.savefig("./Figures/" + country + "_fitted_log.png", dpi=100)
+                    plt.ylim(1, 1e5)
+                else:
+                    plt.savefig("./Figures/" + country + "_fitted.png", dpi=100)
 
 
 
@@ -517,9 +549,9 @@ def main():
                 # plt.plot(linx, expo_func(linx, *results_p[0]))
                 # plt.xlim(30, 50)
 
-    plt.show(block=True)
+    # plt.show(block=True)
 
-    if 1:
+    if 0:
         # field = 'Deaths'
         # field = 'Confirmed'
         # field = 'Recovered'
