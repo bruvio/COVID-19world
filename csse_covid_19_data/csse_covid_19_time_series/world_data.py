@@ -66,20 +66,14 @@ def get_times(dataframe, y, prediction_days):
 
     date = dataframe.index.values
 
-    # start = pd.Timestamp(dataframe['Date'].loc[0])
-    start = dataframe["date"].iloc[0]
-    # start = start.to_pydatetime()
 
-    # start = datetime.datetime.strptime(
-    #     start, "%m/%d/%y"
-    # )
-    # day_of_the_year_start = int(start[0:2])
-    # x = np.arange(day_of_the_year_start, len(y)+day_of_the_year_start)
+    start = dataframe["date"].iloc[0]
+
     x = np.arange(0, len(y))
-    # start = datetime.datetime.strptime(start, "%d/%m/%y")
+
 
     end = dataframe["date"].iloc[-1]
-    # end = datetime.datetime.strptime(end, "%d/%m/%y")
+
 
     real_days = len(y)
     start = pd.Timestamp(start)
@@ -240,6 +234,7 @@ def plot(dataframe,countries, xrange,
     - yscale: log or linear
     - yrange: well, y range, useful in log mode.
     '''
+
     xmin, xmax = xrange
     linx = np.linspace(xmin, xmax, 101)
     colors = ['blue', 'red', 'orange', 'green']
@@ -249,6 +244,7 @@ def plot(dataframe,countries, xrange,
                     (dataframe['quantity'] == dtype)]
         yp = sel['counts'][xmin:xmax + 1]
         xp = np.arange(len(yp)) + xmin
+
         plt.scatter(xp, yp, label=country,
                     alpha=0.7, marker='.', color=color)
         pars, cov = curve_fit(expo_func, xp, yp)
@@ -256,7 +252,7 @@ def plot(dataframe,countries, xrange,
         plt.plot(linx, f,
                  color=color, alpha=0.3)
     plt.legend(loc='upper left')
-    plt.xlabel('days')
+    plt.xlabel('days since beginning of the year')
     plt.ylabel('confirmed cases')
     plt.yscale(yscale)
     if yrange:
