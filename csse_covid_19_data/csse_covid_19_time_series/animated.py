@@ -44,11 +44,11 @@ def draw_barchart(current_year):
             bbox=dict(facecolor='white', alpha=0.8, edgecolor='white'))
     plt.box(False)
     
-draw_barchart(2018)
-plt.show()
+# draw_barchart(2018)
+# plt.show()
 #
-# fig, ax = plt.subplots(figsize=(15, 8))
-# animator = animation.FuncAnimation(fig, draw_barchart, frames=range(1900, 2019))
+fig, ax = plt.subplots(figsize=(15, 8))
+animator = animation.FuncAnimation(fig, draw_barchart, frames=range(1900, 2019))
 # HTML(animator.to_jshtml())
 
 #
