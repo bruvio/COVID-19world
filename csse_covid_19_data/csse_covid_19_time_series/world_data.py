@@ -9,7 +9,7 @@ import pdb
 import numpy as np
 import matplotlib.pylab as plt
 import matplotlib as mpl
-
+from datetime import timedelta
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import matplotlib.animation as animation
@@ -28,6 +28,25 @@ import pycountry as pc
 warnings.filterwarnings("ignore")
 logger = logging.getLogger(__name__)
 
+
+def Insert_row_(row_number, df, row_value):
+    # Slice the upper half of the dataframe
+    df1 = df[0:row_number]
+
+    # Store the result of lower half of the dataframe
+    df2 = df[row_number:]
+
+    # Inser the row in the upper half dataframe
+    df1.loc[row_number] = row_value
+
+    # Concat the two dataframes
+    df_result = pd.concat([df1, df2])
+
+    # Reassign the index labels
+    df_result.index = [*range(df_result.shape[0])]
+
+    # Return the updated dataframe
+    return df_result
 
 def pre_process_database(datatemplate,fields):
     dfs = dict()
@@ -310,10 +329,14 @@ def main(plot_fits,plot_bar_plot):
         for country in countrylist:
             if country in countrylist_df:
                 print(country)
-                databasename = "confirmed cases"
+                databasename = "Confirmed cases"
+                # databasename = "Recovered cases"
+                # databasename = "Deaths cases"
                 dataframe,x,y = select_database(dataframe_all_countries, country, 'Confirmed')
+                # dataframe,x,y = select_database(dataframe_all_countries, country, 'Deaths')
+                # dataframe,x,y = select_database(dataframe_all_countries, country, 'Confirmed')
                 prediction_dates = 75
-                day_to_use_4_fit = 11
+                day_to_use_4_fit = 7
                 t_real, t_prediction, x, start, prediction, days = get_times(
                     dataframe, y, prediction_dates
                 )
@@ -629,29 +652,35 @@ def main(plot_fits,plot_bar_plot):
         # field = 'Recovered'
         fields = ['Confirmed', 'Deaths', 'Recovered']
         for field in fields:
-
+            # df = pd.read_csv(datatemplate.format(field))
             df = dataframe_all_countries[
                         (dataframe_all_countries['quantity'] == field)]
             df = df.reset_index()
 
-            # for p in range(3):
-            #     i = 0
-            #     while i < len(df.columns):
-            #         try:
-            #             a = np.array(df.iloc[i + 1, :])
-            #             b = np.array(df.iloc[i + 2, :])
-            #             c = (a + b) / 2
-            #             df.insert(i + 2, str(df.iloc[ i + 1,:].name) + '^' + str(len(df.columns)), c)
-            #         except:
-            #             print(f"\n  Interpolation No. {p + 1} done...")
-            #         i += 2
 
-            # df = pd.melt(df, id_vars='country', var_name='Time')
+            df = df[['country', 'date', 'counts']]
 
+            df = df.pivot(index='country', columns='date', values='counts')
+            df = df.reset_index()
+            for p in range(3):
+                i = 0
+                while i < len(df.columns):
+                    try:
+                        a = np.array(df.iloc[:, i + 1])
+                        b = np.array(df.iloc[:, i + 2])
+                        c = (a + b) / 2
+                        df.insert(i + 2, str(df.iloc[:, i + 1].name) + '^' + str(len(df.columns)), c)
+                    except:
+                        print(f"\n  Interpolation No. {p + 1} done...")
+                    i += 2
+
+            df = pd.melt(df, id_vars='country', var_name='date')
+
+            df.rename(columns={'value': 'counts'}, inplace=True)
             # frames_list = df["date"].unique()
-
-            frames_list = pd.date_range('22/01/2020', periods=55, freq='1D')
-            print(frames_list[-1])
+            frames_list = df["date"].unique().tolist()
+            for i in range(10):
+                frames_list.append(df['date'].iloc[-1])
 
 
             all_names = df['country'].unique().tolist()
@@ -663,8 +692,8 @@ def main(plot_fits,plot_bar_plot):
             rgb_colors_opacity = [rgb_colors[x] + (0.825,) for x in range(len(rgb_colors))]
             rgb_colors_dark = [transform_color(i, 1.12) for i in random_hex_colors]
 
-            # fig, ax = plt.subplots(figsize=(36, 20))
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=(11,8))
+            # fig, ax = plt.subplots()
 
             num_of_elements = 10
 
@@ -679,15 +708,15 @@ def main(plot_fits,plot_bar_plot):
                         height=0.8,
                         edgecolor=([dark_colors[x] for x in df_frame['country']]), linewidth='6')
 
-                dx = float(df_frame['counts'].max()) / 500
+                dx = float(df_frame['counts'].max()) / 200
 
                 for i, (value, name) in enumerate(zip(df_frame['counts'], df_frame['country'])):
                     ax.text(value + dx, i + (num_of_elements / 50), '    ' + name,
                             size=14, weight='bold', ha='left', va='center', fontdict={'fontname': 'Trebuchet MS'})
-                    ax.text(value + dx, i - (num_of_elements / 50), f'    {value:,.0f}', size=14, ha='left', va='center')
+                    ax.text(value + dx*10, i - (num_of_elements / 50), f'    {value:,.0f}', size=14, ha='left', va='center')
 
                 time_unit_displayed = re.sub(r'\^(.*)', r'', str(Time))
-                ax.text(1.3, 1.14, time_unit_displayed, transform=ax.transAxes, color='#666666',
+                ax.text(1.0, 1.14, time_unit_displayed, transform=ax.transAxes, color='#666666',
                         size=14, ha='right', weight='bold', fontdict={'fontname': 'Trebuchet MS'})
                 # ax.text(-0.005, 1.06, 'Number of confirmed cases', transform=ax.transAxes, size=14, color='#666666')
                 ax.text(-0.005, 1.14, 'Number of {} cases '.format(field), transform=ax.transAxes,
@@ -708,7 +737,8 @@ def main(plot_fits,plot_bar_plot):
         # draw_barchart('2020-03-15')
         # plt.show()
             animator = animation.FuncAnimation(fig, draw_barchart, frames=frames_list)
-            animator.save("Racing Bar Chart-{}.mp4".format(field), dpi=500,bitrate=1900,fps=1.4)
+            # animator.save("./Figures/Racing Bar Chart-{}.mp4".format(field), dpi=100,bitrate=30,fps=1.4)
+            animator.save("./Figures/Racing Bar Chart-{}.mp4".format(field), fps=30,dpi=100)
         # subprocess.run(["open", "-a", "/Applications/QuickTime Player.app", "Racing Bar Chart-{}.mp4".format(field)])
 
 if __name__ == "__main__":
@@ -720,4 +750,5 @@ if __name__ == "__main__":
         3: logging.ERROR,
     }
     logging.root.setLevel(level=debug_map[0])
-    main(plot_fits=True,plot_bar_plot=False)
+    # main(plot_fits=True, plot_bar_plot=False)
+    main(plot_fits=False, plot_bar_plot=True)
