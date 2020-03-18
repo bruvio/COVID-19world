@@ -128,6 +128,8 @@ def derivative(f, a, method="central", h=0.01):
     else:
         raise ValueError("Method must be 'central', 'forward' or 'backward'.")
 
+def fourPL(x, A, B, C, D):
+    return ((A-D)/(1.0+((x/C)**(B))) + D)
 
 def exp_func(x, a, b):
     return a * np.exp(b * x)
@@ -154,14 +156,17 @@ def sigmoidal_func(x, a, b, c):
     return a / (1 + np.exp(-c * (x - b)))
 
 
-def fit_data(x, y, func):
+def fit_data(x, y, func,p0=None):
     # these are the same as the scipy defaults
     # initialParameters = np.array([1.0, 1.0, 1.0])
 
     # curve fit the test data
     # fittedParameters, pcov = curve_fit(func, x, totale_casi, initialParameters, maxfev=5000)
     try:
-        fittedParameters, pcov = curve_fit(func, x, y, maxfev=5000)
+        if p0:
+            fittedParameters, pcov = curve_fit(func, x, y, maxfev=5000,p0=p0)
+        else:
+            fittedParameters, pcov = curve_fit(func, x, y, maxfev=5000)
         # fittedParameters, pcov = curve_fit(func2, x[:max_size], totale_casi[:max_size], maxfev=5000)
         # fittedParameters[2]=90
         modelPredictions = func(y, *fittedParameters)
@@ -224,10 +229,8 @@ def plot_model(xModel, yModel, country, label, color, marker, logscale=False):
 
     # plt.legend(loc='best')
     # plt.xticks(rotation=15, ha="right")
-def plot(dataframe,countries, xrange,
-             dtype='Confirmed',
-             yrange=None,
-             yscale='linear'):
+
+def plot(dataframe,countries, xrange,dtype='Confirmed',  yrange=None,yscale='linear'):
     '''plot the covid-19 data with an exponential fit.
     - countries: list of countries
     - xrange: fit range, e.g. (30,55)
@@ -269,7 +272,7 @@ def transform_color(color, amount=0.5):
     return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
 
 
-def main():
+def main(plot_fits,plot_bar_plot):
     datatemplate = 'time_series_19-covid-{}.csv'
     fields = ['Confirmed', 'Deaths', 'Recovered']
     dataframe_all_countries = pre_process_database(datatemplate, fields)
@@ -289,26 +292,28 @@ def main():
         "Korea, South",
         "Romania",
     ]
-    # countrylist = ["Italy"]
+    countrylist = ["Italy"]
     # countrylist = ['United Kingdom']
     # countrylist = ['Iran']
     # countrylist = ['Singapore']
     # countrylist = ['US']
     # countrylist = ['Switzerland']
-    # countrylist = ['"Germany"']
-    # countrylist = ['"France"']
+    # countrylist = ['Germany']
+    # countrylist = ['France']
+    # countrylist = ['Japan']
+    # countrylist = ['Russia']
     # countrylist = ['Australia']
-    exception_list = ['Australia','China','Australia','US','Germany','France','Switzerland','Singapore','United Kingdom']
+    exception_list = ['Australia','China','Australia','US','Germany','France','Switzerland','Singapore','United Kingdom','Russia','Japan']
     # logscale= True
     logscale = False
-    if 1:
+    if plot_fits:
         for country in countrylist:
             if country in countrylist_df:
                 print(country)
                 databasename = "confirmed cases"
                 dataframe,x,y = select_database(dataframe_all_countries, country, 'Confirmed')
                 prediction_dates = 75
-                day_to_use_4_fit = 5
+                day_to_use_4_fit = 11
                 t_real, t_prediction, x, start, prediction, days = get_times(
                     dataframe, y, prediction_dates
                 )
@@ -318,20 +323,19 @@ def main():
                     xModel_fit, yModel_fit, fittedParameters, Rsquared = fit_data(
                         x, y, sigmoidal_func
                     )
-                    text_fit = text = '${} / (1 + exp^{{(-{} * (x - {}))}})$'.format(float(fittedParameters[0]),float(fittedParameters[1]),float(fittedParameters[2]))
-
+                    text_fit  = '${} / (1 + exp^{{(-{} * (x - {}))}})$'.format(float("{0:.2f}".format(fittedParameters[0])),float("{0:.2f}".format(fittedParameters[1])),float("{0:.2f}".format(fittedParameters[2])))
                 elif country == "United Kingdom":
                     xModel_fit, yModel_fit, fittedParameters, Rsquared = fit_data(
                         x, y, expo_func
                     )
                     text_fit = '$ exp^{{ {} \cdot x}}$'.format(
-                        float(fittedParameters[-1]))
+                        float("{0:.2f}".format(fittedParameters[-1])))
                 else :
                     xModel_fit, yModel_fit, fittedParameters, Rsquared = fit_data(
                         x, y, exp_func1
                     )
                     text_fit = '$ exp^{{ {} \cdot x}}$'.format(
-                        float(fittedParameters[-1]))
+                        float("{0:.2f}".format(fittedParameters[-1])))
                 xModel_date = xModel_fit.astype(datetime.datetime)
 
                 ###########################
@@ -349,26 +353,43 @@ def main():
                         x[-day_to_use_4_fit:], y[-day_to_use_4_fit:], exp_func1
                     )
                     text_10days_fit = '$ exp^{{ {} \cdot x}}$'.format(
-                        float(fittedParameters_10[-1]))
+                        float("{0:.3}".format(fittedParameters_10[-1])))
                 elif country == "US":
                     print('\n last {} days fit data\n'.format(day_to_use_4_fit))
                     xModel, yModel, fittedParameters_10, Rsquared = fit_data(
                         x[-day_to_use_4_fit:], y[-day_to_use_4_fit:], exp_func1
                     )
                     text_10days_fit = '$ exp^{{ {} \cdot x}}$'.format(
-                        float(fittedParameters_10[-1]))
+                        float("{0:.3}".format(fittedParameters_10[-1])))
                 else:
                     print('\n last {} days fit data\n'.format(day_to_use_4_fit))
                     xModel, yModel, fittedParameters_10, Rsquared = fit_data(
                         x[-day_to_use_4_fit:], y[-day_to_use_4_fit:], exp_func1
                     )
                     text_10days_fit = '$ exp^{{ {} \cdot x}}$'.format(
-                        float(fittedParameters_10[-1]))
+                        float("{0:.3f}".format(fittedParameters_10[-1])))
+
                 ################ PLOTTING DATA & FIT ###############
-                plt.figure(num=country)
-                ax1 = plt.subplot(211)
+                plt.figure(num=country+'_fit')
+                # ax1 = plt.subplot(211)
 
                 plot_data(t_real, y, country, "confirmed cases", "r", logscale=logscale)
+
+                plot_model(
+                    t_real,
+                    yModel_fit,
+                    country,
+                    " data fit - " + databasename + "  -  " + text_fit,
+                    "b",
+                    marker="x",
+                    logscale=logscale,
+                )
+
+                # figure  = plt.figure(num=country,figsize=(11, 8))
+                figure  = plt.figure(num=country,figsize=(11, 8))
+                ax1 = plt.subplot(211)
+
+                plot_data(t_real, y, country, databasename, "r", logscale=logscale)
 
                 plot_model(
                     t_real,
@@ -389,16 +410,20 @@ def main():
                     marker="x",
                     logscale=logscale,
                 )
-                plt.legend(loc='best', fontsize=8)
-                plt.ylim([min(y), max(y)])
+                # plt.legend(loc='best', fontsize=8)
+                # plt.legend(loc=9, bbox_to_anchor=(0.5,-0.02), fontsize=8)
+                # ax1.legend(bbox_to_anchor=(0.5, 1.1),
+                #           fancybox=True, shadow=True, ncol=1, fontsize=8)
+                ax1.set_ylim([min(y), max(y)])
+                # plt.show()
                 ###########################
 
                 ################ PREDICTION ###########################
                 print("prediction from {} to {}".format(start, prediction))
                 #
-                fittedParameters_prediction, pcov = curve_fit(
-                    sigmoidal_func, x, y, maxfev=5000, p0=[1, fittedParameters_10[-1], 1]
-                )
+                # fittedParameters_prediction, pcov = curve_fit(
+                #     sigmoidal_func, x, y, maxfev=5000, p0=[1, fittedParameters_10[-1], 1]
+                # )
 
                 # start = datetime.datetime.strptime(
                 #     dataframe["date"].loc[0], "%m/%d/%y"
@@ -411,22 +436,39 @@ def main():
                 if country in exception_list:
                     coefs = np.poly1d(np.polyfit(x, y, 5))
                     modelPredictions = np.polyval(coefs, x_prediction)
+                    absError = modelPredictions[0: len(y)] - y
+                    #
+                    # print('\nsigmoidal fit data\n')
+                    SE = np.square(absError)  # squared errors
+                    MSE = np.mean(SE)  # mean squared errors
+                    RMSE = np.sqrt(MSE)  # Root Mean Squared Error, RMSE
+                    Rsquared = 1.0 - (np.var(absError) / np.var(y))
+                    #
+                    # print("Parameters:", fittedParameters_prediction)
+                    print("RMSE:", RMSE)
+                    print("R-squared:", Rsquared)
+
                 else:
+                    xModel_Predictions, yModel_Predictions, fittedParameters_prediction, Rsquared = fit_data(
+                        x, y, sigmoidal_func
+                    )
+
                     modelPredictions = sigmoidal_func(
                         x_prediction, *fittedParameters_prediction
                     )
+                    absError = modelPredictions[0: len(y)] - y
+                    #
+                    print('\nsigmoidal fit data\n')
+                    SE = np.square(absError)  # squared errors
+                    MSE = np.mean(SE)  # mean squared errors
+                    RMSE = np.sqrt(MSE)  # Root Mean Squared Error, RMSE
+                    Rsquared = 1.0 - (np.var(absError) / np.var(y))
+                    #
+                    print("Parameters:", fittedParameters_prediction)
+                    print("RMSE:", RMSE)
+                    print("R-squared:", Rsquared)
                 #
-                absError = modelPredictions[0 : len(y)] - y
-                #
-                print('\nsigmoidal fit data\n')
-                SE = np.square(absError)  # squared errors
-                MSE = np.mean(SE)  # mean squared errors
-                RMSE = np.sqrt(MSE)  # Root Mean Squared Error, RMSE
-                Rsquared = 1.0 - (np.var(absError) / np.var(y))
-                #
-                print("Parameters:", fittedParameters_prediction)
-                print("RMSE:", RMSE)
-                print("R-squared:", Rsquared)
+
                 # UK Parameters: [2.15051089e+08 9.82481446e+01 2.64184732e-01]
 
                 xModel_prediction = np.arange(0, days)
@@ -439,9 +481,9 @@ def main():
                     yModel_prediction = sigmoidal_func(
                         xModel_prediction, *fittedParameters_prediction
                     )
-                    text = '${} / (1 + exp^{{(-{} * (x - {}))}})$'.format(float(fittedParameters_prediction[0]),
-                                                                          float(fittedParameters_prediction[1]),
-                                                                          float(fittedParameters_prediction[2]))
+                    text = '${} / (1 + exp^{{(-{} * (x - {}))}})$'.format(float("{0:.2f}".format(fittedParameters_prediction[0])),
+                                                                          float("{0:.2f}".format(fittedParameters_prediction[1])),
+                                                                          float("{0:.2f}".format(fittedParameters_prediction[2])))
 
 
                 plot_model(
@@ -459,8 +501,15 @@ def main():
                 plt.xticks(rotation=15, ha="right")
 
                 plt.xlabel("days since it started")  # X axis data label
-                plt.ylabel("confirmed cases")  # Y axis data label
-                plt.legend(loc="best", fontsize="6")
+                plt.ylabel(databasename)  # Y axis data label
+
+
+                # plt.text(0.0, 0.1, 'matplotlib', horizontalalignment='center',
+                # verticalalignment = 'center',
+                # transform = ax1.transAxes)
+                # fig.tight_layout(rect=[0, 0.1, 1, 0.95])
+                # plt.legend(loc='best', bbox_to_anchor=(0.5, -1.02), fontsize=8)
+                # plt.legend(loc="best", fontsize=8)
 
                 ###########################
                 ################ DAILY PREDICTION ###########################
@@ -468,13 +517,16 @@ def main():
                 a = 0
                 daily = np.concatenate([[a], daily])
                 # yy = sigmoidal_func(x, *fittedParameters_prediction)
-                a, b, c = fittedParameters_prediction
+
                 if country in exception_list:
                     f = np.poly1d(coefs)
                 else:
+                    a, b, c = fittedParameters_prediction
                     f = lambda x: a / (1 + np.exp(-c * (x - b)))
                 # yy = f(x)
-                ydx = derivative(f, xModel_prediction)
+                ydx = derivative(f, xModel_prediction, method="forward", h=0.01)
+                # ydx1 = derivative(f, xModel_prediction, method="backward", h=0.01)
+                # ydx2 = derivative(f, xModel_prediction, method="central", h=0.01)
 
                 ax2 = plt.subplot(212, sharex=ax1)
 
@@ -487,12 +539,21 @@ def main():
                     marker="o",
                     logscale=logscale,
                 )
+
                 plot_data(
-                    t_real, daily, country, "daily confirmed cases", "r", logscale=logscale
+                    t_real, daily, country, "daily "+databasename, "r", logscale=logscale
                 )
                 # plt.ylim(1, 1e4)
-                plt.legend(loc="best", fontsize="6")
+                # plt.legend(loc="best", fontsize="6")
+                # plt.legend(loc=9, bbox_to_anchor=(0.5,-0.02), fontsize=8)
                 plt.xticks(rotation=15, ha="right")
+
+
+                ax1.legend(bbox_to_anchor=(0.6, 0.8),
+                          fancybox=True, shadow=True, ncol=1, fontsize=8)
+                ax2.legend( bbox_to_anchor=(0.4, 0.8),
+                          fancybox=True, shadow=True, ncol=1, fontsize=8)
+                figure.tight_layout()
                 if logscale:
                     plt.savefig("./Figures/" + country + "_fitted_log.png", dpi=100)
                     plt.ylim(1, 1e5)
@@ -518,9 +579,24 @@ def main():
                 #
                 #
                 # linx = np.linspace(0, 50, 101)
+                # fields = ['Confirmed', 'Deaths', 'Recovered']
                 # plt.figure()
-                # plt.scatter(x, y)
-                # plt.plot(linx, expo_func(linx, *results[0]))
+                # dataframe, x, Confirmed = select_database(dataframe_all_countries, country, 'Confirmed')
+                # plt.scatter(x, Confirmed,label = 'Confirmed')
+                # dataframe, x, Deaths = select_database(dataframe_all_countries, country, 'Deaths')
+                # plt.scatter(x, Deaths,label = 'Deaths')
+                # dataframe, x, Recovered = select_database(dataframe_all_countries, country, 'Recovered')
+                # plt.scatter(x, Recovered,label = 'Recovered')
+                # plt.legend(loc='best', fontsize = 8)
+                # plt.figure()
+                # dataframe, x, Confirmed = select_database(dataframe_all_countries, country, 'Confirmed',)
+                # plt.plot(x, Confirmed,label = 'Confirmed',marker ='x')
+                # dataframe, x, Deaths = select_database(dataframe_all_countries, country, 'Deaths')
+                # plt.plot(x, Deaths,label = 'Deaths',marker ='x')
+                # dataframe, x, Recovered = select_database(dataframe_all_countries, country, 'Recovered')
+                # plt.plot(x, Recovered,label = 'Recovered',marker ='x')
+                # plt.legend(loc='best', fontsize = 8)
+                # # plt.plot(linx, expo_func(linx, *results[0]))
 
                 try:
                     plt.figure(dpi=90, figsize=(8, 4))
@@ -545,9 +621,9 @@ def main():
                 # plt.plot(linx, expo_func(linx, *results_p[0]))
                 # plt.xlim(30, 50)
 
-    # plt.show(block=True)
+    plt.show(block=True)
 
-    if 0:
+    if plot_bar_plot:
         # field = 'Deaths'
         # field = 'Confirmed'
         # field = 'Recovered'
@@ -603,7 +679,7 @@ def main():
                         height=0.8,
                         edgecolor=([dark_colors[x] for x in df_frame['country']]), linewidth='6')
 
-                dx = float(df_frame['counts'].max()) / 1000
+                dx = float(df_frame['counts'].max()) / 500
 
                 for i, (value, name) in enumerate(zip(df_frame['counts'], df_frame['country'])):
                     ax.text(value + dx, i + (num_of_elements / 50), '    ' + name,
@@ -636,4 +712,12 @@ def main():
         # subprocess.run(["open", "-a", "/Applications/QuickTime Player.app", "Racing Bar Chart-{}.mp4".format(field)])
 
 if __name__ == "__main__":
-    main()
+    logger = logging.getLogger(__name__)
+    debug_map = {
+        0: logging.INFO,
+        1: logging.WARNING,
+        2: logging.DEBUG,
+        3: logging.ERROR,
+    }
+    logging.root.setLevel(level=debug_map[0])
+    main(plot_fits=True,plot_bar_plot=False)
