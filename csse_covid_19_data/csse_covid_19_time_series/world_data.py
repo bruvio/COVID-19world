@@ -320,7 +320,7 @@ def main(plot_fits,plot_bar_plot):
         "Korea, South",
         "Romania",
     ]
-    # countrylist = ["Italy"]
+    countrylist = ["Italy"]
     # countrylist = ['United Kingdom']
     # countrylist = ['Iran']
     # countrylist = ['Singapore']
@@ -329,7 +329,7 @@ def main(plot_fits,plot_bar_plot):
     # countrylist = ['Germany']
     # countrylist = ['France']
     # countrylist = ['Japan']
-    countrylist = ['China']
+    # countrylist = ['China']
     # countrylist = ['Russia']
     # countrylist = ['Australia']
     exception_list = []
