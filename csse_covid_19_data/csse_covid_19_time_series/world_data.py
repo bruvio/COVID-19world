@@ -17,6 +17,8 @@ import matplotlib.colors as mc
 import colorsys
 from random import randint
 import re
+from datetime import date
+
 
 # from IPython.display import HTML
 label_size = 8
@@ -107,13 +109,16 @@ def get_times(dataframe, y, prediction_days):
     prediction = pd.Timestamp(prediction)
     t_prediction_asnumber = np.linspace(start.value, prediction.value, prediction_days)
     t_prediction = np.asarray(pd.to_datetime(t_prediction_asnumber))
+    t_prediction_asnumber_plot = np.linspace(start.value, prediction.value, int(prediction_days/3))
+    t_plot = np.asarray(pd.to_datetime(t_prediction_asnumber_plot))
+
     days = len(t_prediction)
 
     start_prediction_date = date
     stop_prediction_date = days
     date_prediction = np.arange(0, stop_prediction_date)
 
-    return t_real, t_prediction, x, start, prediction, days
+    return t_real, t_prediction, x, start, prediction, days,t_plot
 
 
 def derivative(f, a, method="central", h=0.01):
@@ -292,6 +297,10 @@ def transform_color(color, amount=0.5):
 
 
 def main(plot_fits,plot_bar_plot):
+    today = date.today()
+
+    # dd/mm/YY
+    today = today.strftime("%d-%m-%Y")
     datatemplate = 'time_series_19-covid-{}.csv'
     fields = ['Confirmed', 'Deaths', 'Recovered']
     dataframe_all_countries = pre_process_database(datatemplate, fields)
@@ -311,7 +320,7 @@ def main(plot_fits,plot_bar_plot):
         "Korea, South",
         "Romania",
     ]
-    countrylist = ["Italy"]
+    # countrylist = ["Italy"]
     # countrylist = ['United Kingdom']
     # countrylist = ['Iran']
     # countrylist = ['Singapore']
@@ -320,9 +329,18 @@ def main(plot_fits,plot_bar_plot):
     # countrylist = ['Germany']
     # countrylist = ['France']
     # countrylist = ['Japan']
+    countrylist = ['China']
     # countrylist = ['Russia']
     # countrylist = ['Australia']
-    exception_list = ['Australia','China','Australia','US','Germany','France','Switzerland','Singapore','United Kingdom','Russia','Japan']
+    exception_list = []
+    exception_list.append('Australia')
+    exception_list.append('China')
+    exception_list.append('Australia')
+    exception_list.append('US')
+    exception_list.append('France')
+    exception_list.append('Switzerland')
+    exception_list.append('United Kingdom')
+    exception_list.append('Japan')
     # logscale= True
     logscale = False
     if plot_fits:
@@ -337,7 +355,7 @@ def main(plot_fits,plot_bar_plot):
                 # dataframe,x,y = select_database(dataframe_all_countries, country, 'Confirmed')
                 prediction_dates = 75
                 day_to_use_4_fit = 7
-                t_real, t_prediction, x, start, prediction, days = get_times(
+                t_real, t_prediction, x, start, prediction, days,t_plot = get_times(
                     dataframe, y, prediction_dates
                 )
 
@@ -569,7 +587,7 @@ def main(plot_fits,plot_bar_plot):
                 # plt.ylim(1, 1e4)
                 # plt.legend(loc="best", fontsize="6")
                 # plt.legend(loc=9, bbox_to_anchor=(0.5,-0.02), fontsize=8)
-                plt.xticks(rotation=15, ha="right")
+                plt.xticks(t_plot,rotation=15, ha="right")
 
 
                 ax1.legend(bbox_to_anchor=(0.6, 0.8),
@@ -578,10 +596,10 @@ def main(plot_fits,plot_bar_plot):
                           fancybox=True, shadow=True, ncol=1, fontsize=8)
                 figure.tight_layout()
                 if logscale:
-                    plt.savefig("./Figures/" + country + "_fitted_log.png", dpi=100)
+                    plt.savefig("./Figures/" + country + "_"+databasename+ "_fitted_log-{}.png".format(today), dpi=100)
                     plt.ylim(1, 1e5)
                 else:
-                    plt.savefig("./Figures/" + country + "_fitted.png", dpi=100)
+                    plt.savefig("./Figures/" + country + "_"+databasename+  "_fitted-{}.png".format(today), dpi=100)
 
 
 
@@ -627,7 +645,8 @@ def main(plot_fits,plot_bar_plot):
                          dtype='Confirmed',
                          xrange=(30, 56),
                          yscale='log')
-                    plt.savefig("./Figures/" + country + "_expo_fit_log_scale.png", dpi=100)
+                    # fields = ['Confirmed', 'Deaths', 'Recovered']
+                    plt.savefig("./Figures/" + country + "Confirmed_expo_fit_log_scale-{}.png".format(today), dpi=100)
                 except:
                     print('unable to fit {} data with {}'.format(country,expo_func.__name__))
 
@@ -738,7 +757,7 @@ def main(plot_fits,plot_bar_plot):
         # plt.show()
             animator = animation.FuncAnimation(fig, draw_barchart, frames=frames_list)
             # animator.save("./Figures/Racing Bar Chart-{}.mp4".format(field), dpi=100,bitrate=30,fps=1.4)
-            animator.save("./Figures/Racing Bar Chart-{}.mp4".format(field), fps=30,dpi=100)
+            animator.save("./Figures/Racing Bar Chart-{}-{}.mp4".format(field,today), fps=30,dpi=100)
         # subprocess.run(["open", "-a", "/Applications/QuickTime Player.app", "Racing Bar Chart-{}.mp4".format(field)])
 
 if __name__ == "__main__":
@@ -751,4 +770,5 @@ if __name__ == "__main__":
     }
     logging.root.setLevel(level=debug_map[0])
     # main(plot_fits=True, plot_bar_plot=False)
-    main(plot_fits=False, plot_bar_plot=True)
+    # main(plot_fits=False, plot_bar_plot=True)
+    main(plot_fits=True, plot_bar_plot=True)
