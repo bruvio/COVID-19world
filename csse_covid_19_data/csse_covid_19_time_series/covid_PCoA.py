@@ -63,14 +63,18 @@ datatemplate = "time_series_19-covid-{}.csv"
 fields = ["Confirmed", "Deaths", "Recovered"]
 dataframe_all_countries = pre_process_database(datatemplate, fields)
 countrylist_df = list(set(dataframe_all_countries["country"]))
-df = dataframe_all_countries[(dataframe_all_countries["quantity"] == "Confirmed")]
+field = "Deaths"
+# field = "Confirmed"
+# field = "Recovered"
+df = dataframe_all_countries[(dataframe_all_countries["quantity"] == field)]
 df = df.reset_index()
 
 df = df[["country", "date", "counts"]]
 
 df = df.pivot(index="date", columns="country", values="counts")
 df = df.reset_index()
-df.to_csv("DailyData.csv", index=True)
+# df.to_csv("DailyData-{}.csv".format(field), index=True)
+df.to_csv("DailyData.csv".format(field), index=True)
 
 DailyData = pd.read_csv("./DailyData.csv", index_col=0)
 DailyData.set_index("date", inplace=True)
@@ -301,41 +305,75 @@ for i, txt in enumerate(clusterData["Region"]):
     ax1.annotate(txt, (clusterData["PC1"][i], clusterData["PC2"][i] + 0.02))
 
 
-fig1.savefig("pattern_cluster.png")
-fig2.savefig("pattern_uncluster.png")
-fig3.savefig("pattern_PCoA.png", bbox_inches="tight")
+fig1.savefig("pattern_cluster-{}.png".format(field))
+fig2.savefig("pattern_uncluster-{}.png".format(field))
+fig3.savefig("pattern_PCoA-{}.png".format(field), bbox_inches="tight")
 # plt.show()
 # print(clusterData)
 #
 #
 #
-RegionList = clusterData[clusterData["Cluster"] == 9]["Region"]
+for clusterNumber in [9,7,5,6,8]:
+
+    # clusterNumber = 9
+    # {0: 9, 1: 7, 2: 5, 3: 6, 4: 8}
+    RegionList = clusterData[clusterData["Cluster"] == clusterNumber]["Region"]
 
 
-dfs_cumulative = DailyData[DailyData.columns.intersection(RegionList)]
-# dfs_cumulative = {sheet_name: pd.read_csv('../dash-2019-coronavirus/cumulative_data/{}.csv'.format(sheet_name))
-#           for sheet_name in RegionList}
-#
+    dfs_cumulative = DailyData[DailyData.columns.intersection(RegionList)]
+    # dfs_cumulative = {sheet_name: pd.read_csv('../dash-2019-coronavirus/cumulative_data/{}.csv'.format(sheet_name))
+    #           for sheet_name in RegionList}
+    #
+    # for region in RegionList:
+    #     dfs_cumulative[region] = dfs_cumulative[region].sort_values(by='date')
+    #
+    fig4 = plt.figure(figsize=(12, 4), dpi=200, constrained_layout=True)
+    ax4 = fig4.subplots()
+    for region in RegionList:
+        try:
+            ax4.plot(
+                dfs_cumulative[region][dfs_cumulative[region] > 50].index,
+                dfs_cumulative[region][dfs_cumulative[region] > 50].values,
+            )
+            ax4.annotate(
+                region,
+                xy=(
+                    list(dfs_cumulative[region][dfs_cumulative[region] > 50].index)[0],
+                    list(dfs_cumulative[region][dfs_cumulative[region] > 50])[0],
+                ),
+            )
+        except:
+            pass
+
+    ax4.set_xlabel('Days of the year')
+    ax4.set_ylabel('Confirmed cases (log scale)')
+    ax4.set_yscale("log")
+    plt.xticks(rotation=70)
+
+    fig4.savefig("time_data_cluster-{}.png".format(clusterNumber))
+
+
+# DailyData20 = DailyDataFifty[s.sort_values(ascending=False).index[:20]]
+# # RegionList = clusterData[clusterData["Cluster"] == 9]["Region"]
+# RegionList = DailyData20.columns
+# dfs_cumulative = DailyData[DailyData.columns.intersection(RegionList)]
+# fig5 = plt.figure(figsize=(12, 4), dpi=200, constrained_layout=True)
+# ax5 = fig5.subplots()
 # for region in RegionList:
-#     dfs_cumulative[region] = dfs_cumulative[region].sort_values(by='date')
+#     ax4.plot(
+#         dfs_cumulative[region][dfs_cumulative[region] > 50].index,
+#         dfs_cumulative[region][dfs_cumulative[region] > 50].values,
+#     )
+#     ax5.annotate(
+#         region,
+#         xy=(
+#             list(dfs_cumulative[region][dfs_cumulative[region] > 50].index)[0],
+#             list(dfs_cumulative[region][dfs_cumulative[region] > 50])[0],
+#         ),
+#     )
+# ax5.set_xlabel('Days of the year')
+# ax5.set_ylabel('Confirmed cases (log scale)')
+# ax5.set_yscale("log")
+# plt.xticks(rotation=70)
 #
-fig4 = plt.figure(figsize=(12, 4), dpi=200, constrained_layout=True)
-ax4 = fig4.subplots()
-for region in RegionList:
-    ax4.plot(
-        dfs_cumulative[region][dfs_cumulative[region] > 50].index,
-        dfs_cumulative[region][dfs_cumulative[region] > 50].values,
-    )
-    ax4.annotate(
-        region,
-        xy=(
-            list(dfs_cumulative[region][dfs_cumulative[region] > 50].index)[0],
-            list(dfs_cumulative[region][dfs_cumulative[region] > 50])[0],
-        ),
-    )
-ax4.set_xlabel('Days of the year')
-ax4.set_ylabel('Confirmed cases (log scale)')
-ax4.set_yscale("log")
-plt.xticks(rotation=70)
-
-fig4.savefig("time_data_cluster.png")
+# fig5.savefig("time_top_20_regions.png")

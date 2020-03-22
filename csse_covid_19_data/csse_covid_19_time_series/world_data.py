@@ -315,23 +315,37 @@ def main(plot_fits, plot_bar_plot):
     fields = ["Confirmed", "Deaths", "Recovered"]
     dataframe_all_countries = pre_process_database(datatemplate, fields)
     countrylist_df = list(set(dataframe_all_countries["country"]))
-
-    countrylist = [
-        "United Kingdom",
-        "US",
-        "Germany",
-        "Italy",
-        "China",
-        "Singapore",
-        "Australia",
-        "France",
-        "Switzerland",
-        "Iran",
-        "Korea, South",
-        "Romania",
-    ]
+    countrylist = []
+    countrylist.append("Italy")
+    # countrylist.append("Australia")
+    # countrylist.append("Germany")
+    # countrylist.append("China")
+    # countrylist.append("Australia")
+    # countrylist.append("US")
+    # countrylist.append("France")
+    # countrylist.append("Korea, South")
+    # countrylist.append("Switzerland")
+    # countrylist.append("United Kingdom")
+    # countrylist.append("Japan")
+    # countrylist.append("Romania")
+    # countrylist.append("United Kingdom")
+    # countrylist = [
+    #     "United Kingdom",
+    #     "US",
+    #     "Germany",
+    #     "Italy",
+    #     "China",
+    #     "Singapore",
+    #     "Australia",
+    #     "France",
+    #     "Switzerland",
+    #     "Iran",
+    #     "Korea, South",
+    #     "Romania",
+    #     "Colombia",
+    # ]
     # countrylist = ["Italy"]
-    countrylist = ['United Kingdom']
+    # countrylist = ['United Kingdom']
     # countrylist = ['Iran']
     # countrylist = ['Singapore']
     # countrylist = ['US']
@@ -357,9 +371,9 @@ def main(plot_fits, plot_bar_plot):
         for country in countrylist:
             if country in countrylist_df:
                 print(country)
-                databasename = "Confirmed cases"
+                # databasename = "Confirmed cases"
                 # databasename = "Recovered cases"
-                # databasename = "Deaths cases"
+                databasename = "Deaths cases"
                 dataframe, x, y = select_database(
                     dataframe_all_countries, country, "Confirmed"
                 )
@@ -369,7 +383,7 @@ def main(plot_fits, plot_bar_plot):
                 dataframe_recovered, x_recovered, y_recovered = select_database(
                     dataframe_all_countries, country, "Recovered"
                 )
-
+                dataframe,x,y = dataframe_deaths, x_deaths, y_deaths
                 prediction_dates = 75
                 day_to_use_4_fit = 7
                 t_real, t_prediction, x, start, prediction, days, t_plot = get_times(
@@ -761,9 +775,9 @@ def main(plot_fits, plot_bar_plot):
                 )
 
                 fig_rate.update_layout(
-                    title=country + " death rate (%)",
+                    # title=country + " death rate (%)",
                     xaxis_title="days",
-                    yaxis_title="death rate %",
+                    yaxis_title=country + " death rate (%)",
                     margin=go.layout.Margin(l=10, r=10, b=10, t=5, pad=0),
                     yaxis=dict(
                         showline=False,
@@ -795,7 +809,8 @@ def main(plot_fits, plot_bar_plot):
                     paper_bgcolor="#cbd2d3",
                     font=dict(color="#292929"),
                 )
-
+                # fig_rate.write_image("Figures/death_rates_" + country + ".png")
+                fig_rate.show()
                 #
                 # # Pseduo data for logplot
                 #
@@ -946,10 +961,11 @@ def main(plot_fits, plot_bar_plot):
                 #                            )
                 #                 )
 
-    plt.show(block=True)
+    # plt.show(block=True)
     # Customise layout
 
-    fig_rate.show()
+    # fig_rate.show()
+
     # fig_curve.show()
 
     if plot_bar_plot:
