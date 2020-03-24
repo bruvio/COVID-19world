@@ -6,6 +6,7 @@ register_matplotlib_converters()
 import logging
 
 import plotly.graph_objects as go
+import plotly
 import warnings
 import datetime
 import pdb
@@ -306,7 +307,7 @@ def transform_color(color, amount=0.5):
     return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
 
 
-def main(plot_fits, plot_bar_plot):
+def main(plot_fits, plot_bar_plot,plot_bar_plot_video):
     today = date.today()
 
     # dd/mm/YY
@@ -317,18 +318,19 @@ def main(plot_fits, plot_bar_plot):
     countrylist_df = list(set(dataframe_all_countries["country"]))
     countrylist = []
     countrylist.append("Italy")
-    # countrylist.append("Australia")
-    # countrylist.append("Germany")
-    # countrylist.append("China")
-    # countrylist.append("Australia")
-    # countrylist.append("US")
+    countrylist.append("Australia")
+    countrylist.append("Germany")
+    countrylist.append("China")
+    countrylist.append("Australia")
+    countrylist.append("US")
     # countrylist.append("France")
     # countrylist.append("Korea, South")
     # countrylist.append("Switzerland")
-    # countrylist.append("United Kingdom")
-    # countrylist.append("Japan")
+    countrylist.append("United Kingdom")
+    countrylist.append("Japan")
     # countrylist.append("Romania")
-    # countrylist.append("United Kingdom")
+
+
     # countrylist = [
     #     "United Kingdom",
     #     "US",
@@ -371,9 +373,9 @@ def main(plot_fits, plot_bar_plot):
         for country in countrylist:
             if country in countrylist_df:
                 print(country)
-                # databasename = "Confirmed cases"
+                databasename = "Confirmed cases"
                 # databasename = "Recovered cases"
-                databasename = "Deaths cases"
+                # databasename = "Deaths cases"
                 dataframe, x, y = select_database(
                     dataframe_all_countries, country, "Confirmed"
                 )
@@ -383,7 +385,7 @@ def main(plot_fits, plot_bar_plot):
                 dataframe_recovered, x_recovered, y_recovered = select_database(
                     dataframe_all_countries, country, "Recovered"
                 )
-                dataframe,x,y = dataframe_deaths, x_deaths, y_deaths
+                # dataframe,x,y = dataframe_deaths, x_deaths, y_deaths
                 prediction_dates = 75
                 day_to_use_4_fit = 7
                 t_real, t_prediction, x, start, prediction, days, t_plot = get_times(
@@ -809,8 +811,9 @@ def main(plot_fits, plot_bar_plot):
                     paper_bgcolor="#cbd2d3",
                     font=dict(color="#292929"),
                 )
-                # fig_rate.write_image("Figures/death_rates_" + country + ".png")
-                fig_rate.show()
+                # fig_rate.write_image("Figures/death_rates_" + country )
+                plotly.offline.plot(fig_rate, filename="Figures/death_rates_" + country+'html', auto_open=False)
+                # fig_rate.show()
                 #
                 # # Pseduo data for logplot
                 #
@@ -1109,15 +1112,21 @@ def main(plot_fits, plot_bar_plot):
                     hspace=0.2,
                 )
 
-            # draw_barchart('2020-03-15')
+            draw_barchart(frames_list[-1])
+            plt.savefig(
+                "./Figures/Racing Bar Chart-{}-{}.png".format(field, frames_list[-1]),
+                dpi=100,
+            )
             # plt.show()
             animator = animation.FuncAnimation(fig, draw_barchart, frames=frames_list)
-            # animator.save("./Figures/Racing Bar Chart-{}.mp4".format(field), dpi=100,bitrate=30,fps=1.4)
             animator.save(
                 "./Figures/Racing Bar Chart-{}-{}.mp4".format(field, today),
                 fps=30,
                 dpi=100,
             )
+
+
+            # animator.save("./Figures/Racing Bar Chart-{}.mp4".format(field), dpi=100,bitrate=30,fps=1.4)
         # subprocess.run(["open", "-a", "/Applications/QuickTime Player.app", "Racing Bar Chart-{}.mp4".format(field)])
 
 
@@ -1130,6 +1139,6 @@ if __name__ == "__main__":
         3: logging.ERROR,
     }
     logging.root.setLevel(level=debug_map[0])
-    main(plot_fits=True, plot_bar_plot=False)
+    main(plot_fits=True, plot_bar_plot=True,plot_bar_plot_video=False)
     # main(plot_fits=False, plot_bar_plot=True)
     # main(plot_fits=True, plot_bar_plot=True)
