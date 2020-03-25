@@ -94,7 +94,7 @@ data_italy.tail()
 #
 #
 START_FIT = '2020-02-23'
-STOP_FIT = '2020-03-24'
+STOP_FIT = '2020-03-25'
 EXTRAPOLTATE = ('2020-02-23', '2020-03-26')
 #
 #
@@ -117,7 +117,7 @@ covid19.plot.plot_fit(ax, fits['counts'], color=sns.color_palette()[2])
 for kind, color in zip(['counts'], sns.color_palette()):
     covid19.plot.plot(ax, data_italy[kind], fits[kind], label=kind.replace('_', ' '), extrapolate=EXTRAPOLTATE, color=color, date_interval=3)
 #
-_ = ax.set(title=r'Dati COVID-19 in UK. Modelli $f(t) = 2 ^ \frac{t - t_0}{T_d}$, con $T_d$ tempo di raddoppio')
+_ = ax.set(title=r'COVID-19 data in the UK. Modelli $f(t) = 2 ^ \frac{t - t_0}{T_d}$, w $T_d$ doubling time')
 _ = ax.yaxis.grid(color='lightgrey', linewidth=0.5)
 _ = ax.xaxis.grid(color='lightgrey', linewidth=0.5)
 _ = ax.yaxis.tick_right()
@@ -135,7 +135,7 @@ covid19.plot.plot_fit(ax, fits['counts'], color=sns.color_palette()[2])
 for kind, color in zip(['counts'], sns.color_palette()):
     covid19.plot.plot(ax, data_italy[kind], fits[kind], label=kind.replace('_', ' '), extrapolate=EXTRAPOLTATE, color=color, date_interval=2)
 #
-_ = ax.set(title=r'Dati COVID-19 in UK. Modelli $f(t) = 2 ^ \frac{t - t_0}{T_d}$, con $T_d$ tempo di raddoppio')
+_ = ax.set(title=r'COVID-19 data in the UK. Modelli $f(t) = 2 ^ \frac{t - t_0}{T_d}$, w $T_d$ doubling time')
 _ = ax.yaxis.grid(color='lightgrey', linewidth=0.5)
 _ = ax.xaxis.grid(color='lightgrey', linewidth=0.5)
 _ = ax.yaxis.tick_right()
@@ -155,7 +155,7 @@ covid19.plot.plot(ax, data_italy[kind], fits[kind], label=kind, extrapolate=EXTR
 #
 #
 kinds = ['counts']
-datetime_expected = '2020-03-24'
+datetime_expected = '2020-03-25'
 expected_values = []
 for kind in kinds:
     expected_values.append(int(round(fits[kind].predict(datetime_expected))))
@@ -184,7 +184,7 @@ CHANGE_FIT_2 = np.datetime64('2020-03-11')
 CHANGE_FIT_3 = np.datetime64('2020-03-15')
 STOP_FIT = None
 
-EXTRAPOLTATE = ('2020-02-23', '2020-03-24')
+EXTRAPOLTATE = ('2020-02-23', '2020-03-26')
 
 REGIONS_FIT_PARAMS = {
     'UK': {
