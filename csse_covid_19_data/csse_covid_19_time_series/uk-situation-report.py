@@ -67,8 +67,10 @@ today = date.today()
 country = "United Kingdom"
 # dd/mm/YY
 today = today.strftime("%d-%m-%Y")
-datatemplate = "time_series_19-covid-{}.csv"
-fields = ["Confirmed", "Deaths", "Recovered"]
+# datatemplate = "time_series_19-covid-{}.csv"
+datatemplate = "time_series_covid19_{}_global.csv"
+# fields = ["Confirmed", "Deaths", "Recovered"]
+fields = ["confirmed", "deaths"]
 dataframe_all_countries = pre_process_database(datatemplate, fields)
 # data_italy_path = 'dpc-covid19-ita-andamento-nazionale.csv'
 # data_italy_path = covid19.data.download('andamento-nazionale')

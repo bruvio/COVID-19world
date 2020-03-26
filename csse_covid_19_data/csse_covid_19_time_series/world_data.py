@@ -312,8 +312,10 @@ def main(plot_fits, plot_bar_plot,plot_bar_plot_video):
 
     # dd/mm/YY
     today = today.strftime("%d-%m-%Y")
-    datatemplate = "time_series_19-covid-{}.csv"
-    fields = ["Confirmed", "Deaths", "Recovered"]
+    # datatemplate = "time_series_19-covid-{}.csv"
+    datatemplate = "time_series_covid19_{}_global.csv"
+    # fields = ["Confirmed", "Deaths", "Recovered"]
+    fields = ["confirmed", "deaths"]
     dataframe_all_countries = pre_process_database(datatemplate, fields)
     countrylist_df = list(set(dataframe_all_countries["country"]))
     countrylist = []
@@ -377,14 +379,14 @@ def main(plot_fits, plot_bar_plot,plot_bar_plot_video):
                 # databasename = "Recovered cases"
                 # databasename = "Deaths cases"
                 dataframe, x, y = select_database(
-                    dataframe_all_countries, country, "Confirmed"
+                    dataframe_all_countries, country, "confirmed"
                 )
                 dataframe_deaths, x_deaths, y_deaths = select_database(
-                    dataframe_all_countries, country, "Deaths"
+                    dataframe_all_countries, country, "deaths"
                 )
-                dataframe_recovered, x_recovered, y_recovered = select_database(
-                    dataframe_all_countries, country, "Recovered"
-                )
+                # dataframe_recovered, x_recovered, y_recovered = select_database(
+                #     dataframe_all_countries, country, "Recovered"
+                # )
                 # dataframe,x,y = dataframe_deaths, x_deaths, y_deaths
                 prediction_dates = 75
                 day_to_use_4_fit = 7

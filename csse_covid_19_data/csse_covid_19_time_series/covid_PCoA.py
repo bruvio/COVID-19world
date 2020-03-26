@@ -59,8 +59,10 @@ def select_database(database, country, field):
 today = date.today()
 # dd/mm/YY
 today = today.strftime("%d-%m-%Y")
-datatemplate = "time_series_19-covid-{}.csv"
-fields = ["Confirmed", "Deaths", "Recovered"]
+# datatemplate = "time_series_19-covid-{}.csv"
+datatemplate = "time_series_covid19_{}_global.csv"
+# fields = ["Confirmed", "Deaths", "Recovered"]
+fields = ["confirmed", "deaths"]
 dataframe_all_countries = pre_process_database(datatemplate, fields)
 countrylist_df = list(set(dataframe_all_countries["country"]))
 # field = "Deaths"
