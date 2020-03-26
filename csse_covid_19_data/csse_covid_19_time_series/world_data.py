@@ -388,7 +388,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                 )
                 # dataframe,x,y = dataframe_deaths, x_deaths, y_deaths
                 prediction_dates = 96
-                day_to_use_4_fit = 7
+                day_to_use_4_fit = 4
                 t_real, t_prediction, x, start, prediction, days, t_plot = get_times(
                     dataframe, y, prediction_dates
                 )
@@ -452,20 +452,20 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                     )
 
                 ################ PLOTTING DATA & FIT ###############
-                plt.figure(num=country + "_fit")
-                # ax1 = plt.subplot(211)
-
-                plot_data(t_real, y, country, "confirmed cases", "r", logscale=logscale)
-
-                plot_model(
-                    t_real,
-                    yModel_fit,
-                    country,
-                    " data fit - " + databasename + "  -  " + text_fit,
-                    "b",
-                    marker="x",
-                    logscale=logscale,
-                )
+                # plt.figure(num=country + "_fit")
+                # # ax1 = plt.subplot(211)
+                #
+                # plot_data(t_real, y, country, "confirmed cases", "r", logscale=logscale)
+                #
+                # plot_model(
+                #     t_real,
+                #     yModel_fit,
+                #     country,
+                #     " data fit - " + databasename + "  -  " + text_fit,
+                #     "b",
+                #     marker="x",
+                #     logscale=logscale,
+                # )
 
                 # figure  = plt.figure(num=country,figsize=(11, 8))
                 figure = plt.figure(num=country, figsize=(11, 8))
@@ -473,15 +473,15 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
                 plot_data(t_real, y, country, databasename, "r", logscale=logscale)
 
-                plot_model(
-                    t_real,
-                    yModel_fit,
-                    country,
-                    " data fit - " + databasename + "  -  " + text_fit,
-                    "b",
-                    marker="x",
-                    logscale=logscale,
-                )
+                # plot_model(
+                #     t_real,
+                #     yModel_fit,
+                #     country,
+                #     " data fit - " + databasename + "  -  " + text_fit,
+                #     "b",
+                #     marker="x",
+                #     logscale=logscale,
+                # )
 
                 plot_model(
                     t_real[-day_to_use_4_fit:],
@@ -536,7 +536,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                         yModel_Predictions,
                         fittedParameters_prediction,
                         Rsquared,
-                    ) = fit_data(x, y, sigmoidal_func)
+                    ) = fit_data(x, y, sigmoidal_func, p0=[1, fittedParameters_10[-1], 1])
 
                     modelPredictions = sigmoidal_func(
                         x_prediction, *fittedParameters_prediction
@@ -607,7 +607,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                     a, b, c = fittedParameters_prediction
                     f = lambda x: a / (1 + np.exp(-c * (x - b)))
                 # yy = f(x)
-                ydx = derivative(f, xModel_prediction, method="forward", h=0.01)
+                ydx = derivative(f, xModel_prediction, method="forward", h=0.001)
                 # ydx1 = derivative(f, xModel_prediction, method="backward", h=0.01)
                 # ydx2 = derivative(f, xModel_prediction, method="central", h=0.01)
 
@@ -1147,4 +1147,5 @@ if __name__ == "__main__":
     logging.root.setLevel(level=debug_map[0])
     # main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=False)
     # main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=False)
+    # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=True)
     main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
