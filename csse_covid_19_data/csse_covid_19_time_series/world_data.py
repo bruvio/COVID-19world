@@ -307,31 +307,29 @@ def transform_color(color, amount=0.5):
     return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
 
 
-def main(plot_fits, plot_bar_plot,plot_bar_plot_video):
+def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
     today = date.today()
 
     # dd/mm/YY
     today = today.strftime("%d-%m-%Y")
     # datatemplate = "time_series_19-covid-{}.csv"
     datatemplate = "time_series_covid19_{}_global.csv"
-    # fields = ["Confirmed", "Deaths", "Recovered"]
-    fields = ["confirmed", "deaths"]
+    fields = ["confirmed", "deaths", "recovered"]
     dataframe_all_countries = pre_process_database(datatemplate, fields)
     countrylist_df = list(set(dataframe_all_countries["country"]))
     countrylist = []
     countrylist.append("Italy")
-    countrylist.append("Australia")
-    countrylist.append("Germany")
-    countrylist.append("China")
-    countrylist.append("Australia")
-    countrylist.append("US")
+    # countrylist.append("Australia")
+    # countrylist.append("Germany")
+    # countrylist.append("China")
+    # countrylist.append("Australia")
+    # countrylist.append("US")
     # countrylist.append("France")
     # countrylist.append("Korea, South")
     # countrylist.append("Switzerland")
-    countrylist.append("United Kingdom")
-    countrylist.append("Japan")
+    # countrylist.append("United Kingdom")
+    # countrylist.append("Japan")
     # countrylist.append("Romania")
-
 
     # countrylist = [
     #     "United Kingdom",
@@ -364,6 +362,7 @@ def main(plot_fits, plot_bar_plot,plot_bar_plot_video):
     exception_list.append("Australia")
     exception_list.append("China")
     exception_list.append("Australia")
+    # exception_list.append("Italy")
     exception_list.append("US")
     exception_list.append("France")
     exception_list.append("Switzerland")
@@ -384,11 +383,11 @@ def main(plot_fits, plot_bar_plot,plot_bar_plot_video):
                 dataframe_deaths, x_deaths, y_deaths = select_database(
                     dataframe_all_countries, country, "deaths"
                 )
-                # dataframe_recovered, x_recovered, y_recovered = select_database(
-                #     dataframe_all_countries, country, "Recovered"
-                # )
+                dataframe_recovered, x_recovered, y_recovered = select_database(
+                    dataframe_all_countries, country, "Recovered"
+                )
                 # dataframe,x,y = dataframe_deaths, x_deaths, y_deaths
-                prediction_dates = 75
+                prediction_dates = 96
                 day_to_use_4_fit = 7
                 t_real, t_prediction, x, start, prediction, days, t_plot = get_times(
                     dataframe, y, prediction_dates
@@ -814,7 +813,11 @@ def main(plot_fits, plot_bar_plot,plot_bar_plot_video):
                     font=dict(color="#292929"),
                 )
                 # fig_rate.write_image("Figures/death_rates_" + country )
-                plotly.offline.plot(fig_rate, filename="Figures/death_rates_" + country+'html', auto_open=False)
+                plotly.offline.plot(
+                    fig_rate,
+                    filename="Figures/death_rates_" + country ,
+                    auto_open=False,
+                )
                 # fig_rate.show()
                 #
                 # # Pseduo data for logplot
@@ -977,7 +980,9 @@ def main(plot_fits, plot_bar_plot,plot_bar_plot_video):
         # field = 'Deaths'
         # field = 'Confirmed'
         # field = 'Recovered'
-        fields = ["Confirmed", "Deaths", "Recovered"]
+        # fields = ["Confirmed", "Deaths", "Recovered"]
+        # datatemplate = "time_series_covid19_{}_global.csv"
+        fields = ["confirmed", "deaths", "recovered"]
         for field in fields:
             # df = pd.read_csv(datatemplate.format(field))
             df = dataframe_all_countries[(dataframe_all_countries["quantity"] == field)]
@@ -1008,8 +1013,8 @@ def main(plot_fits, plot_bar_plot,plot_bar_plot_video):
             df.rename(columns={"value": "counts"}, inplace=True)
             # frames_list = df["date"].unique()
             frames_list = df["date"].unique().tolist()
-            for i in range(10):
-                frames_list.append(df["date"].iloc[-1])
+            # for i in range(10):
+            #     frames_list.append(df["date"].iloc[-1])
 
             all_names = df["country"].unique().tolist()
             random_hex_colors = []
@@ -1127,7 +1132,6 @@ def main(plot_fits, plot_bar_plot,plot_bar_plot_video):
                 dpi=100,
             )
 
-
             # animator.save("./Figures/Racing Bar Chart-{}.mp4".format(field), dpi=100,bitrate=30,fps=1.4)
         # subprocess.run(["open", "-a", "/Applications/QuickTime Player.app", "Racing Bar Chart-{}.mp4".format(field)])
 
@@ -1141,6 +1145,6 @@ if __name__ == "__main__":
         3: logging.ERROR,
     }
     logging.root.setLevel(level=debug_map[0])
-    main(plot_fits=True, plot_bar_plot=True,plot_bar_plot_video=False)
-    # main(plot_fits=False, plot_bar_plot=True)
-    # main(plot_fits=True, plot_bar_plot=True)
+    # main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=False)
+    # main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=False)
+    main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)

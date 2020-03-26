@@ -61,8 +61,7 @@ today = date.today()
 today = today.strftime("%d-%m-%Y")
 # datatemplate = "time_series_19-covid-{}.csv"
 datatemplate = "time_series_covid19_{}_global.csv"
-# fields = ["Confirmed", "Deaths", "Recovered"]
-fields = ["confirmed", "deaths"]
+fields = ["confirmed", "deaths", "recovered"]
 dataframe_all_countries = pre_process_database(datatemplate, fields)
 countrylist_df = list(set(dataframe_all_countries["country"]))
 # field = "Deaths"
@@ -97,7 +96,6 @@ for field in fields:
         [i for i in DailyData.columns if int(DailyData[i].sum()) > 50]
     ]
     print(DailyDataFifty.shape)
-
 
     s = DailyDataFifty.sum()
     DailyDataFifty = DailyDataFifty[s.sort_values(ascending=False).index[:49]]
@@ -141,7 +139,7 @@ for field in fields:
             ha="left",
         )
 
-    fig.savefig("pattern_uncluster2.png")
+    fig.savefig("./Figures/" + "pattern_uncluster2-{}.png".format(today))
     #
     # plt.show(block=True)
 
@@ -158,7 +156,6 @@ for field in fields:
             numerator += abs(sample1_count - sample2_count)
             denominator += sample1_count + sample2_count
         return numerator / denominator
-
 
     from skbio.stats.distance import DistanceMatrix
 
@@ -177,9 +174,7 @@ for field in fields:
         # return data, sample_ids
         return DistanceMatrix(data, sample_ids)
 
-
     # data, sample_ids = table_to_distances(DailyDataFiftyNorm, bray_curtis_distance)
-
 
     # bc_dm = distance_matrix(data, sample_ids)
     #
@@ -194,7 +189,6 @@ for field in fields:
     pca = PCA(n_components=2)
     projected = pca.fit_transform(bc_dm.data)
 
-
     fig0 = plt.figure(figsize=(12, 12), dpi=100)
 
     plt.scatter(projected[:, 0], projected[:, 1], s=100, alpha=0.5)
@@ -205,16 +199,14 @@ for field in fields:
         plt.annotate(txt, (projected[:, 0][i], projected[:, 1][i] + 0.02))
 
     # plt.show()
-    fig0.savefig("pattern_.png")
+    fig0.savefig("./Figures/" + "pattern_-{}.png".format(today))
     print(datetime)
-
 
     # Cluster countries using K-mean
     from sklearn.cluster import KMeans
 
     kmeans = KMeans(init="k-means++", n_clusters=5, random_state=0).fit(projected)
     kmeans.labels_
-
 
     # Variance explained by the first two components
     print(pca.explained_variance_)
@@ -237,7 +229,6 @@ for field in fields:
             color.append("cyan")
             # color.append('#fdae61')
 
-
     # Create a metadata table
     clusterData = pd.DataFrame(
         {
@@ -256,7 +247,6 @@ for field in fields:
     clusterData = clusterData.reset_index(drop=True)
     # clusterData
 
-
     fig1 = plt.figure(figsize=(16, 10), dpi=200, constrained_layout=True)
 
     axs1 = fig1.subplots(nrows=7, ncols=7)
@@ -270,8 +260,8 @@ for field in fields:
         axs1.flat[order].annotate(
             i["Region"], (0.05, 0.8), xycoords="axes fraction", va="center", ha="left"
         )
-    txt = 'daily incremental case numbers against the date - clustered'
-    fig1.text(.5, .05, txt, ha='center')
+    txt = "daily incremental case numbers against the date - clustered"
+    fig1.text(0.5, 0.05, txt, ha="center")
 
     fig2 = plt.figure(figsize=(16, 10), dpi=200, constrained_layout=True)
 
@@ -287,8 +277,8 @@ for field in fields:
             i["Region"], (0.05, 0.8), xycoords="axes fraction", va="center", ha="left"
         )
 
-    txt = 'daily incremental case numbers against the date - unclustered'
-    fig2.text(.5, .05, txt, ha='center')
+    txt = "daily incremental case numbers against the date - unclustered"
+    fig2.text(0.5, 0.05, txt, ha="center")
     # fig3 = plt.figure(figsize=(12,12), dpi=300)
     # ax1 = fig3.add_subplot()
     fig3, ax1 = plt.subplots()
@@ -301,30 +291,31 @@ for field in fields:
     )
     ax1.get_xaxis().set_ticks([])
     ax1.get_yaxis().set_ticks([])
-    txt = 'growth pattern of different countries/regions'
-    fig3.text(.5, .05, txt, ha='center')
-    ax1.set_xlabel('')
+    txt = "growth pattern of different countries/regions"
+    fig3.text(0.5, 0.05, txt, ha="center")
+    ax1.set_xlabel("")
     # ax1.set_xlabel('PC1({:.2%} variance explaianed)'.format(pca.explained_variance_[0]))
     # ax1.set_ylabel('PC2({:.2%} variance explaianed)'.format(pca.explained_variance_[1]))
 
     for i, txt in enumerate(clusterData["Region"]):
         ax1.annotate(txt, (clusterData["PC1"][i], clusterData["PC2"][i] + 0.02))
 
-
-    fig1.savefig("pattern_cluster-{}-{}.png".format(field,today))
-    fig2.savefig("pattern_uncluster-{}-{}.png".format(field,today))
-    fig3.savefig("pattern_PCoA-{}-{}.png".format(field,today), bbox_inches="tight")
+    fig1.savefig("./Figures/" + "pattern_cluster-{}-{}.png".format(field, today))
+    fig2.savefig("./Figures/" + "pattern_uncluster-{}-{}.png".format(field, today))
+    fig3.savefig(
+        "./Figures/" + "pattern_PCoA-{}-{}.png".format(field, today),
+        bbox_inches="tight",
+    )
     # plt.show()
     # print(clusterData)
     #
     #
     #
-    for clusterNumber in [9,7,5,6,8]:
+    for clusterNumber in [9, 7, 5, 6, 8]:
 
         # clusterNumber = 9
         # {0: 9, 1: 7, 2: 5, 3: 6, 4: 8}
         RegionList = clusterData[clusterData["Cluster"] == clusterNumber]["Region"]
-
 
         dfs_cumulative = DailyData[DailyData.columns.intersection(RegionList)]
         # dfs_cumulative = {sheet_name: pd.read_csv('../dash-2019-coronavirus/cumulative_data/{}.csv'.format(sheet_name))
@@ -344,19 +335,24 @@ for field in fields:
                 ax4.annotate(
                     region,
                     xy=(
-                        list(dfs_cumulative[region][dfs_cumulative[region] > 50].index)[0],
+                        list(dfs_cumulative[region][dfs_cumulative[region] > 50].index)[
+                            0
+                        ],
                         list(dfs_cumulative[region][dfs_cumulative[region] > 50])[0],
                     ),
                 )
             except:
                 pass
 
-        ax4.set_xlabel('Days of the year')
-        ax4.set_ylabel('Confirmed cases (log scale)')
+        ax4.set_xlabel("Days of the year")
+        ax4.set_ylabel("Confirmed cases (log scale)")
         ax4.set_yscale("log")
         plt.xticks(rotation=70)
 
-        fig4.savefig("time_data_cluster-{}-{}-{}.png".format(field,clusterNumber,today))
+        fig4.savefig(
+            "./Figures/"
+            + "time_data_cluster-{}-{}-{}.png".format(field, clusterNumber, today)
+        )
 
 
 # DailyData20 = DailyDataFifty[s.sort_values(ascending=False).index[:20]]

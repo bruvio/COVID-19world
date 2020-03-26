@@ -70,12 +70,12 @@ today = today.strftime("%d-%m-%Y")
 # datatemplate = "time_series_19-covid-{}.csv"
 datatemplate = "time_series_covid19_{}_global.csv"
 # fields = ["Confirmed", "Deaths", "Recovered"]
-fields = ["confirmed", "deaths"]
+fields = ["confirmed", "deaths", "recovered"]
 dataframe_all_countries = pre_process_database(datatemplate, fields)
 # data_italy_path = 'dpc-covid19-ita-andamento-nazionale.csv'
 # data_italy_path = covid19.data.download('andamento-nazionale')
 dataframe, x, y = select_database(
-    dataframe_all_countries, country, "Confirmed"
+    dataframe_all_countries, country, "confirmed"
 )
 # dataframe.reset_index()
 # # In[4]:
@@ -106,12 +106,12 @@ EXTRAPOLTATE = ('2020-02-23', '2020-03-26')
 data_italy.set_index('date', inplace=True)
 fits = {}
 fits['counts'] = covid19.fit.ExponentialFit.from_frame('counts', data_italy, start=START_FIT, stop=STOP_FIT)
-
+ylim_df = data_italy['counts'].iloc[-1]*1.05
 #
 # # In[7]:
 #
 #
-_, ax = plt.subplots(subplot_kw={'yscale': 'log', 'ylim': (50, 35000)})
+_, ax = plt.subplots(subplot_kw={'yscale': 'log', 'ylim': (50, ylim_df)})
 # # _ = covid19.plot.add_events(ax, linestyle=':', offset=11, color='grey')
 #
 
@@ -129,7 +129,7 @@ _ = ax.legend(loc='upper left')
 # # In[8]:
 #
 #
-_, ax = plt.subplots(subplot_kw={'yscale': 'linear', 'ylim': (80, 18000)})
+_, ax = plt.subplots(subplot_kw={'yscale': 'linear', 'ylim': (80, ylim_df)})
 # # _ = covid19.plot.add_events(ax, linestyle=':', offset=17, color='grey')
 #
 
@@ -146,7 +146,7 @@ _ = ax.yaxis.tick_right()
 # # In[9]:
 #
 #
-_, ax = plt.subplots(subplot_kw={'yscale': 'log', 'ylim': (5, 50000)})
+_, ax = plt.subplots(subplot_kw={'yscale': 'log', 'ylim': (5, ylim_df)})
 kind = 'counts'
 covid19.plot.plot(ax, data_italy[kind], fits[kind], label=kind, extrapolate=EXTRAPOLTATE, color=color)
 #
@@ -226,7 +226,7 @@ UK_EVENTS = [
 for region in REGIONS_FIT_PARAMS:
     # select = (data_italy_regions['denominazione_regione'] == region)
     for kind in ['counts']:
-        _, ax = plt.subplots(subplot_kw={'yscale': 'log', 'ylim': (9, 15000)}, figsize=(14, 8))
+        _, ax = plt.subplots(subplot_kw={'yscale': 'log', 'ylim': (9, ylim_df)}, figsize=(14, 8))
         _ = ax.yaxis.grid(color='lightgrey', linewidth=0.5)
         _ = covid19.plot.add_events(ax,events=UK_EVENTS, linestyle=':', offset=0, color='grey')
         if len(fits[region, kind]) == 0:
