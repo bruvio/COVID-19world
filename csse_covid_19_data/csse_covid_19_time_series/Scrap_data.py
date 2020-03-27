@@ -161,9 +161,9 @@ CaseTable.tail(40)
 
 
 caseTableSimple = CaseTable[[CaseTable.columns[0], CaseTable.columns[1], CaseTable.columns[3], CaseTable.columns[5]]]
-caseTableSimple.columns = ['Country/Region', 'Confirmed', 'Deaths', 'Recovered']
+caseTableSimple.columns = ['Country/Region', 'confirmed', 'deaths', 'recovered']
 # Set data type as string first for manuipulation
-caseTableSimple = caseTableSimple.astype({'Country/Region':str,'Confirmed':str,'Deaths':str, 'Recovered':str})
+caseTableSimple = caseTableSimple.astype({'Country/Region':str,'confirmed':str,'deaths':str, 'recovered':str})
 # Remove the last row of total number (changed on 20200310, worldmeter moved this row as next tbody)
 #caseTableSimple = caseTableSimple.iloc[:-1,:]
 # Remove lead and tail space for each element
@@ -174,9 +174,9 @@ caseTableSimple = caseTableSimple.applymap(removeCommas)
 caseTableSimple = caseTableSimple.replace('', '0')
 # After string manipulation, convert data type as correct type
 caseTableSimple = caseTableSimple.astype({'Country/Region':'str',
-                                          'Confirmed':'int',
-                                          'Deaths':'int',
-                                          'Recovered':'int',                                          
+                                          'confirmed':'int',
+                                          'deaths':'int',
+                                          'recovered':'int',
                                          })
 
 currentTime = datetime.now()
@@ -184,6 +184,19 @@ lastUpdateTime = currentTime.strftime('%m/%d/%Y %H:%M')
 # Remove the first number (This only works for month number less than 10)
 
 caseTableSimple['Last Update'] = lastUpdateTime
+
+
+
+# Change Country name the same as my old data
+if 'S. Korea' in list(caseTableSimple['Country/Region']):
+    caseTableSimple = caseTableSimple.replace('S. Korea', 'South Korea')
+
+if 'UK' in list(caseTableSimple['Country/Region']):
+    caseTableSimple = caseTableSimple.replace('UK', 'United Kingdom')
+
+if 'USA' in list(caseTableSimple['Country/Region']):
+    caseTableSimple = caseTableSimple.replace('USA', 'US')
+
 
 
 timeStampe = currentTime.strftime('%m_%d_%Y_%H_%M')
@@ -196,9 +209,7 @@ removeRegion = ['China', 'Canada', 'Australia', 'USA']
 for i in removeRegion:
     caseTableSimple.drop(caseTableSimple[caseTableSimple['Country/Region'] == i].index, axis=0, inplace=True)
 
-# Change Country name the same as my old data 
-if 'S. Korea' in list(caseTableSimple['Country/Region']):
-    caseTableSimple = caseTableSimple.replace('S. Korea', 'South Korea')
+
 
 # Add column 'Province/State' with empty value
 caseTableSimple['Province/State'] = ''
@@ -347,9 +358,9 @@ for index in list3:
         Deaths.append(0)
 
 US_data = pd.DataFrame({'Province/State': Locations,
-                        'Confirmed': Confirmed,
-                        'Deaths': Deaths,
-                        # 'Recovered':Recovered,
+                        'confirmed': Confirmed,
+                        'deaths': Deaths,
+                        # 'recovered':Recovered,
                         })
 
 # Remove rows that are not data
@@ -415,9 +426,9 @@ for index in list3:
         Deaths.append(0)
 
 CAN_data = pd.DataFrame({'Province/State': Locations,
-                         'Confirmed': Confirmed,
-                         'Deaths': Deaths,
-                         # 'Recovered':Recovered,
+                         'confirmed': Confirmed,
+                         'deaths': Deaths,
+                         # 'recovered':Recovered,
                          })
 
 # Remove rows that are not data
@@ -490,9 +501,9 @@ dataframe['Last Update'] = lastUpdateTime
 dataframe = pd.DataFrame({'Province/State': dataframe['provinceName'],
                           'Country/Region': 'China',
                           'Last Update': lastUpdateTime,
-                        'Confirmed': dataframe['currentConfirmedCount'],
-                        'Deaths': dataframe['deadCount'],
-                        'Recovered': dataframe['curedCount'],
+                        'confirmed': dataframe['currentConfirmedCount'],
+                        'deaths': dataframe['deadCount'],
+                        'recovered': dataframe['curedCount'],
                         })
 dataframe = dataframe[columnOrder]
 
@@ -558,7 +569,7 @@ AUS_df['Last Update'] = lastUpdateTime
 AUS_df = pd.DataFrame({'Province/State': AUS_df['Province/State'],
                           'Country/Region': 'Australia',
                           'Last Update': lastUpdateTime,
-                        'Confirmed': AUS_df['Confirmed'],
+                        'confirmed': AUS_df['Confirmed'],
                         # 'Deaths': AUS_df['deadCount'],
                         # 'Recovered': AUS_df['curedCount'],
                         })

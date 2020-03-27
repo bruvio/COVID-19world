@@ -4,7 +4,8 @@ import subprocess
 
 register_matplotlib_converters()
 import logging
-
+import os
+import glob
 import plotly.graph_objects as go
 import plotly
 import warnings
@@ -316,20 +317,45 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
     datatemplate = "time_series_covid19_{}_global.csv"
     fields = ["confirmed", "deaths", "recovered"]
     dataframe_all_countries = pre_process_database(datatemplate, fields)
+    list_of_files = glob.glob('worldmeter_data/*')  # * means all if need specific format then *.csv
+    latest_file = max(list_of_files, key=os.path.getctime)
+
+    # for filename in os.listdir('worldmeter_data'):
+    #     file = filename.replace('_webData.csv','')
+    #     date_filename = datetime.datetime.strptime(file.split(" ")[0], '%m_%d_%Y_%H_%M')
+    #     if date_filename < datetime.datetime.now() :
+
+    dataframe_all_countries_last_update = pd.read_csv(
+                                              latest_file)
+
+
+
     countrylist_df = list(set(dataframe_all_countries["country"]))
+
+
+
+    # countrynotinlist = []
+    # i = 0
+    # for region in df.columns:
+    #     if region in list(set(dataframe_all_countries["country"])):
+    #         print(region)
+    #         i = i + 1
+    #     else:
+    #         countrynotinlist.append(region)
+
     countrylist = []
     countrylist.append("Italy")
-    countrylist.append("Australia")
-    countrylist.append("Germany")
-    countrylist.append("China")
-    countrylist.append("Australia")
-    countrylist.append("US")
-    countrylist.append("France")
-    countrylist.append("Korea, South")
-    countrylist.append("Switzerland")
-    countrylist.append("United Kingdom")
-    countrylist.append("Japan")
-    countrylist.append("Romania")
+    # countrylist.append("Australia")
+    # countrylist.append("Germany")
+    # countrylist.append("China")
+    # countrylist.append("Australia")
+    # countrylist.append("US")
+    # countrylist.append("France")
+    # countrylist.append("Korea, South")
+    # countrylist.append("Switzerland")
+    # countrylist.append("United Kingdom")
+    # countrylist.append("Japan")
+    # countrylist.append("Romania")
 
     # countrylist = [
     #     "United Kingdom",
@@ -377,6 +403,11 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                 databasename = "Confirmed cases"
                 # databasename = "Recovered cases"
                 # databasename = "Deaths cases"
+
+
+
+                field ='confirmed'
+
                 dataframe, x, y = select_database(
                     dataframe_all_countries, country, "confirmed"
                 )
@@ -384,8 +415,54 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                     dataframe_all_countries, country, "deaths"
                 )
                 dataframe_recovered, x_recovered, y_recovered = select_database(
-                    dataframe_all_countries, country, "Recovered"
+                    dataframe_all_countries, country, "recovered"
                 )
+                for field in fields:
+                    dataframe_all_countries_last_update1 = dataframe_all_countries_last_update[
+                        ["Country/Region", field, "Last Update"]]
+
+                    dataframe_all_countries_last_update2 = pd.DataFrame(
+                        {'Country/Region': dataframe_all_countries_last_update1['Country/Region'],
+                         field: dataframe_all_countries_last_update1[field],
+                         'date': dataframe_all_countries_last_update1['Last Update'],
+                         })
+                    dataframe_all_countries_last_update2.reset_index()
+                    # df = pd.pivot_table(dataframe_all_countries_last_update2, values = 'confirmed', index=['date'], columns = 'confirmed').reset_index()
+                    # df = dataframe_all_countries_last_update2.pivot(values = 'confirmed', columns = 'Country/Region')
+                    df = dataframe_all_countries_last_update2.pivot(index="date", columns="Country/Region", values=field)
+
+                    df_country = df[[country]]
+
+                    dataframe = dataframe.append(pd.Series(), ignore_index=True)
+                    dataframe_deaths = dataframe_deaths.append(pd.Series(), ignore_index=True)
+                    dataframe_recovered = dataframe_recovered.append(pd.Series(), ignore_index=True)
+
+                    # dataframe.append(pd.Series(name=df_country.index[0]))
+                    if field =='confirmed':
+                        dataframe['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
+                        dataframe['country'].iloc[-1] = country
+                        dataframe['quantity'].iloc[-1] = field
+                        dataframe['counts'].iloc[-1] = df_country[country].values[0]
+                        x.append(pd.Series(pd.to_datetime(df_country.index[0])))
+                        y.append(pd.Series(df_country[country].values[0]))
+                    if field == 'deaths':
+                        dataframe_deaths['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
+                        dataframe_deaths['country'].iloc[-1] = country
+                        dataframe_deaths['quantity'].iloc[-1] = field
+                        dataframe_deaths['counts'].iloc[-1] = df_country[country].values[0]
+                        x_deaths.append(pd.Series(pd.to_datetime(df_country.index[0])))
+                        y_deaths.append(pd.Series(df_country[country].values[0]))
+                    if field == 'recovered':
+                        dataframe_recovered['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
+                        dataframe_recovered['country'].iloc[-1] = country
+                        dataframe_recovered['quantity'].iloc[-1] = field
+                        dataframe_recovered['counts'].iloc[-1] = df_country[country].values[0]
+                        x_recovered.append(pd.Series(pd.to_datetime(df_country.index[0])))
+                        y_recovered.append(pd.Series(df_country[country].values[0]))
+
+
+
+
                 # dataframe,x,y = dataframe_deaths, x_deaths, y_deaths
                 prediction_dates = 96
                 day_to_use_4_fit = 4
