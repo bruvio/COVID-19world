@@ -92,6 +92,9 @@ fields = ["confirmed", "deaths", "recovered"]
 dataframe_all_countries = pre_process_database(datatemplate, fields)
 # data_italy_path = 'dpc-covid19-ita-andamento-nazionale.csv'
 # data_italy_path = covid19.data.download('andamento-nazionale')
+
+last_update_df = pd.read_csv()
+
 for country in countrylist:
     print("\n" + country + "\n")
     dataframe, x, y = select_database(dataframe_all_countries, country, "confirmed")

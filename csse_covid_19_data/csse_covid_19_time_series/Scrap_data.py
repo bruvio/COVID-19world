@@ -187,7 +187,7 @@ caseTableSimple['Last Update'] = lastUpdateTime
 
 
 timeStampe = currentTime.strftime('%m_%d_%Y_%H_%M')
-# caseTableSimple.to_csv('./worldmeter_data/{}_webData.csv'.format(timeStampe), index=False)
+caseTableSimple.to_csv('./worldmeter_data/{}_webData.csv'.format(timeStampe), index=False)
 print(caseTableSimple.head(10))
 # raise SystemExit
 
@@ -565,4 +565,4 @@ AUS_df = pd.DataFrame({'Province/State': AUS_df['Province/State'],
 AUS_df = AUS_df[columnOrder[:-2]]
 
 caseTableSimple = pd.concat([AUS_df, caseTableSimple], ignore_index=True)
-caseTableSimple.to_csv('./worldmeter_data/{}_webData.csv'.format(timeStampe), index=False)
+caseTableSimple.to_csv('./web_data/{}_webData.csv'.format(timeStampe), index=False)
