@@ -319,17 +319,17 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
     countrylist_df = list(set(dataframe_all_countries["country"]))
     countrylist = []
     countrylist.append("Italy")
-    # countrylist.append("Australia")
-    # countrylist.append("Germany")
-    # countrylist.append("China")
-    # countrylist.append("Australia")
-    # countrylist.append("US")
-    # countrylist.append("France")
-    # countrylist.append("Korea, South")
-    # countrylist.append("Switzerland")
-    # countrylist.append("United Kingdom")
-    # countrylist.append("Japan")
-    # countrylist.append("Romania")
+    countrylist.append("Australia")
+    countrylist.append("Germany")
+    countrylist.append("China")
+    countrylist.append("Australia")
+    countrylist.append("US")
+    countrylist.append("France")
+    countrylist.append("Korea, South")
+    countrylist.append("Switzerland")
+    countrylist.append("United Kingdom")
+    countrylist.append("Japan")
+    countrylist.append("Romania")
 
     # countrylist = [
     #     "United Kingdom",
@@ -703,6 +703,15 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                 # plt.plot(x, Recovered,label = 'Recovered',marker ='x')
                 # plt.legend(loc='best', fontsize = 8)
                 # # plt.plot(linx, expo_func(linx, *results[0]))
+
+                # The Q-Q plot, or quantile-quantile plot, is a graphical tool
+                # to help us assess if a set of data plausibly came from some theoretical distribution
+                # from statsmodels.graphics.gofplots import qqplot
+                # plt.figure()
+                # qqplot(ydx, line='s')
+                # plt.show()
+
+
 
                 try:
                     plt.figure(dpi=90, figsize=(8, 4))
@@ -1125,12 +1134,13 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                 dpi=100,
             )
             # plt.show()
-            animator = animation.FuncAnimation(fig, draw_barchart, frames=frames_list)
-            animator.save(
-                "./Figures/Racing Bar Chart-{}-{}.mp4".format(field, today),
-                fps=30,
-                dpi=100,
-            )
+            if plot_bar_plot_video:
+                animator = animation.FuncAnimation(fig, draw_barchart, frames=frames_list)
+                animator.save(
+                    "./Figures/Racing Bar Chart-{}-{}.mp4".format(field, today),
+                    fps=30,
+                    dpi=100,
+                )
 
             # animator.save("./Figures/Racing Bar Chart-{}.mp4".format(field), dpi=100,bitrate=30,fps=1.4)
         # subprocess.run(["open", "-a", "/Applications/QuickTime Player.app", "Racing Bar Chart-{}.mp4".format(field)])
@@ -1145,7 +1155,7 @@ if __name__ == "__main__":
         3: logging.ERROR,
     }
     logging.root.setLevel(level=debug_map[0])
-    # main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=False)
+    main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=False)
     # main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=False)
     # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=True)
-    main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
+    # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
