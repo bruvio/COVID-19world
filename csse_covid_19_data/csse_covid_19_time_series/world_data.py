@@ -25,6 +25,7 @@ import re
 from datetime import date
 
 
+
 # from IPython.display import HTML
 label_size = 8
 mpl.rcParams["xtick.labelsize"] = label_size
@@ -429,9 +430,9 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                     dataframe_all_countries_last_update2.reset_index()
                     # df = pd.pivot_table(dataframe_all_countries_last_update2, values = 'confirmed', index=['date'], columns = 'confirmed').reset_index()
                     # df = dataframe_all_countries_last_update2.pivot(values = 'confirmed', columns = 'Country/Region')
-                    df = dataframe_all_countries_last_update2.pivot(index="date", columns="Country/Region", values=field)
+                    df_last_update = dataframe_all_countries_last_update2.pivot(index="date", columns="Country/Region", values=field)
 
-                    df_country = df[[country]]
+                    df_country = df_last_update[[country]]
 
 
 
@@ -1058,7 +1059,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                 #                            )
                 #                 )
 
-    plt.show(block=True)
+    # plt.show(block=True)
     # Customise layout
 
     # fig_rate.show()
@@ -1071,17 +1072,62 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
         # field = 'Recovered'
         # fields = ["Confirmed", "Deaths", "Recovered"]
         # datatemplate = "time_series_covid19_{}_global.csv"
-        fields = ["confirmed", "deaths", "recovered"]
+        # fields = ["confirmed", "deaths", "recovered"]
+        fields = []
+        # fields.append("confirmed")
+        # fields.append("deaths")
+        fields.append("recovered")
         for field in fields:
             # df = pd.read_csv(datatemplate.format(field))
 
-            df = dataframe_all_countries[(dataframe_all_countries["quantity"] == field)]
-            df = df.reset_index()
+            df_reshape = dataframe_all_countries[(dataframe_all_countries["quantity"] == field)]
+            df_reshape = df_reshape.reset_index()
 
-            df = df[["country", "date", "counts"]]
+            df_reshape = df_reshape[["country", "date", "counts"]]
 
-            df = df.pivot(index="country", columns="date", values="counts")
-            df = df.reset_index()
+            df_reshape = df_reshape.pivot(index="country", columns="date", values="counts")
+            df_reshape = df_reshape.reset_index()
+
+            dataframe_all_countries_last_update1 = dataframe_all_countries_last_update[
+                ["Country/Region", field, "Last Update"]]
+
+
+            # dates = [x.replace('/', '-') for x in dataframe_all_countries_last_update1['Last Update']]
+            last_update = dataframe_all_countries_last_update1['Last Update'][0]
+            datetimeobject = datetime.datetime.strptime(last_update, '%m/%d/%Y %H:%M')
+            newformat = datetimeobject.strftime('%Y-%m-%d %H:%M:%S')
+            df_update = pd.DataFrame(
+                {'country': dataframe_all_countries_last_update1['Country/Region'],
+                 'date': newformat,
+                 'counts': dataframe_all_countries_last_update1[field],
+                 })
+
+
+            df_update = df_update.pivot(index="country", columns="date", values="counts")
+
+            # df_reshape = df_reshape.append(pd.Series(), ignore_index=True)
+            df_update = df_update.reset_index()
+
+            # df1 = pd.DataFrame({'A': ['A0', 'A1', 'A2', 'A3'],
+            #                      'B': ['B0', 'B1', 'B2', 'B3'],
+            #                     'C': ['C0', 'C1', 'C2', 'C3'],
+            #                      'D': ['D0', 'D1', 'D2', 'D3']},
+            #                      index = [0, 1, 2, 3])
+            # df4 = pd.DataFrame({'F': [ 'F3', 'F6', 'F7']},
+            #                      index = [ 1, 2, 3])
+            # df = pd.concat([df_reshape, df_update], axis=0, join='inner')
+            df = pd.merge(df_reshape, df_update, on='country')
+            # df = df_reshape.join( df_update, on=['country'], how='left', lsuffix='counts')
+            # df = pd.concat([df_reshape, df_update], ignore_index=True)
+
+
+
+
+            # df = df_reshape.append( df_update, ignore_index=False)
+            # df = df_reshape
+            # df.fillna(0)
+            df.to_csv('test_database_before_interp.csv')
+
             for p in range(3):
                 i = 0
                 while i < len(df.columns):
@@ -1102,6 +1148,11 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
             df.rename(columns={"value": "counts"}, inplace=True)
             # frames_list = df["date"].unique()
+            df.to_csv('test_database_after_interp.csv')
+            # pd.set_option('display.height', 500)
+            # pd.set_option('display.max_rows', 500)
+            # pd.set_option('display.max_columns', 500)
+            # pd.set_option('display.width', 200)
             frames_list = df["date"].unique().tolist()
             # for i in range(10):
             #     frames_list.append(df["date"].iloc[-1])
@@ -1214,6 +1265,10 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                 "./Figures/Racing Bar Chart-{}-{}.png".format(field, frames_list[-1]),
                 dpi=100,
             )
+            # plt.savefig(
+            #     "./Figures/Racing Bar Chart-{}.png".format(field),
+            #     dpi=100,
+            # )
             # plt.show()
             if plot_bar_plot_video:
                 animator = animation.FuncAnimation(fig, draw_barchart, frames=frames_list)
@@ -1238,5 +1293,6 @@ if __name__ == "__main__":
     logging.root.setLevel(level=debug_map[0])
     # main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=False)
     # main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=False)
-    # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=True)
-    main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
+    # main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=True)
+    main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=True)
+    # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
