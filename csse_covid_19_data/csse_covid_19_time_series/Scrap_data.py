@@ -200,6 +200,7 @@ if 'USA' in list(caseTableSimple['Country/Region']):
 
 
 timeStampe = currentTime.strftime('%m_%d_%Y_%H_%M')
+caseTableSimple = caseTableSimple.sort_values(by=['confirmed'], ascending=False)
 caseTableSimple.to_csv('./worldmeter_data/{}_webData.csv'.format(timeStampe), index=False)
 print(caseTableSimple.head(10))
 # raise SystemExit
@@ -364,7 +365,7 @@ US_data = pd.DataFrame({'Province/State': Locations,
                         })
 
 # Remove rows that are not data
-US_data.drop(US_data[US_data['Deaths'] == 'Deaths'].index, axis=0, inplace=True)
+US_data.drop(US_data[US_data['deaths'] == 'deaths'].index, axis=0, inplace=True)
 
 # Replace Washington, D.C. as Washington DC
 if 'Washington, D.C.' in list(US_data['Province/State']):
@@ -432,7 +433,7 @@ CAN_data = pd.DataFrame({'Province/State': Locations,
                          })
 
 # Remove rows that are not data
-CAN_data.drop(CAN_data[CAN_data['Deaths'] == 'Deaths'].index, axis=0, inplace=True)
+CAN_data.drop(CAN_data[CAN_data['deaths'] == 'deaths'].index, axis=0, inplace=True)
 
 
 
@@ -458,9 +459,9 @@ US_Can_data_EN = US_Can_data_EN.drop(['Chinese', 'Province/State', 'Abbr.'], axi
 US_Can_data_EN['Last Update'] = lastUpdateTime
 US_Can_data_EN.rename(columns={'English':'Province/State'}, inplace=True)
 US_Can_data_EN = US_Can_data_EN.drop(US_Can_data_EN[US_Can_data_EN['Province/State'] == 'Wuhan Evacuee'].index, axis=0)
-columnOrder = ['Province/State', 'Country/Region', 'Last Update','Confirmed', 'Deaths', 'Recovered']
+columnOrder = ['Province/State', 'Country/Region', 'Last Update','confirmed', 'deaths', 'recovered']
 
-US_Can_data_EN = US_Can_data_EN[columnOrder]
+US_Can_data_EN = US_Can_data_EN[columnOrder[:-1]]
 # US_Can_data_EN
 
 

@@ -406,7 +406,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
 
 
-                field ='confirmed'
+
 
                 dataframe, x, y = select_database(
                     dataframe_all_countries, country, "confirmed"
@@ -433,12 +433,13 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
                     df_country = df[[country]]
 
-                    dataframe = dataframe.append(pd.Series(), ignore_index=True)
-                    dataframe_deaths = dataframe_deaths.append(pd.Series(), ignore_index=True)
-                    dataframe_recovered = dataframe_recovered.append(pd.Series(), ignore_index=True)
+
+
+
 
                     # dataframe.append(pd.Series(name=df_country.index[0]))
                     if field =='confirmed':
+                        dataframe = dataframe.append(pd.Series(), ignore_index=True)
                         dataframe['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
                         dataframe['country'].iloc[-1] = country
                         dataframe['quantity'].iloc[-1] = field
@@ -446,6 +447,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                         x.append(pd.Series(pd.to_datetime(df_country.index[0])))
                         y.append(pd.Series(df_country[country].values[0]))
                     if field == 'deaths':
+                        dataframe_deaths = dataframe_deaths.append(pd.Series(), ignore_index=True)
                         dataframe_deaths['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
                         dataframe_deaths['country'].iloc[-1] = country
                         dataframe_deaths['quantity'].iloc[-1] = field
@@ -453,6 +455,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                         x_deaths.append(pd.Series(pd.to_datetime(df_country.index[0])))
                         y_deaths.append(pd.Series(df_country[country].values[0]))
                     if field == 'recovered':
+                        dataframe_recovered = dataframe_recovered.append(pd.Series(), ignore_index=True)
                         dataframe_recovered['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
                         dataframe_recovered['country'].iloc[-1] = country
                         dataframe_recovered['quantity'].iloc[-1] = field
@@ -573,7 +576,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                 # plt.legend(loc=9, bbox_to_anchor=(0.5,-0.02), fontsize=8)
                 # ax1.legend(bbox_to_anchor=(0.5, 1.1),
                 #           fancybox=True, shadow=True, ncol=1, fontsize=8)
-                ax1.set_ylim([min(y), max(y)])
+                ax1.set_ylim([min(y), max(y)*1.05])
                 # plt.show()
                 ###########################
 
@@ -969,7 +972,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                 #     marker="<",
                 #     logscale=logscale,linewidths = 0.1
                 # )
-                plt.ylim([min(y), max(y)])
+                plt.ylim([min(y), max(y)*1.05])
                 plt.legend(loc="best", fontsize=8)
                 # # Read cumulative data of a given region from ./cumulative_data folder
                 # # dfs_curve = pd.read_csv('./lineplot_data/dfs_curve.csv')
@@ -1055,7 +1058,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                 #                            )
                 #                 )
 
-    # plt.show(block=True)
+    plt.show(block=True)
     # Customise layout
 
     # fig_rate.show()
@@ -1071,6 +1074,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
         fields = ["confirmed", "deaths", "recovered"]
         for field in fields:
             # df = pd.read_csv(datatemplate.format(field))
+
             df = dataframe_all_countries[(dataframe_all_countries["quantity"] == field)]
             df = df.reset_index()
 
@@ -1232,7 +1236,7 @@ if __name__ == "__main__":
         3: logging.ERROR,
     }
     logging.root.setLevel(level=debug_map[0])
-    main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=False)
+    # main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=False)
     # main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=False)
     # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=True)
-    # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
+    main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
