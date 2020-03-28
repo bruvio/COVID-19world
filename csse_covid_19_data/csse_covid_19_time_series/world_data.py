@@ -346,14 +346,14 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
     countrylist = []
     countrylist.append("Italy")
     # countrylist.append("Australia")
-    # countrylist.append("Germany")
+    countrylist.append("Germany")
     # countrylist.append("China")
     # countrylist.append("Australia")
-    # countrylist.append("US")
+    countrylist.append("US")
     # countrylist.append("France")
     # countrylist.append("Korea, South")
     # countrylist.append("Switzerland")
-    # countrylist.append("United Kingdom")
+    countrylist.append("United Kingdom")
     # countrylist.append("Japan")
     # countrylist.append("Romania")
 
@@ -798,7 +798,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                     plot(
                         dataframe_all_countries,
                         [country],
-                        dtype="Confirmed",
+                        dtype="confirmed",
                         xrange=(30, 56),
                         yscale="log",
                     )
