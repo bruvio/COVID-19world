@@ -197,6 +197,15 @@ if 'UK' in list(caseTableSimple['Country/Region']):
 if 'USA' in list(caseTableSimple['Country/Region']):
     caseTableSimple = caseTableSimple.replace('USA', 'US')
 
+# In my old data, I used 'United Arab Emirates' not 'UAE'
+if 'UAE' in list(caseTableSimple['Country/Region']):
+    caseTableSimple['Country/Region'].replace({'UAE': 'United Arab Emirates'}, inplace=True)
+
+if 'Réunion' in list(caseTableSimple['Country/Region']):
+    caseTableSimple['Country/Region'].replace({'Réunion': 'Reunion'}, inplace=True)
+
+if 'Curaçao' in list(caseTableSimple['Country/Region']):
+    caseTableSimple['Country/Region'].replace({'Curaçao': 'Curacao'}, inplace=True)
 
 
 timeStampe = currentTime.strftime('%m_%d_%Y_%H_%M')
@@ -242,15 +251,6 @@ if 'Taiwan' in list(caseTableSimple['Country/Region']):
     caseTableSimple.at[
         caseTableSimple.loc[caseTableSimple['Country/Region'] == 'Taiwan',].index, 'Province/State'] = 'Taiwan'
 
-# In my old data, I used 'United Arab Emirates' not 'UAE'
-if 'UAE' in list(caseTableSimple['Country/Region']):
-    caseTableSimple['Country/Region'].replace({'UAE': 'United Arab Emirates'}, inplace=True)
-
-if 'Réunion' in list(caseTableSimple['Country/Region']):
-    caseTableSimple['Country/Region'].replace({'Réunion': 'Reunion'}, inplace=True)
-
-if 'Curaçao' in list(caseTableSimple['Country/Region']):
-    caseTableSimple['Country/Region'].replace({'Curaçao': 'Curacao'}, inplace=True)
 
 # In my old data I used US time as Last Update time
 currentTime = datetime.now()
@@ -279,20 +279,20 @@ caseTableSimple.tail(20)
 # The communication with website is ok if the response is 200
 # US_Canada = "https://coronavirus.1point3acres.com/zh"
 # response2 = get(US_Canada, headers=headers)
-# response2
-#
-# # Out[340]:
-#
-# # <Response [200]>
-#
-# # In [341]:
-#
-# # Scrap all content from the website
+# # response2
+# #
+# # # Out[340]:
+# #
+# # # <Response [200]>
+# #
+# # # In [341]:
+# #
+# # # Scrap all content from the website
 # html_soup2 = BeautifulSoup(response2.text, 'html.parser')
-#
-# # In [342]:
-#
-# # Since they change class index everyday, this code is for finding the new index.
+# #
+# # # In [342]:
+# #
+# # # Since they change class index everyday, this code is for finding the new index.
 # indexList = []
 # for span in html_soup2.find_all('span'):
 #     # Only retain 'span' that has contents
@@ -301,99 +301,29 @@ caseTableSimple.tail(20)
 #         if span.contents[0] == 'Location':
 #             # Store the index inside a list
 #             indexList.append(span['class'][0])
-#
-# # In [343]:
-#
-# # The first index is for US table and the 2nd index is for Canada table. Do not care about the rest inside the list.
+# #
+# # # In [343]:
+# #
+# # # The first index is for US table and the 2nd index is for Canada table. Do not care about the rest inside the list.
 # USindex, CANindex = indexList
-#
-# # In [344]:
-#
-# # Check if the index return right data
+# #
+# # # In [344]:
+# #
+# # # Check if the index return right data
 # html_soup2.find_all('span', class_=USindex)
+# #
 #
 #
 #
 #
-#
-# # html_soup2.find_all('span', class_=CANindex)
+# html_soup2.find_all('span', class_=CANindex)
 #
 #
 #
 #
 # # len(html_soup2.find_all('span', class_=CANindex))
 #
-# Locations = []
-# Confirmed = []
-# Recovered = []
-# Deaths = []
-# list1 = range(1, len(html_soup2.find_all('span', class_=USindex)) - 4, 5)
-# list2 = range(2, len(html_soup2.find_all('span', class_=USindex)) - 3, 5)
-# list3 = range(3, len(html_soup2.find_all('span', class_=USindex)) - 2, 5)
-# list4 = range(4, len(html_soup2.find_all('span', class_=USindex)) - 1, 5)
-#
-# for index in list1:
-#     if len(html_soup2.find_all('span', class_=USindex)[index].contents):
-#         Locations.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
-#     else:
-#         Locations.append(0)
-# for index in list2:
-#     if len(html_soup2.find_all('span', class_=USindex)[index].contents):
-#         try:
-#             Confirmed.append(html_soup2.find_all('span', class_=USindex)[index].contents[1])
-#         except:
-#             Confirmed.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
-#     else:
-#         Confirmed.append(0)
-# for index in list3:
-#     # They do not provide recovered cases number anymore.
-#     # if len(html_soup2.find_all('span', class_=USindex)[index].contents):
-#     #    Recovered.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
-#     # else:
-#     Recovered.append(0)
-# for index in list3:
-#     if len(html_soup2.find_all('span', class_=USindex)[index].contents):
-#         try:
-#             Deaths.append(html_soup2.find_all('span', class_=USindex)[index].contents[1])
-#         except:
-#             Deaths.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
-#     else:
-#         Deaths.append(0)
-#
-# US_data = pd.DataFrame({'Province/State': Locations,
-#                         'Confirmed': Confirmed,
-#                         'Deaths': Deaths,
-#                         # 'Recovered':Recovered,
-#                         })
-#
-# # Remove rows that are not data
-# US_data.drop(US_data[US_data['Deaths'] == 'Deaths'].index, axis=0, inplace=True)
-#
-# # Remove rows that are not data
-# US_data.drop(US_data[US_data['Province/State'] == 'United States'].index, axis=0, inplace=True)
-#
-# # Replace Washington, D.C. as Washington DC
-# if 'Washington, D.C.' in list(US_data['Province/State']):
-#     US_data['Province/State'].replace({'Washington, D.C.': 'Washington DC'}, inplace=True)
-#
-# # Replace Washington as WA
-# if 'Washington' in list(US_data['Province/State']):
-#     US_data['Province/State'].replace({'Washington': 'WA'}, inplace=True)
-#
-# # Replace Grand Princess as From Grand Princess
-# # if 'Grand Princess' in list(US_data['Province/State']):
-# #    US_data['Province/State'].replace({'Grand Princess':'From Grand Princess'}, inplace=True)
-#
-# # Replace Diamond Princess as From Diamond Princess cruise
-# # if 'Diamond Princess' in list(US_data['Province/State']):
-# #    US_data['Province/State'].replace({'Diamond Princess':'From Diamond Princess cruise'}, inplace=True)
-#
-# # Assign 0 in column Province/State as unassigned
-# if 0 in list(US_data['Province/State']):
-#     US_data.at[US_data.loc[US_data['Province/State'] == 0,].index, 'Province/State'] = 'Unassigned'
-#
-# # Remove comma for each element
-# US_data['Confirmed'] = US_data['Confirmed'].apply(removeCommas)
+
 
 # As the website changed to dynamic, using selenium to interact with the website vitually
 from selenium import webdriver
@@ -402,6 +332,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 # Open vitual Chrome browser
+
+
 driver = webdriver.Chrome()
 # Direct the driver to open a webpage by calling the ‘get’ method, with a parameter of the page we want to visit.
 driver.get("https://coronavirus.1point3acres.com/en")
@@ -409,15 +341,35 @@ driver.get("https://coronavirus.1point3acres.com/en")
 python_button = driver.find_element(By.XPATH, "//span[text()='Canada']")
 python_button.click()
 
-html_soup2 = BeautifulSoup(driver.page_source, 'html.parser')
+# html_soup22 = BeautifulSoup(driver.page_source)
+html_soup2 = BeautifulSoup(driver.page_source,  'html.parser')
+
+
+driver.get("https://coronavirus.1point3acres.com/en")
+# click tab button to let page lode new data (US data is the default)
+python_button = driver.find_element(By.XPATH, "//span[text()='United States']")
+python_button.click()
+
+# html_soup22 = BeautifulSoup(driver.page_source)
+html_soup22 = BeautifulSoup(driver.page_source,  'html.parser')
 
 # Wait for the dynamically loaded elements to show up
 # WebDriverWait(driver, 10).until(
 #     EC.visibility_of_element_located((By.CLASS_NAME, CANindex)))
 # # And grab the new page HTML source
-# html_page = driver.page_source
+html_page = driver.page_source
 driver.quit()
+indexList = []
+for span in html_soup2.find_all('span'):
+    # Only retain 'span' that has contents
+    if len(span.contents):
+        # Since we only need to find index for table, use one of the table head as target word to locate index
+        if span.contents[0] == 'Location':
+            # Store the index inside a list
+            indexList.append(span['class'][0])
 
+# USindex, CANindex = indexList
+CANindex = indexList[1]
 Locations = []
 Confirmed = []
 Recovered = []
@@ -456,22 +408,97 @@ for index in list3:
         Deaths.append(0)
 
 CAN_data = pd.DataFrame({'Province/State': Locations,
-                         'Confirmed': Confirmed,
-                         'Deaths': Deaths,
+                         'confirmed': Confirmed,
+                         'deaths': Deaths,
                          # 'Recovered':Recovered,
                          })
 
 # Remove rows that are not data
-CAN_data.drop(CAN_data[CAN_data['Deaths'] == 'Deaths'].index, axis=0, inplace=True)
+CAN_data.drop(CAN_data[CAN_data['deaths'] == 'deaths'].index, axis=0, inplace=True)
 
 # Remove rows that are not data
 CAN_data.drop(CAN_data[CAN_data['Province/State'] == 'Canada'].index, axis=0, inplace=True)
 
 # Remove comma for each element
-CAN_data['Confirmed'] = CAN_data['Confirmed'].apply(removeCommas)
+CAN_data['confirmed'] = CAN_data['confirmed'].apply(removeCommas)
 
 
 CAN_data
+
+
+html_soup2 = html_soup22
+USindex = indexList[0]
+Locations = []
+Confirmed = []
+Recovered = []
+Deaths = []
+list1 = range(1, len(html_soup2.find_all('span', class_=USindex)) - 4, 5)
+list2 = range(2, len(html_soup2.find_all('span', class_=USindex)) - 3, 5)
+list3 = range(3, len(html_soup2.find_all('span', class_=USindex)) - 2, 5)
+list4 = range(4, len(html_soup2.find_all('span', class_=USindex)) - 1, 5)
+
+for index in list1:
+    if len(html_soup2.find_all('span', class_=USindex)[index].contents):
+        Locations.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
+    else:
+        Locations.append(0)
+for index in list2:
+    if len(html_soup2.find_all('span', class_=USindex)[index].contents):
+        try:
+            Confirmed.append(html_soup2.find_all('span', class_=USindex)[index].contents[1])
+        except:
+            Confirmed.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
+    else:
+        Confirmed.append(0)
+for index in list3:
+    # They do not provide recovered cases number anymore.
+    # if len(html_soup2.find_all('span', class_=USindex)[index].contents):
+    #    Recovered.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
+    # else:
+    Recovered.append(0)
+for index in list3:
+    if len(html_soup2.find_all('span', class_=USindex)[index].contents):
+        try:
+            Deaths.append(html_soup2.find_all('span', class_=USindex)[index].contents[1])
+        except:
+            Deaths.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
+    else:
+        Deaths.append(0)
+
+US_data = pd.DataFrame({'Province/State': Locations,
+                        'confirmed': Confirmed,
+                        'deaths': Deaths,
+                        # 'Recovered':Recovered,
+                        })
+
+# Remove rows that are not data
+US_data.drop(US_data[US_data['deaths'] == 'deaths'].index, axis=0, inplace=True)
+
+# Remove rows that are not data
+US_data.drop(US_data[US_data['Province/State'] == 'United States'].index, axis=0, inplace=True)
+
+# Replace Washington, D.C. as Washington DC
+if 'Washington, D.C.' in list(US_data['Province/State']):
+    US_data['Province/State'].replace({'Washington, D.C.': 'Washington DC'}, inplace=True)
+
+# Replace Washington as WA
+if 'Washington' in list(US_data['Province/State']):
+    US_data['Province/State'].replace({'Washington': 'WA'}, inplace=True)
+
+# Replace Grand Princess as From Grand Princess
+# if 'Grand Princess' in list(US_data['Province/State']):
+#    US_data['Province/State'].replace({'Grand Princess':'From Grand Princess'}, inplace=True)
+
+# Replace Diamond Princess as From Diamond Princess cruise
+# if 'Diamond Princess' in list(US_data['Province/State']):
+#    US_data['Province/State'].replace({'Diamond Princess':'From Diamond Princess cruise'}, inplace=True)
+
+# Assign 0 in column Province/State as unassigned
+if 0 in list(US_data['Province/State']):
+    US_data.at[US_data.loc[US_data['Province/State'] == 0,].index, 'Province/State'] = 'Unassigned'
+
+# Remove comma for each element
+US_data['confirmed'] = US_data['confirmed'].apply(removeCommas)
 
 
 
