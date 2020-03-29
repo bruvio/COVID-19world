@@ -612,20 +612,21 @@ caseTableSimple = pd.concat([AUS_df, caseTableSimple], ignore_index=True)
 caseTableSimple.to_csv('./web_data/{}_webData.csv'.format(timeStampe), index=False)
 
 
-# us_index = worldometer_table.index[worldometer_table['Country/Region']=='US'].tolist()[0]
-# china_index = worldometer_table.index[worldometer_table['Country/Region']=='China'].tolist()[0]
-# aus_index = worldometer_table.index[worldometer_table['Country/Region']=='Australia'].tolist()[0]
-# canada_index = worldometer_table.index[worldometer_table['Country/Region']=='Canada'].tolist()[0]
-#
-# worldometer_table['confirmed'].iloc[us_index] =USA_total_confirmed
-# worldometer_table['confirmed'].iloc[china_index] =CHN_total_confirmed
-# worldometer_table['recovered'].iloc[china_index] =CHN_total_recovered
-# worldometer_table['confirmed'].iloc[aus_index] = AUS_total_confirmed
-# worldometer_table['confirmed'].iloc[canada_index] =CAN_total_confirmed
-# worldometer_table['deaths'].iloc[us_index] = USA_total_deaths
-# worldometer_table['deaths'].iloc[china_index] = CHN_total_deaths
-# worldometer_table['deaths'].iloc[canada_index] =CAN_total_deaths
-# worldometer_table['deaths'].iloc[aus_index]
+us_index = worldometer_table.index[worldometer_table['Country/Region']=='US'].tolist()[0]
+china_index = worldometer_table.index[worldometer_table['Country/Region']=='China'].tolist()[0]
+aus_index = worldometer_table.index[worldometer_table['Country/Region']=='Australia'].tolist()[0]
+canada_index = worldometer_table.index[worldometer_table['Country/Region']=='Canada'].tolist()[0]
+
+print(worldometer_table['confirmed'].loc[us_index] ,USA_total_confirmed)
+print(worldometer_table['confirmed'].loc[china_index] ,CHN_total_confirmed)
+print(worldometer_table['recovered'].loc[china_index] ,CHN_total_recovered)
+print(worldometer_table['confirmed'].loc[aus_index] , AUS_total_confirmed)
+print(worldometer_table['confirmed'].loc[canada_index] ,CAN_total_confirmed)
+print(worldometer_table['deaths'].loc[us_index] , USA_total_deaths)
+print(worldometer_table['deaths'].loc[china_index] ,CHN_total_deaths)
+print(worldometer_table['deaths'].loc[canada_index] ,CAN_total_deaths)
+
+
 
 
 #  updating worldmeter table with most recend data from different sources
@@ -643,10 +644,10 @@ worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'deaths'] 
 worldometer_table.loc[worldometer_table['Country/Region'] == 'Australia', 'confirmed'] = AUS_total_confirmed
 
 
-print(worldometer_table.loc[worldometer_table['Country/Region'] == 'Australia', 'confirmed'],AUS_total_confirmed)
-print(worldometer_table.loc[worldometer_table['Country/Region'] == 'US', 'confirmed'],USA_total_confirmed)
-print(worldometer_table.loc[worldometer_table['Country/Region'] == 'Canada', 'confirmed'],CAN_total_confirmed)
-print(worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'confirmed'],CHN_total_confirmed)
+# print(worldometer_table[worldometer_table['Country/Region'] == 'Australia', 'confirmed'],AUS_total_confirmed)
+# print(worldometer_table[worldometer_table['Country/Region'] == 'US', 'confirmed'],USA_total_confirmed)
+# print(worldometer_table[worldometer_table['Country/Region'] == 'Canada', 'confirmed'],CAN_total_confirmed)
+# print(worldometer_table[worldometer_table['Country/Region'] == 'China', 'confirmed'],CHN_total_confirmed)
 
 
 # writing table to csv
