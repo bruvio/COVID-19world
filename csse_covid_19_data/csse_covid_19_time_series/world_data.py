@@ -1288,3 +1288,4 @@ if __name__ == "__main__":
 
     main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=True)
     # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
+

@@ -13,8 +13,9 @@ from datetime import datetime, timedelta
 import math 
 import os
 import ast
-
-
+import time
+import glob
+from datetime import date
 
 
 # Function for remove comma within numbers
@@ -650,5 +651,48 @@ worldometer_table.loc[worldometer_table['Country/Region'] == 'Australia', 'confi
 # print(worldometer_table[worldometer_table['Country/Region'] == 'China', 'confirmed'],CHN_total_confirmed)
 
 
+# load previous worldometer table
+# list_of_files = glob.glob('worldmeter_data/*')  # * means all if need specific format then *.csv
+# latest_file = max(list_of_files, key=os.path.getctime)
+list_of_files = []
+now = time.time()
+
+for f in os.listdir('./worldmeter_data/'):
+    if os.stat(os.path.join('./worldmeter_data/',f)).st_mtime < now - 1 * 86400:
+        list_of_files.append(f)
+
+list_of_files.sort(reverse=True)
+latest_file = list_of_files[0]
+
+previous_worldometer_table = pd.read_csv('./worldmeter_data/'+   latest_file)
+
+previous_worldometer_table['increase_confirmed'] = np.where(worldometer_table['confirmed'] == previous_worldometer_table['confirmed'], 0, worldometer_table['confirmed'] - previous_worldometer_table['confirmed']) #create new column in df1 for price diff
+# previous_worldometer_table['increase_deaths'] = np.where(worldometer_table['deaths'] == previous_worldometer_table['deaths'], 0, worldometer_table['deaths'] - previous_worldometer_table['deaths']) #create new column in df1 for price diff
+# previous_worldometer_table['increase_recovered'] = np.where(worldometer_table['recovered'] == previous_worldometer_table['recovered'], 0, worldometer_table['recovered'] - previous_worldometer_table['recovered']) #create new column in df1 for price diff
+# print(previous_worldometer_table.head(20))
 # writing table to csv
 worldometer_table.to_csv('./worldmeter_data/{}_webData.csv'.format(timeStampe), index=False)
+
+
+
+
+comparison_df = worldometer_table.merge(previous_worldometer_table,
+                              indicator=True
+                              ,left_on='Country/Region',right_on='Country/Region',suffixes=('_left', '_right'))
+
+
+
+comparison_df = pd.DataFrame(
+    {'Country/Region': comparison_df['Country/Region'],
+     'Confirmed_diff': comparison_df['confirmed_left'] - comparison_df['confirmed_right'],
+     'Deaths_diff': comparison_df['deaths_left'] - comparison_df['deaths_right'],
+     'Recovered_diff': comparison_df['recovered_left'] - comparison_df['recovered_right'],
+     'date_diff': pd.to_datetime(comparison_df['Last Update_left']) - pd.to_datetime(comparison_df['Last Update_right']),
+     })
+
+today = date.today()
+comparison_df.to_csv('./daily_diff/{}_diff.csv'.format(today))
+# diff_df = dataframe_difference(worldometer_table,previous_worldometer_table,'confirmed',which='left_only')
+# diff_df = dataframe_difference(worldometer_table,previous_worldometer_table)
+
+print(comparison_df.head(20))
