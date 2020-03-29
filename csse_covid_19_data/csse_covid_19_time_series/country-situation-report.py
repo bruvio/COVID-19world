@@ -14,6 +14,8 @@
 import itertools
 import numpy as np
 import sys
+import glob
+import os
 
 sys.path.insert(0, "..")
 import warnings
@@ -93,17 +95,75 @@ dataframe_all_countries = pre_process_database(datatemplate, fields)
 # data_italy_path = 'dpc-covid19-ita-andamento-nazionale.csv'
 # data_italy_path = covid19.data.download('andamento-nazionale')
 
-last_update_df = pd.read_csv()
+list_of_files = glob.glob('worldmeter_data/*')  # * means all if need specific format then *.csv
+latest_file = max(list_of_files, key=os.path.getctime)
+
+dataframe_all_countries_last_update = pd.read_csv(
+    latest_file)
+
+
+field = 'confirmed'
+# field = 'recovered'
+# field = 'deaths'
+# fields = []
+# field.append('confirmed')
+# field.append('deaths')
+# field.append('recovered')
 
 for country in countrylist:
     print("\n" + country + "\n")
-    dataframe, x, y = select_database(dataframe_all_countries, country, "confirmed")
+    dataframe, x, y = select_database(dataframe_all_countries, country, field)
     # dataframe.reset_index()
     # # In[4]:
     #
     #
     # data_italy = pd.read_csv(dataframe, parse_dates=['date'], index_col=['date'])
     # data_italy.index = data_italy.index.normalize()
+    # data_italy = dataframe.copy()
+
+    # for field in fields:
+    dataframe_all_countries_last_update1 = dataframe_all_countries_last_update[
+        ["Country/Region", field, "Last Update"]]
+
+    dataframe_all_countries_last_update2 = pd.DataFrame(
+        {'Country/Region': dataframe_all_countries_last_update1['Country/Region'],
+         field: dataframe_all_countries_last_update1[field],
+         'date': dataframe_all_countries_last_update1['Last Update'],
+         })
+    dataframe_all_countries_last_update2.reset_index()
+    # df = pd.pivot_table(dataframe_all_countries_last_update2, values = 'confirmed', index=['date'], columns = 'confirmed').reset_index()
+    # df = dataframe_all_countries_last_update2.pivot(values = 'confirmed', columns = 'Country/Region')
+    df_last_update = dataframe_all_countries_last_update2.pivot(index="date", columns="Country/Region",
+                                                                values=field)
+
+    df_country = df_last_update[[country]]
+
+    # dataframe.append(pd.Series(name=df_country.index[0]))
+    if field == 'confirmed':
+        dataframe = dataframe.append(pd.Series(), ignore_index=True)
+        dataframe['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
+        dataframe['country'].iloc[-1] = country
+        dataframe['quantity'].iloc[-1] = field
+        dataframe['counts'].iloc[-1] = df_country[country].values[0]
+        x.append(pd.Series(pd.to_datetime(df_country.index[0])))
+        y.append(pd.Series(df_country[country].values[0]))
+    if field == 'deaths':
+        dataframe_deaths = dataframe_deaths.append(pd.Series(), ignore_index=True)
+        dataframe_deaths['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
+        dataframe_deaths['country'].iloc[-1] = country
+        dataframe_deaths['quantity'].iloc[-1] = field
+        dataframe_deaths['counts'].iloc[-1] = df_country[country].values[0]
+        x_deaths.append(pd.Series(pd.to_datetime(df_country.index[0])))
+        y_deaths.append(pd.Series(df_country[country].values[0]))
+    if field == 'recovered':
+        dataframe_recovered = dataframe_recovered.append(pd.Series(), ignore_index=True)
+        dataframe_recovered['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
+        dataframe_recovered['country'].iloc[-1] = country
+        dataframe_recovered['quantity'].iloc[-1] = field
+        dataframe_recovered['counts'].iloc[-1] = df_country[country].values[0]
+        x_recovered.append(pd.Series(pd.to_datetime(df_country.index[0])))
+        y_recovered.append(pd.Series(df_country[country].values[0]))
+
     data_italy = dataframe.copy()
     for column in ["counts"]:
         data_italy["variazione_" + column] = data_italy[column].diff(1)
@@ -117,8 +177,8 @@ for country in countrylist:
     #
     #
     START_FIT = "2020-02-23"
-    STOP_FIT = "2020-03-25"
-    EXTRAPOLTATE = ("2020-02-23", "2020-03-27")
+    STOP_FIT = "2020-03-29"
+    EXTRAPOLTATE = ("2020-02-23", "2020-03-31")
     #
     #
     # # In[6]:

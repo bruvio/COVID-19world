@@ -316,15 +316,16 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
     today = today.strftime("%d-%m-%Y")
     # datatemplate = "time_series_19-covid-{}.csv"
     datatemplate = "time_series_covid19_{}_global.csv"
-    fields = ["confirmed", "deaths", "recovered"]
+    # fields = ["confirmed", "deaths", "recovered"]
+    fields = []
+    field.append('confirmed')
+    field.append('deaths')
+    field.append('recovered')
+
     dataframe_all_countries = pre_process_database(datatemplate, fields)
     list_of_files = glob.glob('worldmeter_data/*')  # * means all if need specific format then *.csv
     latest_file = max(list_of_files, key=os.path.getctime)
 
-    # for filename in os.listdir('worldmeter_data'):
-    #     file = filename.replace('_webData.csv','')
-    #     date_filename = datetime.datetime.strptime(file.split(" ")[0], '%m_%d_%Y_%H_%M')
-    #     if date_filename < datetime.datetime.now() :
 
     dataframe_all_countries_last_update = pd.read_csv(
                                               latest_file)
@@ -333,16 +334,6 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
     countrylist_df = list(set(dataframe_all_countries["country"]))
 
-
-
-    # countrynotinlist = []
-    # i = 0
-    # for region in df.columns:
-    #     if region in list(set(dataframe_all_countries["country"])):
-    #         print(region)
-    #         i = i + 1
-    #     else:
-    #         countrynotinlist.append(region)
 
     countrylist = []
     countrylist.append("Italy")
