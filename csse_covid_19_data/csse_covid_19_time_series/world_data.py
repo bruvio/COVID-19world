@@ -1075,8 +1075,8 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
         # fields = ["confirmed", "deaths", "recovered"]
         fields = []
         fields.append("confirmed")
-        fields.append("deaths")
-        fields.append("recovered")
+        # fields.append("deaths")
+        # fields.append("recovered")
         for field in fields:
             # df = pd.read_csv(datatemplate.format(field))
 
@@ -1260,9 +1260,9 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                     hspace=0.2,
                 )
 
-            draw_barchart(frames_list[-1][0:10])
+            draw_barchart(frames_list[-1])
             plt.savefig(
-                "./Figures/Racing Bar Chart-{}-{}.png".format(field, frames_list[-1][0:10]),
+                "./Figures/Racing Bar Chart-{}-{}.png".format(field, frames_list[-1]),
                 dpi=100,
             )
             # plt.savefig(
@@ -1295,5 +1295,5 @@ if __name__ == "__main__":
     # main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=False)
     # main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=True)
 
-    main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=True)
+    main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=True)
     # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
