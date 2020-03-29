@@ -210,7 +210,10 @@ if 'Curaçao' in list(caseTableSimple['Country/Region']):
 
 timeStampe = currentTime.strftime('%m_%d_%Y_%H_%M')
 caseTableSimple = caseTableSimple.sort_values(by=['confirmed'], ascending=False)
-caseTableSimple.to_csv('./worldmeter_data/{}_webData.csv'.format(timeStampe), index=False)
+
+worldometer_table = caseTableSimple.copy()
+
+# worldometer_table.to_csv('./worldmeter_data/{}_webData.csv'.format(timeStampe), index=False)
 print(caseTableSimple.head(10))
 # raise SystemExit
 
@@ -273,56 +276,6 @@ caseTableSimple.tail(20)
 # # Scrap data for US_CAN
 
 
-
-
- # Test if we can scrap info from worldometers
-# The communication with website is ok if the response is 200
-# US_Canada = "https://coronavirus.1point3acres.com/zh"
-# response2 = get(US_Canada, headers=headers)
-# # response2
-# #
-# # # Out[340]:
-# #
-# # # <Response [200]>
-# #
-# # # In [341]:
-# #
-# # # Scrap all content from the website
-# html_soup2 = BeautifulSoup(response2.text, 'html.parser')
-# #
-# # # In [342]:
-# #
-# # # Since they change class index everyday, this code is for finding the new index.
-# indexList = []
-# for span in html_soup2.find_all('span'):
-#     # Only retain 'span' that has contents
-#     if len(span.contents):
-#         # Since we only need to find index for table, use one of the table head as target word to locate index
-#         if span.contents[0] == 'Location':
-#             # Store the index inside a list
-#             indexList.append(span['class'][0])
-# #
-# # # In [343]:
-# #
-# # # The first index is for US table and the 2nd index is for Canada table. Do not care about the rest inside the list.
-# USindex, CANindex = indexList
-# #
-# # # In [344]:
-# #
-# # # Check if the index return right data
-# html_soup2.find_all('span', class_=USindex)
-# #
-#
-#
-#
-#
-# html_soup2.find_all('span', class_=CANindex)
-#
-#
-#
-#
-# # len(html_soup2.find_all('span', class_=CANindex))
-#
 
 
 # As the website changed to dynamic, using selenium to interact with the website vitually
@@ -421,8 +374,9 @@ CAN_data.drop(CAN_data[CAN_data['Province/State'] == 'Canada'].index, axis=0, in
 
 # Remove comma for each element
 CAN_data['confirmed'] = CAN_data['confirmed'].apply(removeCommas)
-
-
+CAN_data['deaths'] = CAN_data['deaths'].apply(removeCommas)
+CAN_total_confirmed = CAN_data['confirmed'].iloc[1:-1].astype(int).sum()
+CAN_total_deaths =CAN_data['deaths'].iloc[1:-1].astype(int).sum()
 CAN_data
 
 
@@ -499,9 +453,12 @@ if 0 in list(US_data['Province/State']):
 
 # Remove comma for each element
 US_data['confirmed'] = US_data['confirmed'].apply(removeCommas)
+US_data['deaths'] = US_data['deaths'].apply(removeCommas)
 
 
 
+USA_total_confirmed = US_data['confirmed'].iloc[1:-1].astype(int).sum()
+USA_total_deaths =US_data['deaths'].iloc[1:-1].astype(int).sum()
 
 US_Can_data = pd.concat([US_data, CAN_data], ignore_index=True)
 US_Can_data = US_Can_data.apply(lambda x: x.str.strip())
@@ -524,6 +481,10 @@ columnOrder = ['Province/State', 'Country/Region', 'Last Update','confirmed', 'd
 
 US_Can_data_EN = US_Can_data_EN[columnOrder[:-1]]
 # US_Can_data_EN
+
+
+
+
 
 
 
@@ -570,6 +531,7 @@ dataframe = pd.DataFrame({'Province/State': dataframe['provinceName'],
 dataframe = dataframe[columnOrder]
 
 
+
 from china_cities import *
 from googletrans import Translator
 translator = Translator()
@@ -580,6 +542,9 @@ for province in dataframe['Province/State']:
         provinceNames.append(trans)
 dataframe['Province/State']  = provinceNames
 CHN_data = dataframe
+CHN_total_confirmed = CHN_data['confirmed'].sum()
+CHN_total_deaths =CHN_data['deaths'].sum()
+CHN_total_recovered =CHN_data['recovered'].sum()
 
 
 caseTableSimple = pd.concat([CHN_data, caseTableSimple], ignore_index=True)
@@ -637,5 +602,52 @@ AUS_df = pd.DataFrame({'Province/State': AUS_df['Province/State'],
                         })
 AUS_df = AUS_df[columnOrder[:-2]]
 
+AUS_total_confirmed =AUS_df['confirmed'].sum()
+
+
+
+
+
 caseTableSimple = pd.concat([AUS_df, caseTableSimple], ignore_index=True)
 caseTableSimple.to_csv('./web_data/{}_webData.csv'.format(timeStampe), index=False)
+
+
+# us_index = worldometer_table.index[worldometer_table['Country/Region']=='US'].tolist()[0]
+# china_index = worldometer_table.index[worldometer_table['Country/Region']=='China'].tolist()[0]
+# aus_index = worldometer_table.index[worldometer_table['Country/Region']=='Australia'].tolist()[0]
+# canada_index = worldometer_table.index[worldometer_table['Country/Region']=='Canada'].tolist()[0]
+#
+# worldometer_table['confirmed'].iloc[us_index] =USA_total_confirmed
+# worldometer_table['confirmed'].iloc[china_index] =CHN_total_confirmed
+# worldometer_table['recovered'].iloc[china_index] =CHN_total_recovered
+# worldometer_table['confirmed'].iloc[aus_index] = AUS_total_confirmed
+# worldometer_table['confirmed'].iloc[canada_index] =CAN_total_confirmed
+# worldometer_table['deaths'].iloc[us_index] = USA_total_deaths
+# worldometer_table['deaths'].iloc[china_index] = CHN_total_deaths
+# worldometer_table['deaths'].iloc[canada_index] =CAN_total_deaths
+# worldometer_table['deaths'].iloc[aus_index]
+
+
+#  updating worldmeter table with most recend data from different sources
+
+worldometer_table.loc[worldometer_table['Country/Region'] == 'US', 'confirmed'] = USA_total_confirmed
+worldometer_table.loc[worldometer_table['Country/Region'] == 'US', 'deaths'] = USA_total_deaths
+
+worldometer_table.loc[worldometer_table['Country/Region'] == 'Canada', 'confirmed'] = CAN_total_confirmed
+worldometer_table.loc[worldometer_table['Country/Region'] == 'Canada', 'deaths'] = CAN_total_deaths
+
+worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'confirmed'] = CHN_total_confirmed
+worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'recovered'] = CHN_total_recovered
+worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'deaths'] = CHN_total_deaths
+
+worldometer_table.loc[worldometer_table['Country/Region'] == 'Australia', 'confirmed'] = AUS_total_confirmed
+
+
+print(worldometer_table.loc[worldometer_table['Country/Region'] == 'Australia', 'confirmed'],AUS_total_confirmed)
+print(worldometer_table.loc[worldometer_table['Country/Region'] == 'US', 'confirmed'],USA_total_confirmed)
+print(worldometer_table.loc[worldometer_table['Country/Region'] == 'Canada', 'confirmed'],CAN_total_confirmed)
+print(worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'confirmed'],CHN_total_confirmed)
+
+
+# writing table to csv
+worldometer_table.to_csv('./worldmeter_data/{}_webData.csv'.format(timeStampe), index=False)

@@ -1074,8 +1074,8 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
         # datatemplate = "time_series_covid19_{}_global.csv"
         # fields = ["confirmed", "deaths", "recovered"]
         fields = []
-        # fields.append("confirmed")
-        # fields.append("deaths")
+        fields.append("confirmed")
+        fields.append("deaths")
         fields.append("recovered")
         for field in fields:
             # df = pd.read_csv(datatemplate.format(field))
@@ -1294,5 +1294,5 @@ if __name__ == "__main__":
     # main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=False)
     # main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=False)
     # main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=True)
-    main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=True)
+    main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=True)
     # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
