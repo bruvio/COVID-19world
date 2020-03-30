@@ -162,9 +162,9 @@ CaseTable.tail(40)
 
 
 caseTableSimple = CaseTable[[CaseTable.columns[0], CaseTable.columns[1], CaseTable.columns[3], CaseTable.columns[5]]]
-caseTableSimple.columns = ['Country/Region', 'confirmed', 'deaths', 'recovered']
+caseTableSimple.columns = ['Country/Region', 'Confirmed', 'Deaths', 'Recovered']
 # Set data type as string first for manuipulation
-caseTableSimple = caseTableSimple.astype({'Country/Region':str,'confirmed':str,'deaths':str, 'recovered':str})
+caseTableSimple = caseTableSimple.astype({'Country/Region':str,'Confirmed':str,'Deaths':str, 'Recovered':str})
 # Remove the last row of total number (changed on 20200310, worldmeter moved this row as next tbody)
 #caseTableSimple = caseTableSimple.iloc[:-1,:]
 # Remove lead and tail space for each element
@@ -175,9 +175,9 @@ caseTableSimple = caseTableSimple.applymap(removeCommas)
 caseTableSimple = caseTableSimple.replace('', '0')
 # After string manipulation, convert data type as correct type
 caseTableSimple = caseTableSimple.astype({'Country/Region':'str',
-                                          'confirmed':'int',
-                                          'deaths':'int',
-                                          'recovered':'int',
+                                          'Confirmed':'int',
+                                          'Deaths':'int',
+                                          'Recovered':'int',
                                          })
 
 currentTime = datetime.now()
@@ -210,7 +210,7 @@ if 'Curaçao' in list(caseTableSimple['Country/Region']):
 
 
 timeStampe = currentTime.strftime('%m_%d_%Y_%H_%M')
-caseTableSimple = caseTableSimple.sort_values(by=['confirmed'], ascending=False)
+caseTableSimple = caseTableSimple.sort_values(by=['Confirmed'], ascending=False)
 
 worldometer_table = caseTableSimple.copy()
 
@@ -219,7 +219,7 @@ print(caseTableSimple.head(10))
 # raise SystemExit
 
 # Data for these countries come from other source
-removeRegion = ['China', 'Canada', 'Australia', 'USA']
+removeRegion = ['China', 'Canada', 'Australia', 'US']
 for i in removeRegion:
     caseTableSimple.drop(caseTableSimple[caseTableSimple['Country/Region'] == i].index, axis=0, inplace=True)
 
@@ -347,7 +347,7 @@ for index in list2:
     else:
         Confirmed.append(0)
 for index in list3:
-    # . They do not provide recovered cases number
+    # . They do not provide Recovered cases number
     # if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
     #    Recovered.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
     # else:
@@ -362,22 +362,22 @@ for index in list3:
         Deaths.append(0)
 
 CAN_data = pd.DataFrame({'Province/State': Locations,
-                         'confirmed': Confirmed,
-                         'deaths': Deaths,
+                         'Confirmed': Confirmed,
+                         'Deaths': Deaths,
                          # 'Recovered':Recovered,
                          })
 
 # Remove rows that are not data
-CAN_data.drop(CAN_data[CAN_data['deaths'] == 'deaths'].index, axis=0, inplace=True)
+CAN_data.drop(CAN_data[CAN_data['Deaths'] == 'Deaths'].index, axis=0, inplace=True)
 
 # Remove rows that are not data
 CAN_data.drop(CAN_data[CAN_data['Province/State'] == 'Canada'].index, axis=0, inplace=True)
 
 # Remove comma for each element
-CAN_data['confirmed'] = CAN_data['confirmed'].apply(removeCommas)
-CAN_data['deaths'] = CAN_data['deaths'].apply(removeCommas)
-CAN_total_confirmed = CAN_data['confirmed'].iloc[1:-1].astype(int).sum()
-CAN_total_deaths =CAN_data['deaths'].iloc[1:-1].astype(int).sum()
+CAN_data['Confirmed'] = CAN_data['Confirmed'].apply(removeCommas)
+CAN_data['Deaths'] = CAN_data['Deaths'].apply(removeCommas)
+CAN_total_confirmed = CAN_data['Confirmed'].astype(int).sum()
+CAN_total_deaths =CAN_data['Deaths'].astype(int).sum()
 CAN_data
 
 
@@ -406,7 +406,7 @@ for index in list2:
     else:
         Confirmed.append(0)
 for index in list3:
-    # They do not provide recovered cases number anymore.
+    # They do not provide Recovered cases number anymore.
     # if len(html_soup2.find_all('span', class_=USindex)[index].contents):
     #    Recovered.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
     # else:
@@ -421,13 +421,13 @@ for index in list3:
         Deaths.append(0)
 
 US_data = pd.DataFrame({'Province/State': Locations,
-                        'confirmed': Confirmed,
-                        'deaths': Deaths,
+                        'Confirmed': Confirmed,
+                        'Deaths': Deaths,
                         # 'Recovered':Recovered,
                         })
 
 # Remove rows that are not data
-US_data.drop(US_data[US_data['deaths'] == 'deaths'].index, axis=0, inplace=True)
+US_data.drop(US_data[US_data['Deaths'] == 'Deaths'].index, axis=0, inplace=True)
 
 # Remove rows that are not data
 US_data.drop(US_data[US_data['Province/State'] == 'United States'].index, axis=0, inplace=True)
@@ -453,13 +453,13 @@ if 0 in list(US_data['Province/State']):
     US_data.at[US_data.loc[US_data['Province/State'] == 0,].index, 'Province/State'] = 'Unassigned'
 
 # Remove comma for each element
-US_data['confirmed'] = US_data['confirmed'].apply(removeCommas)
-US_data['deaths'] = US_data['deaths'].apply(removeCommas)
+US_data['Confirmed'] = US_data['Confirmed'].apply(removeCommas)
+US_data['Deaths'] = US_data['Deaths'].apply(removeCommas)
 
 
 
-USA_total_confirmed = US_data['confirmed'].iloc[1:-1].astype(int).sum()
-USA_total_deaths =US_data['deaths'].iloc[1:-1].astype(int).sum()
+USA_total_confirmed = US_data['Confirmed'].astype(int).sum()
+USA_total_deaths =US_data['Deaths'].astype(int).sum()
 
 US_Can_data = pd.concat([US_data, CAN_data], ignore_index=True)
 US_Can_data = US_Can_data.apply(lambda x: x.str.strip())
@@ -468,7 +468,7 @@ US_Can_data
 # In[252]:
 
 
-nameList = pd.read_csv('./web_data/statesNameTranslation.csv')
+nameList = pd.read_csv('./statesNameTranslation.csv')
 
 
 
@@ -478,7 +478,7 @@ US_Can_data_EN = US_Can_data_EN.drop(['Chinese', 'Province/State', 'Abbr.'], axi
 US_Can_data_EN['Last Update'] = lastUpdateTime
 US_Can_data_EN.rename(columns={'English':'Province/State'}, inplace=True)
 US_Can_data_EN = US_Can_data_EN.drop(US_Can_data_EN[US_Can_data_EN['Province/State'] == 'Wuhan Evacuee'].index, axis=0)
-columnOrder = ['Province/State', 'Country/Region', 'Last Update','confirmed', 'deaths', 'recovered']
+columnOrder = ['Province/State', 'Country/Region', 'Last Update','Confirmed', 'Deaths', 'Recovered']
 
 US_Can_data_EN = US_Can_data_EN[columnOrder[:-1]]
 # US_Can_data_EN
@@ -525,9 +525,9 @@ dataframe['Last Update'] = lastUpdateTime
 dataframe = pd.DataFrame({'Province/State': dataframe['provinceName'],
                           'Country/Region': 'China',
                           'Last Update': lastUpdateTime,
-                        'confirmed': dataframe['confirmedCount'],
-                        'deaths': dataframe['deadCount'],
-                        'recovered': dataframe['curedCount'],
+                        'Confirmed': dataframe['confirmedCount'],
+                        'Deaths': dataframe['deadCount'],
+                        'Recovered': dataframe['curedCount'],
                         })
 dataframe = dataframe[columnOrder]
 
@@ -543,9 +543,9 @@ for province in dataframe['Province/State']:
         provinceNames.append(trans)
 dataframe['Province/State']  = provinceNames
 CHN_data = dataframe
-CHN_total_confirmed = CHN_data['confirmed'].sum()
-CHN_total_deaths =CHN_data['deaths'].sum()
-CHN_total_recovered =CHN_data['recovered'].sum()
+CHN_total_confirmed = CHN_data['Confirmed'].sum()
+CHN_total_deaths =CHN_data['Deaths'].sum()
+CHN_total_recovered =CHN_data['Recovered'].sum()
 
 
 caseTableSimple = pd.concat([CHN_data, caseTableSimple], ignore_index=True)
@@ -600,13 +600,13 @@ AUS_df['Last Update'] = lastUpdateTime
 AUS_df = pd.DataFrame({'Province/State': AUS_df['Province/State'],
                           'Country/Region': 'Australia',
                           'Last Update': lastUpdateTime,
-                        'confirmed': AUS_df['Confirmed'],
+                        'Confirmed': AUS_df['Confirmed'],
                         # 'Deaths': AUS_df['deadCount'],
                         # 'Recovered': AUS_df['curedCount'],
                         })
 AUS_df = AUS_df[columnOrder[:-2]]
 
-AUS_total_confirmed =AUS_df['confirmed'].sum()
+AUS_total_confirmed =AUS_df['Confirmed'].sum()
 
 
 
@@ -621,37 +621,37 @@ china_index = worldometer_table.index[worldometer_table['Country/Region']=='Chin
 aus_index = worldometer_table.index[worldometer_table['Country/Region']=='Australia'].tolist()[0]
 canada_index = worldometer_table.index[worldometer_table['Country/Region']=='Canada'].tolist()[0]
 
-print(worldometer_table['confirmed'].loc[us_index] ,USA_total_confirmed)
-print(worldometer_table['confirmed'].loc[china_index] ,CHN_total_confirmed)
-print(worldometer_table['recovered'].loc[china_index] ,CHN_total_recovered)
-print(worldometer_table['confirmed'].loc[aus_index] , AUS_total_confirmed)
-print(worldometer_table['confirmed'].loc[canada_index] ,CAN_total_confirmed)
-print(worldometer_table['deaths'].loc[us_index] , USA_total_deaths)
-print(worldometer_table['deaths'].loc[china_index] ,CHN_total_deaths)
-print(worldometer_table['deaths'].loc[canada_index] ,CAN_total_deaths)
+print(worldometer_table['Confirmed'].loc[us_index] ,USA_total_confirmed)
+print(worldometer_table['Confirmed'].loc[china_index] ,CHN_total_confirmed)
+print(worldometer_table['Recovered'].loc[china_index] ,CHN_total_recovered)
+print(worldometer_table['Confirmed'].loc[aus_index] , AUS_total_confirmed)
+print(worldometer_table['Confirmed'].loc[canada_index] ,CAN_total_confirmed)
+print(worldometer_table['Deaths'].loc[us_index] , USA_total_deaths)
+print(worldometer_table['Deaths'].loc[china_index] ,CHN_total_deaths)
+print(worldometer_table['Deaths'].loc[canada_index] ,CAN_total_deaths)
 
 
 
 
 #  updating worldmeter table with most recend data from different sources
 
-worldometer_table.loc[worldometer_table['Country/Region'] == 'US', 'confirmed'] = USA_total_confirmed
-worldometer_table.loc[worldometer_table['Country/Region'] == 'US', 'deaths'] = USA_total_deaths
+worldometer_table.loc[worldometer_table['Country/Region'] == 'US', 'Confirmed'] = USA_total_confirmed
+worldometer_table.loc[worldometer_table['Country/Region'] == 'US', 'Deaths'] = USA_total_deaths
 
-worldometer_table.loc[worldometer_table['Country/Region'] == 'Canada', 'confirmed'] = CAN_total_confirmed
-worldometer_table.loc[worldometer_table['Country/Region'] == 'Canada', 'deaths'] = CAN_total_deaths
+worldometer_table.loc[worldometer_table['Country/Region'] == 'Canada', 'Confirmed'] = CAN_total_confirmed
+worldometer_table.loc[worldometer_table['Country/Region'] == 'Canada', 'Deaths'] = CAN_total_deaths
 
-worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'confirmed'] = CHN_total_confirmed
-worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'recovered'] = CHN_total_recovered
-worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'deaths'] = CHN_total_deaths
+worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'Confirmed'] = CHN_total_confirmed
+worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'Recovered'] = CHN_total_recovered
+worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'Deaths'] = CHN_total_deaths
 
-worldometer_table.loc[worldometer_table['Country/Region'] == 'Australia', 'confirmed'] = AUS_total_confirmed
+worldometer_table.loc[worldometer_table['Country/Region'] == 'Australia', 'Confirmed'] = AUS_total_confirmed
 
 
-# print(worldometer_table[worldometer_table['Country/Region'] == 'Australia', 'confirmed'],AUS_total_confirmed)
-# print(worldometer_table[worldometer_table['Country/Region'] == 'US', 'confirmed'],USA_total_confirmed)
-# print(worldometer_table[worldometer_table['Country/Region'] == 'Canada', 'confirmed'],CAN_total_confirmed)
-# print(worldometer_table[worldometer_table['Country/Region'] == 'China', 'confirmed'],CHN_total_confirmed)
+# print(worldometer_table[worldometer_table['Country/Region'] == 'Australia', 'Confirmed'],AUS_total_confirmed)
+# print(worldometer_table[worldometer_table['Country/Region'] == 'US', 'Confirmed'],USA_total_confirmed)
+# print(worldometer_table[worldometer_table['Country/Region'] == 'Canada', 'Confirmed'],CAN_total_confirmed)
+# print(worldometer_table[worldometer_table['Country/Region'] == 'China', 'Confirmed'],CHN_total_confirmed)
 
 
 # load previous worldometer table
@@ -661,7 +661,7 @@ list_of_files = []
 now = time.time()
 
 for f in os.listdir('./worldmeter_data/'):
-    if os.stat(os.path.join('./worldmeter_data/',f)).st_mtime < now - 1 * 86400:
+    if os.stat(os.path.join('./worldmeter_data/',f)).st_mtime < now - 0.5 * 86400:
         list_of_files.append(f)
 
 list_of_files.sort(reverse=True)
@@ -669,9 +669,9 @@ latest_file = list_of_files[0]
 
 previous_worldometer_table = pd.read_csv('./worldmeter_data/'+   latest_file)
 
-# previous_worldometer_table['increase_confirmed'] = np.where(worldometer_table['confirmed'] == previous_worldometer_table['confirmed'], 0, worldometer_table['confirmed'] - previous_worldometer_table['confirmed']) #create new column in df1 for price diff
-# previous_worldometer_table['increase_deaths'] = np.where(worldometer_table['deaths'] == previous_worldometer_table['deaths'], 0, worldometer_table['deaths'] - previous_worldometer_table['deaths']) #create new column in df1 for price diff
-# previous_worldometer_table['increase_recovered'] = np.where(worldometer_table['recovered'] == previous_worldometer_table['recovered'], 0, worldometer_table['recovered'] - previous_worldometer_table['recovered']) #create new column in df1 for price diff
+# previous_worldometer_table['increase_confirmed'] = np.where(worldometer_table['Confirmed'] == previous_worldometer_table['Confirmed'], 0, worldometer_table['Confirmed'] - previous_worldometer_table['Confirmed']) #create new column in df1 for price diff
+# previous_worldometer_table['increase_deaths'] = np.where(worldometer_table['Deaths'] == previous_worldometer_table['Deaths'], 0, worldometer_table['Deaths'] - previous_worldometer_table['Deaths']) #create new column in df1 for price diff
+# previous_worldometer_table['increase_recovered'] = np.where(worldometer_table['Recovered'] == previous_worldometer_table['Recovered'], 0, worldometer_table['Recovered'] - previous_worldometer_table['Recovered']) #create new column in df1 for price diff
 # print(previous_worldometer_table.head(20))
 # writing table to csv
 worldometer_table.to_csv('./worldmeter_data/{}_webData.csv'.format(timeStampe), index=False)
@@ -686,19 +686,19 @@ comparison_df = worldometer_table.merge(previous_worldometer_table,
 
 comparison_df = pd.DataFrame(
     {'Country/Region': comparison_df['Country/Region'],
-     'Confirmed_diff': comparison_df['confirmed_left'] - comparison_df['confirmed_right'],
-     'Deaths_diff': comparison_df['deaths_left'] - comparison_df['deaths_right'],
-     'Recovered_diff': comparison_df['recovered_left'] - comparison_df['recovered_right'],
+     'Confirmed_diff': comparison_df['Confirmed_left'] - comparison_df['Confirmed_right'],
+     'Deaths_diff': comparison_df['Deaths_left'] - comparison_df['Deaths_right'],
+     'Recovered_diff': comparison_df['Recovered_left'] - comparison_df['Recovered_right'],
      'date_diff': pd.to_datetime(comparison_df['Last Update_left']) - pd.to_datetime(comparison_df['Last Update_right']),
      })
 
 today = date.today()
-worldometer_table = comparison_df.sort_values(by=['Confirmed_diff'], ascending=False)
+comparison_df = comparison_df.sort_values(by=['Confirmed_diff'], ascending=False)
 
 
 
 comparison_df.to_csv('./daily_diff/{}_diff.csv'.format(today))
-# diff_df = dataframe_difference(worldometer_table,previous_worldometer_table,'confirmed',which='left_only')
+# diff_df = dataframe_difference(worldometer_table,previous_worldometer_table,'Confirmed',which='left_only')
 # diff_df = dataframe_difference(worldometer_table,previous_worldometer_table)
 
 print(comparison_df.head(20))
