@@ -157,7 +157,7 @@ covid19.plot.plot(ax, data_italy[kind], fits[kind], label=kind, extrapolate=EXTR
 #
 #
 kinds = ['counts']
-datetime_expected = '2020-03-26'
+datetime_expected = '2020-03-31'
 expected_values = []
 for kind in kinds:
     expected_values.append(int(round(fits[kind].predict(datetime_expected))))
@@ -186,7 +186,7 @@ CHANGE_FIT_2 = np.datetime64('2020-03-11')
 CHANGE_FIT_3 = np.datetime64('2020-03-15')
 STOP_FIT = None
 
-EXTRAPOLTATE = ('2020-02-23', '2020-03-26')
+EXTRAPOLTATE = ('2020-02-23', '2020-04-02')
 
 REGIONS_FIT_PARAMS = {
     'Italy': {

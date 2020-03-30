@@ -16,7 +16,7 @@ import ast
 import time
 import glob
 from datetime import date
-
+pd.options.display.width = 0
 
 # Function for remove comma within numbers
 def removeCommas(string): 
@@ -278,221 +278,234 @@ caseTableSimple.tail(20)
 
 
 
-
+try:
 # As the website changed to dynamic, using selenium to interact with the website vitually
-from selenium import webdriver
+    from selenium import webdriver
 
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-# Open vitual Chrome browser
-
-
-driver = webdriver.Chrome()
-# Direct the driver to open a webpage by calling the ‘get’ method, with a parameter of the page we want to visit.
-driver.get("https://coronavirus.1point3acres.com/en")
-# click tab button to let page lode new data (US data is the default)
-python_button = driver.find_element(By.XPATH, "//span[text()='Canada']")
-python_button.click()
-
-# html_soup22 = BeautifulSoup(driver.page_source)
-html_soup2 = BeautifulSoup(driver.page_source,  'html.parser')
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.common.by import By
+    # Open vitual Chrome browser
 
 
-driver.get("https://coronavirus.1point3acres.com/en")
-# click tab button to let page lode new data (US data is the default)
-python_button = driver.find_element(By.XPATH, "//span[text()='United States']")
-python_button.click()
+    driver = webdriver.Chrome()
+    # Direct the driver to open a webpage by calling the ‘get’ method, with a parameter of the page we want to visit.
+    driver.get("https://coronavirus.1point3acres.com/en")
+    # click tab button to let page lode new data (US data is the default)
+    python_button = driver.find_element(By.XPATH, "//span[text()='Canada']")
+    python_button.click()
 
-# html_soup22 = BeautifulSoup(driver.page_source)
-html_soup22 = BeautifulSoup(driver.page_source,  'html.parser')
-
-# Wait for the dynamically loaded elements to show up
-# WebDriverWait(driver, 10).until(
-#     EC.visibility_of_element_located((By.CLASS_NAME, CANindex)))
-# # And grab the new page HTML source
-html_page = driver.page_source
-driver.quit()
-indexList = []
-for span in html_soup2.find_all('span'):
-    # Only retain 'span' that has contents
-    if len(span.contents):
-        # Since we only need to find index for table, use one of the table head as target word to locate index
-        if span.contents[0] == 'Location':
-            # Store the index inside a list
-            indexList.append(span['class'][0])
-
-# USindex, CANindex = indexList
-CANindex = indexList[1]
-Locations = []
-Confirmed = []
-Recovered = []
-Deaths = []
-list1 = range(0, len(html_soup2.find_all('span', class_=CANindex)) - 4, 5)
-list2 = range(1, len(html_soup2.find_all('span', class_=CANindex)) - 3, 5)
-list3 = range(2, len(html_soup2.find_all('span', class_=CANindex)) - 2, 5)
-list4 = range(3, len(html_soup2.find_all('span', class_=CANindex)) - 1, 5)
-
-for index in list1:
-    if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
-        Locations.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
-    else:
-        Locations.append(0)
-for index in list2:
-    if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
-        try:
-            Confirmed.append(html_soup2.find_all('span', class_=CANindex)[index].contents[1])
-        except:
-            Confirmed.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
-    else:
-        Confirmed.append(0)
-for index in list3:
-    # . They do not provide Recovered cases number
-    # if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
-    #    Recovered.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
-    # else:
-    Recovered.append(0)
-for index in list3:
-    if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
-        try:
-            Deaths.append(html_soup2.find_all('span', class_=CANindex)[index].contents[1])
-        except:
-            Deaths.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
-    else:
-        Deaths.append(0)
-
-CAN_data = pd.DataFrame({'Province/State': Locations,
-                         'Confirmed': Confirmed,
-                         'Deaths': Deaths,
-                         # 'Recovered':Recovered,
-                         })
-
-# Remove rows that are not data
-CAN_data.drop(CAN_data[CAN_data['Deaths'] == 'Deaths'].index, axis=0, inplace=True)
-
-# Remove rows that are not data
-CAN_data.drop(CAN_data[CAN_data['Province/State'] == 'Canada'].index, axis=0, inplace=True)
-
-# Remove comma for each element
-CAN_data['Confirmed'] = CAN_data['Confirmed'].apply(removeCommas)
-CAN_data['Deaths'] = CAN_data['Deaths'].apply(removeCommas)
-CAN_total_confirmed = CAN_data['Confirmed'].astype(int).sum()
-CAN_total_deaths =CAN_data['Deaths'].astype(int).sum()
-CAN_data
+    # html_soup22 = BeautifulSoup(driver.page_source)
+    html_soup2 = BeautifulSoup(driver.page_source,  'html.parser')
 
 
-html_soup2 = html_soup22
-USindex = indexList[0]
-Locations = []
-Confirmed = []
-Recovered = []
-Deaths = []
-list1 = range(1, len(html_soup2.find_all('span', class_=USindex)) - 4, 5)
-list2 = range(2, len(html_soup2.find_all('span', class_=USindex)) - 3, 5)
-list3 = range(3, len(html_soup2.find_all('span', class_=USindex)) - 2, 5)
-list4 = range(4, len(html_soup2.find_all('span', class_=USindex)) - 1, 5)
+    driver.get("https://coronavirus.1point3acres.com/en")
+    # click tab button to let page lode new data (US data is the default)
+    python_button = driver.find_element(By.XPATH, "//span[text()='United States']")
+    python_button.click()
 
-for index in list1:
-    if len(html_soup2.find_all('span', class_=USindex)[index].contents):
-        Locations.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
-    else:
-        Locations.append(0)
-for index in list2:
-    if len(html_soup2.find_all('span', class_=USindex)[index].contents):
-        try:
-            Confirmed.append(html_soup2.find_all('span', class_=USindex)[index].contents[1])
-        except:
-            Confirmed.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
-    else:
-        Confirmed.append(0)
-for index in list3:
-    # They do not provide Recovered cases number anymore.
-    # if len(html_soup2.find_all('span', class_=USindex)[index].contents):
-    #    Recovered.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
-    # else:
-    Recovered.append(0)
-for index in list3:
-    if len(html_soup2.find_all('span', class_=USindex)[index].contents):
-        try:
-            Deaths.append(html_soup2.find_all('span', class_=USindex)[index].contents[1])
-        except:
-            Deaths.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
-    else:
-        Deaths.append(0)
+    # html_soup22 = BeautifulSoup(driver.page_source)
+    html_soup22 = BeautifulSoup(driver.page_source,  'html.parser')
 
-US_data = pd.DataFrame({'Province/State': Locations,
-                        'Confirmed': Confirmed,
-                        'Deaths': Deaths,
-                        # 'Recovered':Recovered,
-                        })
+    # Wait for the dynamically loaded elements to show up
+    # WebDriverWait(driver, 10).until(
+    #     EC.visibility_of_element_located((By.CLASS_NAME, CANindex)))
+    # # And grab the new page HTML source
+    html_page = driver.page_source
+    driver.quit()
+    indexList = []
+    for span in html_soup2.find_all('span'):
+        # Only retain 'span' that has contents
+        if len(span.contents):
+            # Since we only need to find index for table, use one of the table head as target word to locate index
+            if span.contents[0] == 'Location':
+                # Store the index inside a list
+                indexList.append(span['class'][0])
+except:
+    print('failed to connect to US Canada database')
 
-# Remove rows that are not data
-US_data.drop(US_data[US_data['Deaths'] == 'Deaths'].index, axis=0, inplace=True)
+print('scraping Canadian data')
+try:
 
-# Remove rows that are not data
-US_data.drop(US_data[US_data['Province/State'] == 'United States'].index, axis=0, inplace=True)
+    # USindex, CANindex = indexList
+    CANindex = indexList[1]
+    Locations = []
+    Confirmed = []
+    Recovered = []
+    Deaths = []
+    list1 = range(0, len(html_soup2.find_all('span', class_=CANindex)) - 4, 5)
+    list2 = range(1, len(html_soup2.find_all('span', class_=CANindex)) - 3, 5)
+    list3 = range(2, len(html_soup2.find_all('span', class_=CANindex)) - 2, 5)
+    list4 = range(3, len(html_soup2.find_all('span', class_=CANindex)) - 1, 5)
 
-# Replace Washington, D.C. as Washington DC
-if 'Washington, D.C.' in list(US_data['Province/State']):
-    US_data['Province/State'].replace({'Washington, D.C.': 'Washington DC'}, inplace=True)
+    for index in list1:
+        if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
+            Locations.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
+        else:
+            Locations.append(0)
+    for index in list2:
+        if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
+            try:
+                Confirmed.append(html_soup2.find_all('span', class_=CANindex)[index].contents[1])
+            except:
+                Confirmed.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
+        else:
+            Confirmed.append(0)
+    for index in list3:
+        # . They do not provide Recovered cases number
+        # if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
+        #    Recovered.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
+        # else:
+        Recovered.append(0)
+    for index in list3:
+        if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
+            try:
+                Deaths.append(html_soup2.find_all('span', class_=CANindex)[index].contents[1])
+            except:
+                Deaths.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
+        else:
+            Deaths.append(0)
 
-# Replace Washington as WA
-if 'Washington' in list(US_data['Province/State']):
-    US_data['Province/State'].replace({'Washington': 'WA'}, inplace=True)
+    CAN_data = pd.DataFrame({'Province/State': Locations,
+                             'Confirmed': Confirmed,
+                             'Deaths': Deaths,
+                             # 'Recovered':Recovered,
+                             })
 
-# Replace Grand Princess as From Grand Princess
-# if 'Grand Princess' in list(US_data['Province/State']):
-#    US_data['Province/State'].replace({'Grand Princess':'From Grand Princess'}, inplace=True)
+    # Remove rows that are not data
+    CAN_data.drop(CAN_data[CAN_data['Deaths'] == 'Deaths'].index, axis=0, inplace=True)
 
-# Replace Diamond Princess as From Diamond Princess cruise
-# if 'Diamond Princess' in list(US_data['Province/State']):
-#    US_data['Province/State'].replace({'Diamond Princess':'From Diamond Princess cruise'}, inplace=True)
+    # Remove rows that are not data
+    CAN_data.drop(CAN_data[CAN_data['Province/State'] == 'Canada'].index, axis=0, inplace=True)
 
-# Assign 0 in column Province/State as unassigned
-if 0 in list(US_data['Province/State']):
-    US_data.at[US_data.loc[US_data['Province/State'] == 0,].index, 'Province/State'] = 'Unassigned'
+    # Remove comma for each element
+    CAN_data['Confirmed'] = CAN_data['Confirmed'].apply(removeCommas)
+    CAN_data['Deaths'] = CAN_data['Deaths'].apply(removeCommas)
+    CAN_total_confirmed = CAN_data['Confirmed'].astype(int).sum()
+    CAN_total_deaths =CAN_data['Deaths'].astype(int).sum()
+    CAN_data
+except:
+    print('failed to scrap Canada data')
 
-# Remove comma for each element
-US_data['Confirmed'] = US_data['Confirmed'].apply(removeCommas)
-US_data['Deaths'] = US_data['Deaths'].apply(removeCommas)
+print('scraping US data')
+try:
+    html_soup2 = html_soup22
+    USindex = indexList[0]
+    Locations = []
+    Confirmed = []
+    Recovered = []
+    Deaths = []
+    list1 = range(1, len(html_soup2.find_all('span', class_=USindex)) - 4, 5)
+    list2 = range(2, len(html_soup2.find_all('span', class_=USindex)) - 3, 5)
+    list3 = range(3, len(html_soup2.find_all('span', class_=USindex)) - 2, 5)
+    list4 = range(4, len(html_soup2.find_all('span', class_=USindex)) - 1, 5)
 
+    for index in list1:
+        if len(html_soup2.find_all('span', class_=USindex)[index].contents):
+            Locations.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
+        else:
+            Locations.append(0)
+    for index in list2:
+        if len(html_soup2.find_all('span', class_=USindex)[index].contents):
+            try:
+                Confirmed.append(html_soup2.find_all('span', class_=USindex)[index].contents[1])
+            except:
+                Confirmed.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
+        else:
+            Confirmed.append(0)
+    for index in list3:
+        # They do not provide Recovered cases number anymore.
+        # if len(html_soup2.find_all('span', class_=USindex)[index].contents):
+        #    Recovered.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
+        # else:
+        Recovered.append(0)
+    for index in list3:
+        if len(html_soup2.find_all('span', class_=USindex)[index].contents):
+            try:
+                Deaths.append(html_soup2.find_all('span', class_=USindex)[index].contents[1])
+            except:
+                Deaths.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
+        else:
+            Deaths.append(0)
 
+    US_data = pd.DataFrame({'Province/State': Locations,
+                            'Confirmed': Confirmed,
+                            'Deaths': Deaths,
+                            # 'Recovered':Recovered,
+                            })
 
-USA_total_confirmed = US_data['Confirmed'].astype(int).sum()
-USA_total_deaths =US_data['Deaths'].astype(int).sum()
+    # Remove rows that are not data
+    US_data.drop(US_data[US_data['Deaths'] == 'Deaths'].index, axis=0, inplace=True)
 
-US_Can_data = pd.concat([US_data, CAN_data], ignore_index=True)
-US_Can_data = US_Can_data.apply(lambda x: x.str.strip())
-US_Can_data
+    # Remove rows that are not data
+    US_data.drop(US_data[US_data['Province/State'] == 'United States'].index, axis=0, inplace=True)
 
-# In[252]:
+    # Replace Washington, D.C. as Washington DC
+    if 'Washington, D.C.' in list(US_data['Province/State']):
+        US_data['Province/State'].replace({'Washington, D.C.': 'Washington DC'}, inplace=True)
 
+    # Replace Washington as WA
+    if 'Washington' in list(US_data['Province/State']):
+        US_data['Province/State'].replace({'Washington': 'WA'}, inplace=True)
 
-nameList = pd.read_csv('./statesNameTranslation.csv')
+    # Replace Grand Princess as From Grand Princess
+    # if 'Grand Princess' in list(US_data['Province/State']):
+    #    US_data['Province/State'].replace({'Grand Princess':'From Grand Princess'}, inplace=True)
+
+    # Replace Diamond Princess as From Diamond Princess cruise
+    # if 'Diamond Princess' in list(US_data['Province/State']):
+    #    US_data['Province/State'].replace({'Diamond Princess':'From Diamond Princess cruise'}, inplace=True)
+
+    # Assign 0 in column Province/State as unassigned
+    if 0 in list(US_data['Province/State']):
+        US_data.at[US_data.loc[US_data['Province/State'] == 0,].index, 'Province/State'] = 'Unassigned'
+
+    # Remove comma for each element
+    US_data['Confirmed'] = US_data['Confirmed'].apply(removeCommas)
+    US_data['Deaths'] = US_data['Deaths'].apply(removeCommas)
 
 
 
+    USA_total_confirmed = US_data['Confirmed'].astype(int).sum()
+    USA_total_deaths =US_data['Deaths'].astype(int).sum()
+except:
+    print('failed to scrap US data')
 
-US_Can_data_EN = pd.merge(US_Can_data, nameList, how = 'left', left_on = 'Province/State', right_on = 'English')
-US_Can_data_EN = US_Can_data_EN.drop(['Chinese', 'Province/State', 'Abbr.'], axis=1)
-US_Can_data_EN['Last Update'] = lastUpdateTime
-US_Can_data_EN.rename(columns={'English':'Province/State'}, inplace=True)
-US_Can_data_EN = US_Can_data_EN.drop(US_Can_data_EN[US_Can_data_EN['Province/State'] == 'Wuhan Evacuee'].index, axis=0)
-columnOrder = ['Province/State', 'Country/Region', 'Last Update','Confirmed', 'Deaths', 'Recovered']
+print('merging US and Canadian data')
+try:
+    US_Can_data = pd.concat([US_data, CAN_data], ignore_index=True)
+    US_Can_data = US_Can_data.apply(lambda x: x.str.strip())
+    US_Can_data
 
-US_Can_data_EN = US_Can_data_EN[columnOrder[:-1]]
-# US_Can_data_EN
+    # In[252]:
 
+
+    nameList = pd.read_csv('./statesNameTranslation.csv')
 
 
 
 
+    US_Can_data_EN = pd.merge(US_Can_data, nameList, how = 'left', left_on = 'Province/State', right_on = 'English')
+    US_Can_data_EN = US_Can_data_EN.drop(['Chinese', 'Province/State', 'Abbr.'], axis=1)
+    US_Can_data_EN['Last Update'] = lastUpdateTime
+    US_Can_data_EN.rename(columns={'English':'Province/State'}, inplace=True)
+    US_Can_data_EN = US_Can_data_EN.drop(US_Can_data_EN[US_Can_data_EN['Province/State'] == 'Wuhan Evacuee'].index, axis=0)
+    columnOrder = ['Province/State', 'Country/Region', 'Last Update','Confirmed', 'Deaths', 'Recovered']
+
+    US_Can_data_EN = US_Can_data_EN[columnOrder[:-1]]
+    # US_Can_data_EN
 
 
-caseTableSimple = pd.concat([US_Can_data_EN, caseTableSimple], ignore_index=True)
+
+
+
+
+
+    caseTableSimple = pd.concat([US_Can_data_EN, caseTableSimple], ignore_index=True)
 # finalTable
 
-
+except:
+    print('failed to merge US and Canada  data')
 
 
 timeStampe = currentTime.strftime('%m_%d_%Y_%H_%M')
@@ -500,119 +513,123 @@ timeStampe = currentTime.strftime('%m_%d_%Y_%H_%M')
 
 # # Scrap data for China
 
+print('scraping Chinese data')
+try:
+
+    CHN = "https://ncov.dxy.cn/ncovh5/view/pneumonia?scene=2&clicktime=1579582238&enterid=1579582238&from=singlemessage&isappinstalled=0"
 
 
-# Test if we can scrap info from worldometers
-# The communication with website is ok if the response is 200
-CHN = "https://ncov.dxy.cn/ncovh5/view/pneumonia?scene=2&clicktime=1579582238&enterid=1579582238&from=singlemessage&isappinstalled=0"
+    res = get('https://ncov.dxy.cn/ncovh5/view/pneumonia?scene=2&clicktime=1579582238&enterid=1579582238&from=singlemessage&isappinstalled=0')
+    res.encoding = "GBK"
+    r = res.text
+    p = re.compile(r'window\.getAreaStat = \[(.*?)\]}catch')
+    data = p.findall(r)[0]
+    print(ast.literal_eval(data))
 
+    regext = ast.literal_eval(data)
 
-res = get('https://ncov.dxy.cn/ncovh5/view/pneumonia?scene=2&clicktime=1579582238&enterid=1579582238&from=singlemessage&isappinstalled=0')
-res.encoding = "GBK"
-r = res.text
-p = re.compile(r'window\.getAreaStat = \[(.*?)\]}catch')
-data = p.findall(r)[0]
-print(ast.literal_eval(data))
+    dataframe = pd.DataFrame(list(regext))
 
-regext = ast.literal_eval(data)
+    dataframe = dataframe[['provinceName', 'provinceShortName', 'currentConfirmedCount',
+           'confirmedCount', 'suspectedCount', 'curedCount', 'deadCount']]
+    dataframe['Last Update'] = lastUpdateTime
 
-dataframe = pd.DataFrame(list(regext))
-
-dataframe = dataframe[['provinceName', 'provinceShortName', 'currentConfirmedCount',
-       'confirmedCount', 'suspectedCount', 'curedCount', 'deadCount']]
-dataframe['Last Update'] = lastUpdateTime
-
-dataframe = pd.DataFrame({'Province/State': dataframe['provinceName'],
-                          'Country/Region': 'China',
-                          'Last Update': lastUpdateTime,
-                        'Confirmed': dataframe['confirmedCount'],
-                        'Deaths': dataframe['deadCount'],
-                        'Recovered': dataframe['curedCount'],
-                        })
-dataframe = dataframe[columnOrder]
-
-
-
-from china_cities import *
-from googletrans import Translator
-translator = Translator()
-
-provinceNames = []
-for province in dataframe['Province/State']:
-        trans = translator.translate(province, dest='en').text
-        provinceNames.append(trans)
-dataframe['Province/State']  = provinceNames
-CHN_data = dataframe
-CHN_total_confirmed = CHN_data['Confirmed'].sum()
-CHN_total_deaths =CHN_data['Deaths'].sum()
-CHN_total_recovered =CHN_data['Recovered'].sum()
-
-
-caseTableSimple = pd.concat([CHN_data, caseTableSimple], ignore_index=True)
-#
+    dataframe = pd.DataFrame({'Province/State': dataframe['provinceName'],
+                              'Country/Region': 'China',
+                              'Last Update': lastUpdateTime,
+                            'Confirmed': dataframe['confirmedCount'],
+                            'Deaths': dataframe['deadCount'],
+                            'Recovered': dataframe['curedCount'],
+                            })
+    dataframe = dataframe[columnOrder]
 
 
 
-Australia = "https://www.health.gov.au/news/health-alerts/novel-coronavirus-2019-ncov-health-alert/coronavirus-covid-19-current-situation-and-case-numbers"
-response2 = get(Australia, headers=headers)
-response2
+    from china_cities import *
+    from googletrans import Translator
+    translator = Translator()
+
+    provinceNames = []
+    for province in dataframe['Province/State']:
+            trans = translator.translate(province, dest='en').text
+            provinceNames.append(trans)
+    dataframe['Province/State']  = provinceNames
+    CHN_data = dataframe
+    CHN_total_confirmed = CHN_data['Confirmed'].sum()
+    CHN_total_deaths =CHN_data['Deaths'].sum()
+    CHN_total_recovered =CHN_data['Recovered'].sum()
 
 
+    caseTableSimple = pd.concat([CHN_data, caseTableSimple], ignore_index=True)
+except:
+    print('failed to scrap Chinese data')
 
 
-# Scrap all content from the website
-html_soup2 = BeautifulSoup(response2.text, 'html.parser')
+try:
+    Australia = "https://www.health.gov.au/news/health-alerts/novel-coronavirus-2019-ncov-health-alert/coronavirus-covid-19-current-situation-and-case-numbers"
+    response2 = get(Australia, headers=headers)
+    response2
 
-confirmed_cases = []
+    # Scrap all content from the website
+    html_soup2 = BeautifulSoup(response2.text, 'html.parser')
 
-for name in  html_soup2.find_all('td', class_='numeric'):
-    salary = name.parent.find_all('td')[-1]  # last cell in the row
-    # value = int(name.get_text())
-    # print(name.get_text())
-    # print(salary.get_text())
-    # print(value)
-    confirmed_cases.append(int(salary.get_text().strip().replace(',','')))
-confirmed_cases = confirmed_cases[:-1]
+    confirmed_cases = []
+
+    for name in  html_soup2.find_all('td', class_='numeric'):
+        salary = name.parent.find_all('td')[-1]  # last cell in the row
+        # value = int(name.get_text())
+        # print(name.get_text())
+        # print(salary.get_text())
+        # print(value)
+        confirmed_cases.append(int(salary.get_text().strip().replace(',','')))
+    confirmed_cases = confirmed_cases[:-1]
 
 
 
 
-a = html_soup2.find("div", {"class":"health-table__responsive"}).findAll('p')
-locations = []
-for index, value in enumerate(a):
-    # print(index,value)
-    if "numeric" in str(value):
-        continue
-    else:
+    a = html_soup2.find("div", {"class":"health-table__responsive"}).findAll('p')
+    locations = []
+    for index, value in enumerate(a):
+        # print(index,value)
+        if "numeric" in str(value):
+            continue
+        else:
 
-        dummy = str(a[index - 1]).replace('<p>', '')
-        dummy = dummy.replace('</p>', '')
-        dummy = dummy.replace('<span>', '')
-        dummy = dummy.replace('</span>', '')
+            dummy = str(a[index - 1]).replace('<p>', '')
+            dummy = dummy.replace('</p>', '')
+            dummy = dummy.replace('<span>', '')
+            dummy = dummy.replace('</span>', '')
 
-        locations.append(dummy)
+            locations.append(dummy)
 
 
-locations = [locations[2]] +locations[4:]
+    locations = [locations[2]] +locations[4:]
 
-AUS_df = pd.DataFrame(list(zip(locations,confirmed_cases)),columns = ['Province/State','Confirmed'])
-AUS_df['Last Update'] = lastUpdateTime
-AUS_df = pd.DataFrame({'Province/State': AUS_df['Province/State'],
-                          'Country/Region': 'Australia',
-                          'Last Update': lastUpdateTime,
-                        'Confirmed': AUS_df['Confirmed'],
-                        # 'Deaths': AUS_df['deadCount'],
-                        # 'Recovered': AUS_df['curedCount'],
-                        })
-AUS_df = AUS_df[columnOrder[:-2]]
+    AUS_df = pd.DataFrame(list(zip(locations,confirmed_cases)),columns = ['Province/State','Confirmed'])
+    AUS_df['Last Update'] = lastUpdateTime
+    AUS_df = pd.DataFrame({'Province/State': AUS_df['Province/State'],
+                              'Country/Region': 'Australia',
+                              'Last Update': lastUpdateTime,
+                            'Confirmed': AUS_df['Confirmed'],
+                            # 'Deaths': AUS_df['deadCount'],
+                            # 'Recovered': AUS_df['curedCount'],
+                            })
+    AUS_df = AUS_df[columnOrder[:-2]]
 
-AUS_total_confirmed =AUS_df['Confirmed'].sum()
+    AUS_total_confirmed =AUS_df['Confirmed'].sum()
 
 
 
 
 
-caseTableSimple = pd.concat([AUS_df, caseTableSimple], ignore_index=True)
+    caseTableSimple = pd.concat([AUS_df, caseTableSimple], ignore_index=True)
+except:
+    print('failed to scrape Australian data')
+
+
+
+
+# write to file table
 caseTableSimple.to_csv('./web_data/{}_webData.csv'.format(timeStampe), index=False)
 
 
@@ -661,6 +678,8 @@ list_of_files = []
 now = time.time()
 
 for f in os.listdir('./worldmeter_data/'):
+    # mtime = path.stat().st_mtime
+    # timestamp_str = datetime.datetime.fromtimestamp(mtime).strftime('%Y-%m-%d-%H:%M')
     if os.stat(os.path.join('./worldmeter_data/',f)).st_mtime < now - 0.5 * 86400:
         list_of_files.append(f)
 
@@ -677,28 +696,29 @@ previous_worldometer_table = pd.read_csv('./worldmeter_data/'+   latest_file)
 worldometer_table.to_csv('./worldmeter_data/{}_webData.csv'.format(timeStampe), index=False)
 
 
-
-comparison_df = worldometer_table.merge(previous_worldometer_table,
-                              indicator=True
-                              ,left_on='Country/Region',right_on='Country/Region',suffixes=('_left', '_right'))
-
-
-
-comparison_df = pd.DataFrame(
-    {'Country/Region': comparison_df['Country/Region'],
-     'Confirmed_diff': comparison_df['Confirmed_left'] - comparison_df['Confirmed_right'],
-     'Deaths_diff': comparison_df['Deaths_left'] - comparison_df['Deaths_right'],
-     'Recovered_diff': comparison_df['Recovered_left'] - comparison_df['Recovered_right'],
-     'date_diff': pd.to_datetime(comparison_df['Last Update_left']) - pd.to_datetime(comparison_df['Last Update_right']),
-     })
-
-today = date.today()
-comparison_df = comparison_df.sort_values(by=['Confirmed_diff'], ascending=False)
+try:
+    comparison_df = worldometer_table.merge(previous_worldometer_table,
+                                  indicator=True
+                                  ,left_on='Country/Region',right_on='Country/Region',suffixes=('_left', '_right'))
 
 
 
-comparison_df.to_csv('./daily_diff/{}_diff.csv'.format(today))
-# diff_df = dataframe_difference(worldometer_table,previous_worldometer_table,'Confirmed',which='left_only')
-# diff_df = dataframe_difference(worldometer_table,previous_worldometer_table)
+    comparison_df = pd.DataFrame(
+        {'Country/Region': comparison_df['Country/Region'],
+         'Confirmed_diff': comparison_df['Confirmed_left'] - comparison_df['Confirmed_right'],
+         'Deaths_diff': comparison_df['Deaths_left'] - comparison_df['Deaths_right'],
+         'Recovered_diff': comparison_df['Recovered_left'] - comparison_df['Recovered_right'],
+         'date_diff': pd.to_datetime(comparison_df['Last Update_left']) - pd.to_datetime(comparison_df['Last Update_right']),
+         })
 
-print(comparison_df.head(20))
+    today = date.today()
+    comparison_df = comparison_df.sort_values(by=['Confirmed_diff'], ascending=False)
+
+
+
+    comparison_df.to_csv('./daily_diff/{}_diff.csv'.format(today))
+    # diff_df = dataframe_difference(worldometer_table,previous_worldometer_table,'Confirmed',which='left_only')
+    # diff_df = dataframe_difference(worldometer_table,previous_worldometer_table)
+except:
+    print('failed to compare with previous day')
+    print(comparison_df.head(20))

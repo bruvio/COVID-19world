@@ -79,7 +79,8 @@ countrylist.append("Italy")
 # countrylist.append("China")
 # countrylist.append("US")
 # countrylist.append("Finland")
-# countrylist.append("France")
+countrylist.append("France")
+countrylist.append("Spain")
 # countrylist.append("Korea, South")
 # countrylist.append("Switzerland")
 countrylist.append("United Kingdom")
@@ -109,6 +110,39 @@ field = 'Confirmed'
 # field.append('confirmed')
 # field.append('deaths')
 # field.append('recovered')
+
+DAY = np.timedelta64(24 * 60 * 60, 's')
+
+START_FIT = None
+CHANGE_FIT_1 = np.datetime64('2020-03-05')
+CHANGE_FIT_2 = np.datetime64('2020-03-11')
+CHANGE_FIT_3 = np.datetime64('2020-03-15')
+STOP_FIT = None
+
+EXTRAPOLTATE = ('2020-02-23', '2020-04-02')
+
+REGIONS_FIT_PARAMS = {
+    'United Kingdom': {
+        'exponential_fits': [('2020-02-24', '2020-03-23'), ('2020-03-24', None)],
+        # 'exponential_fits': [(None, '2020-03-11'), ('2020-03-12', None)],
+    },
+    'Spain': {
+        'exponential_fits': [('2020-02-24', '2020-03-15'), ('2020-03-15', None)],
+        # 'exponential_fits': [(None, '2020-03-11'), ('2020-03-12', None)],
+    },
+    'France': {
+        'exponential_fits': [('2020-02-24', '2020-03-17'), ('2020-03-13', None)],
+        # 'exponential_fits': [(None, '2020-03-11'), ('2020-03-12', None)],
+    },
+    'Italy': {
+        'exponential_fits': [('2020-02-24', '2020-03-10'), ('2020-03-13', '2020-03-17'), ('2020-03-18', None)],
+        # 'exponential_fits': [(None, '2020-03-11'), ('2020-03-12', None)],
+    }
+}
+
+DELAY = 12 * DAY
+PALETTE_ONE = list(sns.color_palette())
+PALETTE = itertools.cycle(PALETTE_ONE)
 
 for country in countrylist:
     print("\n" + country + "\n")
@@ -176,9 +210,16 @@ for country in countrylist:
     # # In[5]:
     #
     #
-    START_FIT = "2020-02-23"
-    STOP_FIT = "2020-03-30"
-    EXTRAPOLTATE = ("2020-02-23", "2020-04-01")
+    if country =='United Kingdom':
+        START_FIT = "2020-02-23"
+        STOP_FIT = "2020-03-31"
+        EXTRAPOLTATE = ("2020-02-23", "2020-04-01")
+    # else country =='Italy':
+    else:
+        START_FIT = '2020-02-23'
+        STOP_FIT = '2020-03-31'
+        EXTRAPOLTATE = ('2020-02-23', '2020-04-01')
+
     #
     #
     # # In[6]:
@@ -223,6 +264,7 @@ for country in countrylist:
 
     plt.savefig("./Figures/"
                         +country + "COVID-19 Model-log-{}.png".format(today), dpi=400)
+    plt.close()
     #
     #
     # # In[8]:
@@ -255,6 +297,7 @@ for country in countrylist:
 
     plt.savefig("./Figures/"
                         +country + "COVID-19 Model-{}.png".format(today), dpi=400)
+    plt.close()
     #
     #
     # # In[9]:
@@ -271,7 +314,7 @@ for country in countrylist:
     #
     #
     kinds = ["counts"]
-    datetime_expected = "2020-04-10"
+    datetime_expected = '2020-03-31'
     expected_values = []
     for kind in kinds:
         expected_values.append(int(round(fits[kind].predict(datetime_expected))))
@@ -292,93 +335,100 @@ for country in countrylist:
 #
 #
 #
-DAY = np.timedelta64(24 * 60 * 60, 's')
-
-START_FIT = None
-CHANGE_FIT_1 = np.datetime64('2020-03-05')
-CHANGE_FIT_2 = np.datetime64('2020-03-11')
-CHANGE_FIT_3 = np.datetime64('2020-03-15')
-STOP_FIT = None
-
-EXTRAPOLTATE = ('2020-02-23', '2020-03-24')
-
-REGIONS_FIT_PARAMS = {
-    'United Kingdom': {
-        'exponential_fits': [('2020-02-24', '2020-03-10'), ('2020-03-13', None)],
-        # 'exponential_fits': [(None, '2020-03-11'), ('2020-03-12', None)],
-    },
-    'Italy': {
-        'exponential_fits': [('2020-02-24', '2020-03-10'), ('2020-03-13', '2020-03-17'), ('2020-03-18', None)],
-        # 'exponential_fits': [(None, '2020-03-11'), ('2020-03-12', None)],
-    }
-}
-
-DELAY = 12 * DAY
-PALETTE_ONE = list(sns.color_palette())
-PALETTE = itertools.cycle(PALETTE_ONE)
-
-# In[6]:
 
 
-fits = {}
-for region, params in REGIONS_FIT_PARAMS.items():
-    for kind in ['counts']:
-        exponential_fits = params.get('exponential_fits',
-                                      [(START_FIT, CHANGE_FIT_1), (CHANGE_FIT_1 + DAY, CHANGE_FIT_2),
-                                       (CHANGE_FIT_2 + DAY, CHANGE_FIT_3), (CHANGE_FIT_3 + DAY, STOP_FIT)])
-        fits[region, kind] = []
-        for start, stop in exponential_fits:
-            try:
-
-                fits[region, kind] += [
-                    covid19.fit.ExponentialFit.from_frame(kind, data_italy, start=start, stop=stop)]
-            except:
-                print('skipping:', region, start, stop)
-
-# In[7]:
-UK_EVENTS = [
-{'x': '2020-03-17', 'label': 'first advice to stay home'},
-{'x': '2020-03-23', 'label': 'Lockdown in UK'},
-]
-
-for region in REGIONS_FIT_PARAMS:
-    # select = (data_italy_regions['denominazione_regione'] == region)
-    for kind in ['counts']:
-        _, ax = plt.subplots(subplot_kw={'yscale': 'log', 'ylim': (9, 15000)}, figsize=(14, 8))
-        _ = ax.yaxis.grid(color='lightgrey', linewidth=0.5)
-        _ = covid19.plot.add_events(ax,events=UK_EVENTS, linestyle=':', offset=0, color='grey')
-        if len(fits[region, kind]) == 0:
-            print('No data for', region)
-            continue
-        try:
-            for fit, color in zip(fits[region, kind], PALETTE_ONE[1:]):
-                covid19.plot.plot_fit(ax, fit, label=kind.split('_')[0].title(), extrapolate=EXTRAPOLTATE, color=color)
-            covid19.plot.plot_data(ax, data_italy[kind], label=kind.split('_')[0].title(),
-                                   color=PALETTE_ONE[0], date_interval=3)
-            ax.set_title(f'{region}')
-            _ = ax.yaxis.grid(color='lightgrey', linewidth=0.5)
-            _ = ax.yaxis.tick_right()
-        except:
-            pass
-    plt.savefig("./Figures/"
-                        +country + "COVID-19 Model-change-fit{}.png".format(today), dpi=400)
-# _ = ax.set(title=r'COVID-19 "severe" cases in Italy. Fit is $f(t) = 2 ^ \frac{t - t_0}{T_d}$, with $T_d$ doubling time and $t_0$ reference date')
+    # In[6]:
 
 
-# ## Estimate of the initial / uncontined doubling time
+    fits = {}
+    for region, params in REGIONS_FIT_PARAMS.items():
+        if region == country:
+            for kind in ['counts']:
+                exponential_fits = params.get('exponential_fits',
+                                              [(START_FIT, CHANGE_FIT_1), (CHANGE_FIT_1 + DAY, CHANGE_FIT_2),
+                                               (CHANGE_FIT_2 + DAY, CHANGE_FIT_3), (CHANGE_FIT_3 + DAY, STOP_FIT)])
+                fits[region, kind] = []
+                for start, stop in exponential_fits:
+                    try:
 
-# In[8]:
+                        fits[region, kind] += [
+                            covid19.fit.ExponentialFit.from_frame(kind, data_italy, start=start, stop=stop)]
+                    except:
+                        print('skipping:', region, start, stop)
+
+    # In[7]:
+    UK_EVENTS = [
+    {'x': '2020-03-17', 'label': 'first advice to stay home'},
+    {'x': '2020-03-23', 'label': 'Lockdown in UK'},
+    ]
+
+    ITALY_EVENTS = [
+        # {'x': '2020-02-19', 'label': 'First alarm'},
+        {'x': '2020-02-24', 'label': 'Chiusura scuole al nord'},
+        {'x': '2020-03-01', 'label': 'Lockdown parziale al nord'},
+        {'x': '2020-03-05', 'label': 'Chiusura scuole in Italia'},
+        {'x': '2020-03-08', 'label': 'Lockdown al nord'},
+        {'x': '2020-03-10', 'label': 'Lockdown in Italia'},
+    ]
+    country_EVENTS = []
+
+    Spain_EVENTS = [
+        {'x': '2020-03-15', 'label': 'Lockdown in Spain'}
+    ]
+    France_EVENTS = [
+        {'x': '2020-03-17', 'label': 'Lockdown in France'}
+    ]
+
+    for region in REGIONS_FIT_PARAMS:
+        if region == country:
+        # select = (data_italy_regions['denominazione_regione'] == region)
+            for kind in ['counts']:
+                _, ax = plt.subplots(subplot_kw={'yscale': 'log', 'ylim': (9, ylim_df)}, figsize=(14, 8))
+                _ = ax.yaxis.grid(color='lightgrey', linewidth=0.5)
+                if region == 'United Kingdom':
+                    events = UK_EVENTS
+                elif region == 'Italy':
+                    events = ITALY_EVENTS
+                elif region == 'Spain':
+                    events = Spain_EVENTS
+                elif region == 'France':
+                    events = France_EVENTS
+                else:
+                    events = country_EVENTS
+                _ = covid19.plot.add_events(ax,events=events, linestyle=':', offset=0, color='grey')
+                if len(fits[region, kind]) == 0:
+                    print('No data for', region)
+                    continue
+                try:
+                    for fit, color in zip(fits[region, kind], PALETTE_ONE[1:]):
+                        covid19.plot.plot_fit(ax, fit, label=kind.split('_')[0].title(), extrapolate=EXTRAPOLTATE, color=color)
+                    covid19.plot.plot_data(ax, data_italy[kind], label=kind.split('_')[0].title(),
+                                           color=PALETTE_ONE[0], date_interval=3)
+                    ax.set_title(f'{region}')
+                    _ = ax.yaxis.grid(color='lightgrey', linewidth=0.5)
+                    _ = ax.yaxis.tick_right()
+                    plt.savefig("./Figures/"
+                                + region + "COVID-19 Model-change-fit{}.png".format(today), dpi=400)
+                except:
+                    pass
+
+    # _ = ax.set(title=r'COVID-19 "severe" cases in Italy. Fit is $f(t) = 2 ^ \frac{t - t_0}{T_d}$, with $T_d$ doubling time and $t_0$ reference date')
 
 
-for key, value in list(fits.items()):
-    if len(value):
-        print(f'{key[0]}:{" " * (14 - len(key[0]))} {str(value[0])}')
+    # ## Estimate of the initial / uncontined doubling time
 
-# In[9]:
+    # In[8]:
 
 
-for key, value in list(fits.items()):
-    if len(value):
-        print(f'{key[0]}:{" " * (14 - len(key[0]))} {str(value[-1])}')
+    for key, value in list(fits.items()):
+        if len(value):
+            print(f'{key[0]}:{" " * (14 - len(key[0]))} {str(value[0])}')
+
+    # In[9]:
+
+
+    for key, value in list(fits.items()):
+        if len(value):
+            print(f'{key[0]}:{" " * (14 - len(key[0]))} {str(value[-1])}')
 #
 plt.show()

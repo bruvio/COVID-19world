@@ -337,16 +337,17 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
     countrylist = []
     countrylist.append("Italy")
-    # countrylist.append("Australia")
+    countrylist.append("Australia")
     countrylist.append("Germany")
     # countrylist.append("China")
     # countrylist.append("Australia")
     countrylist.append("US")
-    # countrylist.append("France")
+    countrylist.append("France")
+    countrylist.append("Spain")
     # countrylist.append("Korea, South")
-    # countrylist.append("Switzerland")
+    countrylist.append("Switzerland")
     countrylist.append("United Kingdom")
-    # countrylist.append("Japan")
+    countrylist.append("Japan")
     # countrylist.append("Romania")
 
     # countrylist = [
@@ -430,30 +431,30 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
 
                     # dataframe.append(pd.Series(name=df_country.index[0]))
-                    if field =='Confirmed':
-                        dataframe = dataframe.append(pd.Series(), ignore_index=True)
-                        dataframe['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
-                        dataframe['country'].iloc[-1] = country
-                        dataframe['quantity'].iloc[-1] = field
-                        dataframe['counts'].iloc[-1] = df_country[country].values[0]
-                        x.append(pd.Series(pd.to_datetime(df_country.index[0])))
-                        y.append(pd.Series(df_country[country].values[0]))
-                    if field == 'Ddeaths':
-                        dataframe_deaths = dataframe_deaths.append(pd.Series(), ignore_index=True)
-                        dataframe_deaths['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
-                        dataframe_deaths['country'].iloc[-1] = country
-                        dataframe_deaths['quantity'].iloc[-1] = field
-                        dataframe_deaths['counts'].iloc[-1] = df_country[country].values[0]
-                        x_deaths.append(pd.Series(pd.to_datetime(df_country.index[0])))
-                        y_deaths.append(pd.Series(df_country[country].values[0]))
-                    if field == 'Recovered':
-                        dataframe_recovered = dataframe_recovered.append(pd.Series(), ignore_index=True)
-                        dataframe_recovered['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
-                        dataframe_recovered['country'].iloc[-1] = country
-                        dataframe_recovered['quantity'].iloc[-1] = field
-                        dataframe_recovered['counts'].iloc[-1] = df_country[country].values[0]
-                        x_recovered.append(pd.Series(pd.to_datetime(df_country.index[0])))
-                        y_recovered.append(pd.Series(df_country[country].values[0]))
+                    # if field =='Confirmed':
+                    dataframe = dataframe.append(pd.Series(), ignore_index=True)
+                    dataframe['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
+                    dataframe['country'].iloc[-1] = country
+                    dataframe['quantity'].iloc[-1] = 'Confirmed'
+                    dataframe['counts'].iloc[-1] = df_country[country].values[0]
+                    x.append(pd.Series(pd.to_datetime(df_country.index[0])))
+                    y.append(pd.Series(df_country[country].values[0]))
+                # if field == 'Deaths':
+                    dataframe_deaths = dataframe_deaths.append(pd.Series(), ignore_index=True)
+                    dataframe_deaths['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
+                    dataframe_deaths['country'].iloc[-1] = country
+                    dataframe_deaths['quantity'].iloc[-1] = 'Deaths'
+                    dataframe_deaths['counts'].iloc[-1] = df_country[country].values[0]
+                    x_deaths.append(pd.Series(pd.to_datetime(df_country.index[0])))
+                    y_deaths.append(pd.Series(df_country[country].values[0]))
+                # if field == 'Recovered':
+                    dataframe_recovered = dataframe_recovered.append(pd.Series(), ignore_index=True)
+                    dataframe_recovered['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
+                    dataframe_recovered['country'].iloc[-1] = country
+                    dataframe_recovered['quantity'].iloc[-1] = 'Recovered'
+                    dataframe_recovered['counts'].iloc[-1] = df_country[country].values[0]
+                    x_recovered.append(pd.Series(pd.to_datetime(df_country.index[0])))
+                    y_recovered.append(pd.Series(df_country[country].values[0]))
 
 
 
