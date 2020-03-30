@@ -315,7 +315,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
     # dd/mm/YY
     today = today.strftime("%d-%m-%Y")
     # datatemplate = "time_series_19-covid-{}.csv"
-    datatemplate = "time_series_covid19_{}_global.csv"
+    datatemplate = "./csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_{}_global.csv"
     # fields = ["confirmed", "deaths", "recovered"]
     fields = []
     field.append('confirmed')

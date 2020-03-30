@@ -559,38 +559,41 @@ response2
 
 
 
-# Since they change class index everyday, this code is for finding the new index.
-indexList = []
-for span in html_soup2.find_all('span'):
-    # Only retain 'span' that has contents
-    if len(span.contents):
-        # Since we only need to find index for table, use one of the table head as target word to locate index
-        if span.contents[0] == 'numeric':
-            # Store the index inside a list
-            indexList.append(span['numeric'][0])
 
 # Scrap all content from the website
 html_soup2 = BeautifulSoup(response2.text, 'html.parser')
 
 confirmed_cases = []
-for span in  html_soup2.find_all('span', class_='numeric'):
-    value = int(span.text.split()[0].replace(',', ''))
-    confirmed_cases.append(value)
 
+for name in  html_soup2.find_all('td', class_='numeric'):
+    salary = name.parent.find_all('td')[-1]  # last cell in the row
+    # value = int(name.get_text())
+    # print(name.get_text())
+    # print(salary.get_text())
+    # print(value)
+    confirmed_cases.append(int(salary.get_text().strip().replace(',','')))
 confirmed_cases = confirmed_cases[:-1]
+
+
 
 
 a = html_soup2.find("div", {"class":"health-table__responsive"}).findAll('p')
 locations = []
-for index,value in enumerate(a):
+for index, value in enumerate(a):
     # print(index,value)
     if "numeric" in str(value):
-        dummy = str(a[index-1]).replace('<p>','')
-        dummy = dummy.replace('</p>','')
+        continue
+    else:
+
+        dummy = str(a[index - 1]).replace('<p>', '')
+        dummy = dummy.replace('</p>', '')
+        dummy = dummy.replace('<span>', '')
+        dummy = dummy.replace('</span>', '')
+
         locations.append(dummy)
 
 
-locations = locations[:-1]
+locations = [locations[2]] +locations[4:]
 
 AUS_df = pd.DataFrame(list(zip(locations,confirmed_cases)),columns = ['Province/State','Confirmed'])
 AUS_df['Last Update'] = lastUpdateTime
@@ -666,13 +669,12 @@ latest_file = list_of_files[0]
 
 previous_worldometer_table = pd.read_csv('./worldmeter_data/'+   latest_file)
 
-previous_worldometer_table['increase_confirmed'] = np.where(worldometer_table['confirmed'] == previous_worldometer_table['confirmed'], 0, worldometer_table['confirmed'] - previous_worldometer_table['confirmed']) #create new column in df1 for price diff
+# previous_worldometer_table['increase_confirmed'] = np.where(worldometer_table['confirmed'] == previous_worldometer_table['confirmed'], 0, worldometer_table['confirmed'] - previous_worldometer_table['confirmed']) #create new column in df1 for price diff
 # previous_worldometer_table['increase_deaths'] = np.where(worldometer_table['deaths'] == previous_worldometer_table['deaths'], 0, worldometer_table['deaths'] - previous_worldometer_table['deaths']) #create new column in df1 for price diff
 # previous_worldometer_table['increase_recovered'] = np.where(worldometer_table['recovered'] == previous_worldometer_table['recovered'], 0, worldometer_table['recovered'] - previous_worldometer_table['recovered']) #create new column in df1 for price diff
 # print(previous_worldometer_table.head(20))
 # writing table to csv
 worldometer_table.to_csv('./worldmeter_data/{}_webData.csv'.format(timeStampe), index=False)
-
 
 
 
@@ -691,6 +693,10 @@ comparison_df = pd.DataFrame(
      })
 
 today = date.today()
+worldometer_table = comparison_df.sort_values(by=['Confirmed_diff'], ascending=False)
+
+
+
 comparison_df.to_csv('./daily_diff/{}_diff.csv'.format(today))
 # diff_df = dataframe_difference(worldometer_table,previous_worldometer_table,'confirmed',which='left_only')
 # diff_df = dataframe_difference(worldometer_table,previous_worldometer_table)

@@ -60,7 +60,7 @@ today = date.today()
 # dd/mm/YY
 today = today.strftime("%d-%m-%Y")
 # datatemplate = "time_series_19-covid-{}.csv"
-datatemplate = "time_series_covid19_{}_global.csv"
+datatemplate = "./csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_{}_global.csv"
 fields = ["confirmed", "deaths", "recovered"]
 dataframe_all_countries = pre_process_database(datatemplate, fields)
 countrylist_df = list(set(dataframe_all_countries["country"]))

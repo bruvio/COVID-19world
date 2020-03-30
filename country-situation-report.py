@@ -88,7 +88,7 @@ countrylist.append("United Kingdom")
 # dd/mm/YY
 today = today.strftime("%d-%m-%Y")
 # datatemplate = "time_series_19-covid-{}.csv"
-datatemplate = "time_series_covid19_{}_global.csv"
+datatemplate = "./csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_{}_global.csv"
 fields = ["confirmed", "deaths", "recovered"]
 
 dataframe_all_countries = pre_process_database(datatemplate, fields)
@@ -177,8 +177,8 @@ for country in countrylist:
     #
     #
     START_FIT = "2020-02-23"
-    STOP_FIT = "2020-03-29"
-    EXTRAPOLTATE = ("2020-02-23", "2020-03-31")
+    STOP_FIT = "2020-03-30"
+    EXTRAPOLTATE = ("2020-02-23", "2020-04-01")
     #
     #
     # # In[6]:
@@ -190,7 +190,7 @@ for country in countrylist:
         "counts", data_italy, start=START_FIT, stop=STOP_FIT
     )
 
-    ylim_df = data_italy["counts"].iloc[-1] * 1.05
+    ylim_df = data_italy["counts"].iloc[-1] * 1.20
     #
     # # In[7]:
     #
@@ -271,7 +271,7 @@ for country in countrylist:
     #
     #
     kinds = ["counts"]
-    datetime_expected = "2020-03-24"
+    datetime_expected = "2020-04-10"
     expected_values = []
     for kind in kinds:
         expected_values.append(int(round(fits[kind].predict(datetime_expected))))

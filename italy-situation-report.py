@@ -64,11 +64,11 @@ def select_database(database, country, field):
 # In[3]:
 
 today = date.today()
-country = "United Kingdom"
+country = "Italy"
 # dd/mm/YY
 today = today.strftime("%d-%m-%Y")
 # datatemplate = "time_series_19-covid-{}.csv"
-datatemplate = "time_series_covid19_{}_global.csv"
+datatemplate = "./csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_{}_global.csv"
 # fields = ["Confirmed", "Deaths", "Recovered"]
 fields = ["confirmed", "deaths", "recovered"]
 dataframe_all_countries = pre_process_database(datatemplate, fields)
@@ -96,8 +96,8 @@ data_italy.tail()
 #
 #
 START_FIT = '2020-02-23'
-STOP_FIT = '2020-03-25'
-EXTRAPOLTATE = ('2020-02-23', '2020-03-26')
+STOP_FIT = '2020-03-26'
+EXTRAPOLTATE = ('2020-02-23', '2020-03-27')
 #
 #
 # # In[6]:
@@ -157,7 +157,7 @@ covid19.plot.plot(ax, data_italy[kind], fits[kind], label=kind, extrapolate=EXTR
 #
 #
 kinds = ['counts']
-datetime_expected = '2020-03-25'
+datetime_expected = '2020-03-26'
 expected_values = []
 for kind in kinds:
     expected_values.append(int(round(fits[kind].predict(datetime_expected))))
@@ -189,9 +189,9 @@ STOP_FIT = None
 EXTRAPOLTATE = ('2020-02-23', '2020-03-26')
 
 REGIONS_FIT_PARAMS = {
-    'UK': {
-        'exponential_fits': [('2020-02-24', '2020-03-10'), ('2020-03-13', None)],
-        # 'exponential_fits': [(None, '2020-03-11'), ('2020-03-12', None)],
+    'Italy': {
+        'exponential_fits': [('2020-02-24', '2020-03-10'), ('2020-03-13', '2020-03-17'), ('2020-03-18', None)],
+
     }
 }
 
@@ -217,18 +217,14 @@ for region, params in REGIONS_FIT_PARAMS.items():
             except:
                 print('skipping:', region, start, stop)
 
-# In[7]:
-UK_EVENTS = [
-{'x': '2020-03-17', 'label': 'first advice to stay home'},
-{'x': '2020-03-23', 'label': 'Lockdown in UK'},
-]
+
 
 for region in REGIONS_FIT_PARAMS:
     # select = (data_italy_regions['denominazione_regione'] == region)
     for kind in ['counts']:
         _, ax = plt.subplots(subplot_kw={'yscale': 'log', 'ylim': (9, ylim_df)}, figsize=(14, 8))
         _ = ax.yaxis.grid(color='lightgrey', linewidth=0.5)
-        _ = covid19.plot.add_events(ax,events=UK_EVENTS, linestyle=':', offset=0, color='grey')
+        _ = covid19.plot.add_events(ax, linestyle=':', offset=0, color='grey')
         if len(fits[region, kind]) == 0:
             print('No data for', region)
             continue
@@ -242,7 +238,8 @@ for region in REGIONS_FIT_PARAMS:
             _ = ax.yaxis.tick_right()
         except:
             pass
-
+plt.savefig("./Figures/"
+                        +country + "COVID-19 Model-change-fit-{}.png".format(today), dpi=400)
 # _ = ax.set(title=r'COVID-19 "severe" cases in Italy. Fit is $f(t) = 2 ^ \frac{t - t_0}{T_d}$, with $T_d$ doubling time and $t_0$ reference date')
 
 
