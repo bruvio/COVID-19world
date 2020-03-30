@@ -318,9 +318,9 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
     datatemplate = "./csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_{}_global.csv"
     # fields = ["confirmed", "deaths", "recovered"]
     fields = []
-    field.append('confirmed')
-    field.append('deaths')
-    field.append('recovered')
+    fields.append('Confirmed')
+    fields.append('Deaths')
+    fields.append('Recovered')
 
     dataframe_all_countries = pre_process_database(datatemplate, fields)
     list_of_files = glob.glob('worldmeter_data/*')  # * means all if need specific format then *.csv
@@ -401,13 +401,13 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
 
                 dataframe, x, y = select_database(
-                    dataframe_all_countries, country, "confirmed"
+                    dataframe_all_countries, country, "Confirmed"
                 )
                 dataframe_deaths, x_deaths, y_deaths = select_database(
-                    dataframe_all_countries, country, "deaths"
+                    dataframe_all_countries, country, "Deaths"
                 )
                 dataframe_recovered, x_recovered, y_recovered = select_database(
-                    dataframe_all_countries, country, "recovered"
+                    dataframe_all_countries, country, "Recovered"
                 )
                 for field in fields:
                     dataframe_all_countries_last_update1 = dataframe_all_countries_last_update[
@@ -430,7 +430,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
 
                     # dataframe.append(pd.Series(name=df_country.index[0]))
-                    if field =='confirmed':
+                    if field =='Confirmed':
                         dataframe = dataframe.append(pd.Series(), ignore_index=True)
                         dataframe['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
                         dataframe['country'].iloc[-1] = country
@@ -438,7 +438,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                         dataframe['counts'].iloc[-1] = df_country[country].values[0]
                         x.append(pd.Series(pd.to_datetime(df_country.index[0])))
                         y.append(pd.Series(df_country[country].values[0]))
-                    if field == 'deaths':
+                    if field == 'Ddeaths':
                         dataframe_deaths = dataframe_deaths.append(pd.Series(), ignore_index=True)
                         dataframe_deaths['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
                         dataframe_deaths['country'].iloc[-1] = country
@@ -446,7 +446,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                         dataframe_deaths['counts'].iloc[-1] = df_country[country].values[0]
                         x_deaths.append(pd.Series(pd.to_datetime(df_country.index[0])))
                         y_deaths.append(pd.Series(df_country[country].values[0]))
-                    if field == 'recovered':
+                    if field == 'Recovered':
                         dataframe_recovered = dataframe_recovered.append(pd.Series(), ignore_index=True)
                         dataframe_recovered['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
                         dataframe_recovered['country'].iloc[-1] = country
@@ -1065,7 +1065,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
         # datatemplate = "time_series_covid19_{}_global.csv"
         # fields = ["confirmed", "deaths", "recovered"]
         fields = []
-        fields.append("confirmed")
+        fields.append("Confirmed")
         # fields.append("deaths")
         # fields.append("recovered")
         for field in fields:
@@ -1286,6 +1286,6 @@ if __name__ == "__main__":
     # main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=False)
     # main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=True)
 
-    main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=True)
+    main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=True)
     # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
 
