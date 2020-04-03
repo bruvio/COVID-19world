@@ -1,16 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
 
-
-# get_ipython().magic('load_ext autoreload')
-# get_ipython().magic('autoreload 2')
-#
-# get_ipython().magic('matplotlib inline')
-
-
-# In[2]:
 import itertools
 import numpy as np
 import sys
@@ -67,9 +58,7 @@ def select_database(database, country, field):
     return sel, sel["date"], sel["counts"]
 
 
-# ## data
 
-# In[3]:
 
 today = date.today()
 countrylist = []
@@ -156,6 +145,7 @@ for country in countrylist:
     # data_italy = dataframe.copy()
 
     # for field in fields:
+    # updating JH data base with latest daily data scraped from web
     dataframe_all_countries_last_update1 = dataframe_all_countries_last_update[
         ["Country/Region", field, "Last Update"]]
 
@@ -202,14 +192,7 @@ for country in countrylist:
     for column in ["counts"]:
         data_italy["variazione_" + column] = data_italy[column].diff(1)
 
-    # data_italy.tail()
 
-    #
-    # # ## situation report
-    #
-    # # In[5]:
-    #
-    #
     if country =='United Kingdom':
         START_FIT = "2020-02-23"
         STOP_FIT = "2020-04-12"
@@ -220,11 +203,7 @@ for country in countrylist:
         STOP_FIT = '2020-04-12'
         EXTRAPOLTATE = ('2020-02-23', '2020-04-12')
 
-    #
-    #
-    # # In[6]:
-    #
-    #
+
     data_italy.set_index("date", inplace=True)
     fits = {}
     fits["counts"] = covid19.fit.ExponentialFit.from_frame(
@@ -232,13 +211,10 @@ for country in countrylist:
     )
 
     ylim_df = data_italy["counts"].iloc[-1] * 1.20
-    #
-    # # In[7]:
-    #
-    #
+
     _, ax = plt.subplots(subplot_kw={"yscale": "log", "ylim": (50, ylim_df)})
-    # # _ = covid19.plot.add_events(ax, linestyle=':', offset=11, color='grey')
-    #
+
+
 
     covid19.plot.plot_fit(ax, fits["counts"], color=sns.color_palette()[2])
     for kind, color in zip(["counts"], sns.color_palette()):
@@ -265,11 +241,7 @@ for country in countrylist:
     plt.savefig("./Figures/"
                         +country + "COVID-19 Model-log-{}.png".format(today), dpi=400)
     plt.close()
-    #
-    #
-    # # In[8]:
-    #
-    #
+
     _, ax = plt.subplots(subplot_kw={"yscale": "linear", "ylim": (80, ylim_df)})
     # # _ = covid19.plot.add_events(ax, linestyle=':', offset=17, color='grey')
     #
@@ -298,46 +270,16 @@ for country in countrylist:
     plt.savefig("./Figures/"
                         +country + "COVID-19 Model-{}.png".format(today), dpi=400)
     plt.close()
-    #
-    #
-    # # In[9]:
-    #
-    #
-    # _, ax = plt.subplots(subplot_kw={'yscale': 'log', 'ylim': (5, 50000)})
-    # kind = 'counts'
-    # covid19.plot.plot(ax, data_italy[kind], fits[kind], label=kind, extrapolate=EXTRAPOLTATE, color=color)
-    # #
-    #
-    # # ## estimates
-    #
-    # # In[10]:
-    #
-    #
+
     kinds = ["counts"]
     datetime_expected = '2020-03-31'
     expected_values = []
     for kind in kinds:
         expected_values.append(int(round(fits[kind].predict(datetime_expected))))
     print(", ".join(f"{k}: {v}" for v, k in zip(expected_values, kinds)))
-    #
-    #
-    # # In[11]:
-    #
-    #
+
     for key, value in list(fits.items()):
         print(f'{key} {" " * (26 - len(key))}{str(value)}')
-#
-#
-# # In[ ]:
-#
-#
-#
-#
-#
-#
-
-
-    # In[6]:
 
 
     fits = {}
@@ -411,14 +353,6 @@ for country in countrylist:
                                 + region + "COVID-19 Model-change-fit{}.png".format(today), dpi=400)
                 except:
                     pass
-
-    # _ = ax.set(title=r'COVID-19 "severe" cases in Italy. Fit is $f(t) = 2 ^ \frac{t - t_0}{T_d}$, with $T_d$ doubling time and $t_0$ reference date')
-
-
-    # ## Estimate of the initial / uncontined doubling time
-
-    # In[8]:
-
 
     for key, value in list(fits.items()):
         if len(value):

@@ -201,8 +201,6 @@ def fit_data(x, y, func, p0=None):
             fittedParameters, pcov = curve_fit(func, x, y, maxfev=5000, p0=p0)
         else:
             fittedParameters, pcov = curve_fit(func, x, y, maxfev=5000)
-        # fittedParameters, pcov = curve_fit(func2, x[:max_size], totale_casi[:max_size], maxfev=5000)
-        # fittedParameters[2]=90
         modelPredictions = func(y, *fittedParameters)
 
         absError = modelPredictions - y
@@ -236,7 +234,6 @@ def plot_data(Xdata, Ydata, country, label, color, logscale=False):
     if logscale:
         plt.yscale("log")
         plt.ylim(1, 1e4)
-    # plt.plot(Xdata, Ydata, 'D', label="Original Data - " + country + ' - ' + label,color=color)
     plt.scatter(
         Xdata,
         Ydata,
@@ -253,8 +250,6 @@ def plot_model(
     if logscale:
         plt.yscale("log")
         plt.ylim(1, 1e4)
-
-    # plt.plot(xModel, yModel, label="Fitted Data - " + country + ' - ' + label, color=color,marker=marker)
     plt.scatter(
         xModel,
         yModel,
@@ -337,17 +332,17 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
     countrylist = []
     countrylist.append("Italy")
-    countrylist.append("Australia")
-    countrylist.append("Germany")
+    # countrylist.append("Australia")
+    # countrylist.append("Germany")
     # countrylist.append("China")
     # countrylist.append("Australia")
-    countrylist.append("US")
-    countrylist.append("France")
-    countrylist.append("Spain")
+    # countrylist.append("US")
+    # countrylist.append("France")
+    # countrylist.append("Spain")
     # countrylist.append("Korea, South")
-    countrylist.append("Switzerland")
-    countrylist.append("United Kingdom")
-    countrylist.append("Japan")
+    # countrylist.append("Switzerland")
+    # countrylist.append("United Kingdom")
+    # countrylist.append("Japan")
     # countrylist.append("Romania")
 
     exception_list = []
@@ -358,7 +353,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
     exception_list.append("US")
     exception_list.append("France")
     exception_list.append("Switzerland")
-    exception_list.append("United Kingdom")
+    # exception_list.append("United Kingdom")
     exception_list.append("Japan")
     # logscale= True
     logscale = False
@@ -383,6 +378,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                 dataframe_recovered, x_recovered, y_recovered = select_database(
                     dataframe_all_countries, country, "Recovered"
                 )
+                #updating JH data base with latest daily data scraped from web
                 for field in fields:
                     dataframe_all_countries_last_update1 = dataframe_all_countries_last_update[
                         ["Country/Region", field, "Last Update"]]
@@ -600,7 +596,6 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                     print("R-squared:", Rsquared)
                 #
 
-                # UK Parameters: [2.15051089e+08 9.82481446e+01 2.64184732e-01]
 
                 xModel_prediction = np.arange(0, days)
                 if country in exception_list:
@@ -1024,20 +1019,9 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                 #                            )
                 #                 )
 
-    # plt.show(block=True)
-    # Customise layout
-
-    # fig_rate.show()
-
-    # fig_curve.show()
 
     if plot_bar_plot:
-        # field = 'Deaths'
-        # field = 'Confirmed'
-        # field = 'Recovered'
-        # fields = ["Confirmed", "Deaths", "Recovered"]
-        # datatemplate = "time_series_covid19_{}_global.csv"
-        # fields = ["confirmed", "deaths", "recovered"]
+
         fields = []
         fields.append("Confirmed")
         # fields.append("deaths")
@@ -1114,10 +1098,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
             df.rename(columns={"value": "counts"}, inplace=True)
             # frames_list = df["date"].unique()
             df.to_csv('test_database_after_interp.csv')
-            # pd.set_option('display.height', 500)
-            # pd.set_option('display.max_rows', 500)
-            # pd.set_option('display.max_columns', 500)
-            # pd.set_option('display.width', 200)
+
             frames_list = df["date"].unique().tolist()
             # for i in range(10):
             #     frames_list.append(df["date"].iloc[-1])
