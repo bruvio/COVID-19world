@@ -119,7 +119,7 @@ CHANGE_FIT_2 = np.datetime64('2020-03-11')
 CHANGE_FIT_3 = np.datetime64('2020-03-15')
 STOP_FIT = None
 
-EXTRAPOLTATE = ('2020-02-23', '2020-04-02')
+EXTRAPOLTATE = ('2020-02-23', '2020-04-05')
 
 REGIONS_FIT_PARAMS = {
     'United Kingdom': {
@@ -173,7 +173,7 @@ for country in countrylist:
     df_country = df_last_update[[country]]
 
     # dataframe.append(pd.Series(name=df_country.index[0]))
-    if field == 'confirmed':
+    if field == 'Confirmed':
         dataframe = dataframe.append(pd.Series(), ignore_index=True)
         dataframe['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
         dataframe['country'].iloc[-1] = country
@@ -181,7 +181,7 @@ for country in countrylist:
         dataframe['counts'].iloc[-1] = df_country[country].values[0]
         x.append(pd.Series(pd.to_datetime(df_country.index[0])))
         y.append(pd.Series(df_country[country].values[0]))
-    if field == 'deaths':
+    if field == 'Deaths':
         dataframe_deaths = dataframe_deaths.append(pd.Series(), ignore_index=True)
         dataframe_deaths['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
         dataframe_deaths['country'].iloc[-1] = country
@@ -189,7 +189,7 @@ for country in countrylist:
         dataframe_deaths['counts'].iloc[-1] = df_country[country].values[0]
         x_deaths.append(pd.Series(pd.to_datetime(df_country.index[0])))
         y_deaths.append(pd.Series(df_country[country].values[0]))
-    if field == 'recovered':
+    if field == 'Recovered':
         dataframe_recovered = dataframe_recovered.append(pd.Series(), ignore_index=True)
         dataframe_recovered['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
         dataframe_recovered['country'].iloc[-1] = country
@@ -212,13 +212,13 @@ for country in countrylist:
     #
     if country =='United Kingdom':
         START_FIT = "2020-02-23"
-        STOP_FIT = "2020-03-31"
-        EXTRAPOLTATE = ("2020-02-23", "2020-04-01")
+        STOP_FIT = "2020-04-12"
+        EXTRAPOLTATE = ("2020-02-23", "2020-04-12")
     # else country =='Italy':
     else:
         START_FIT = '2020-02-23'
-        STOP_FIT = '2020-03-31'
-        EXTRAPOLTATE = ('2020-02-23', '2020-04-01')
+        STOP_FIT = '2020-04-12'
+        EXTRAPOLTATE = ('2020-02-23', '2020-04-12')
 
     #
     #

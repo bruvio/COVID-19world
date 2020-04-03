@@ -350,33 +350,6 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
     countrylist.append("Japan")
     # countrylist.append("Romania")
 
-    # countrylist = [
-    #     "United Kingdom",
-    #     "US",
-    #     "Germany",
-    #     "Italy",
-    #     "China",
-    #     "Singapore",
-    #     "Australia",
-    #     "France",
-    #     "Switzerland",
-    #     "Iran",
-    #     "Korea, South",
-    #     "Romania",
-    #     "Colombia",
-    # ]
-    # countrylist = ["Italy"]
-    # countrylist = ['United Kingdom']
-    # countrylist = ['Iran']
-    # countrylist = ['Singapore']
-    # countrylist = ['US']
-    # countrylist = ['Switzerland']
-    # countrylist = ['Germany']
-    # countrylist = ['France']
-    # countrylist = ['Japan']
-    # countrylist = ['China']
-    # countrylist = ['Russia']
-    # countrylist = ['Australia']
     exception_list = []
     exception_list.append("Australia")
     exception_list.append("China")

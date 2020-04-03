@@ -336,7 +336,7 @@ try:
     list1 = range(0, len(html_soup2.find_all('span', class_=CANindex)) - 4, 5)
     list2 = range(1, len(html_soup2.find_all('span', class_=CANindex)) - 3, 5)
     list3 = range(2, len(html_soup2.find_all('span', class_=CANindex)) - 2, 5)
-    list4 = range(3, len(html_soup2.find_all('span', class_=CANindex)) - 1, 5)
+    list4 = range(4, len(html_soup2.find_all('span', class_=CANindex)) - 0, 5)
 
     for index in list1:
         if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
@@ -353,36 +353,53 @@ try:
             Confirmed.append(0)
     for index in list3:
         # . They do not provide Recovered cases number
-        # if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
-        #    Recovered.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
-        # else:
-        Recovered.append(0)
-    for index in list3:
         if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
-            try:
-                Deaths.append(html_soup2.find_all('span', class_=CANindex)[index].contents[1])
-            except:
-                Deaths.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
+           Deaths.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
         else:
             Deaths.append(0)
+    for index in list4:
+        if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
+            try:
+                Recovered.append(html_soup2.find_all('span', class_=CANindex)[index].contents[1])
+            except:
+                Recovered.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
+        else:
+            Recovered.append(0)
 
     CAN_data = pd.DataFrame({'Province/State': Locations,
                              'Confirmed': Confirmed,
                              'Deaths': Deaths,
-                             # 'Recovered':Recovered,
+                             'Recovered':Recovered,
                              })
 
     # Remove rows that are not data
+    CAN_data.drop(CAN_data[CAN_data['Confirmed'] == 'Confirmed'].index, axis=0, inplace=True)
+    CAN_data.drop(CAN_data[CAN_data['Recovered'] == 'Recovered'].index, axis=0, inplace=True)
     CAN_data.drop(CAN_data[CAN_data['Deaths'] == 'Deaths'].index, axis=0, inplace=True)
 
     # Remove rows that are not data
     CAN_data.drop(CAN_data[CAN_data['Province/State'] == 'Canada'].index, axis=0, inplace=True)
 
-    # Remove comma for each element
+    # Locations1 = []
+    # for name in CAN_data['Province/State']:
+    #     name.parent.find('div', class_=CANindex).get_text().strip()
+    #     Locations1.append(name)
+    # Locations1 = []
+    # for index,row in CAN_data.iterrows():
+    #     Locations1.append(row['Province/State'].iloc[index].parent.find('div', class_=CANindex).get_text().strip()
+
+    Locations1 = []
+    for index in range(0,len(CAN_data['Province/State'])):
+        Locations1.append(CAN_data['Province/State'].iloc[index].parent.find('div', class_=CANindex).get_text().strip())
+
+    CAN_data['Province/State'] = Locations1
+        # Remove comma for each element
     CAN_data['Confirmed'] = CAN_data['Confirmed'].apply(removeCommas)
+    CAN_data['Recovered'] = CAN_data['Recovered'].apply(removeCommas)
     CAN_data['Deaths'] = CAN_data['Deaths'].apply(removeCommas)
     CAN_total_confirmed = CAN_data['Confirmed'].astype(int).sum()
     CAN_total_deaths =CAN_data['Deaths'].astype(int).sum()
+    CAN_total_recovered =CAN_data['Recovered'].astype(int).sum()
     CAN_data
 except:
     print('failed to scrap Canada data')
@@ -398,7 +415,7 @@ try:
     list1 = range(1, len(html_soup2.find_all('span', class_=USindex)) - 4, 5)
     list2 = range(2, len(html_soup2.find_all('span', class_=USindex)) - 3, 5)
     list3 = range(3, len(html_soup2.find_all('span', class_=USindex)) - 2, 5)
-    list4 = range(4, len(html_soup2.find_all('span', class_=USindex)) - 1, 5)
+    list4 = range(5, len(html_soup2.find_all('span', class_=USindex)) - 0, 5)
 
     for index in list1:
         if len(html_soup2.find_all('span', class_=USindex)[index].contents):
@@ -415,27 +432,29 @@ try:
             Confirmed.append(0)
     for index in list3:
         # They do not provide Recovered cases number anymore.
-        # if len(html_soup2.find_all('span', class_=USindex)[index].contents):
-        #    Recovered.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
-        # else:
-        Recovered.append(0)
-    for index in list3:
         if len(html_soup2.find_all('span', class_=USindex)[index].contents):
-            try:
-                Deaths.append(html_soup2.find_all('span', class_=USindex)[index].contents[1])
-            except:
-                Deaths.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
+           Deaths.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
         else:
             Deaths.append(0)
+    for index in list4:
+        if len(html_soup2.find_all('span', class_=USindex)[index].contents):
+            try:
+                Recovered.append(html_soup2.find_all('span', class_=USindex)[index].contents[1])
+            except:
+                Recovered.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
+        else:
+            Recovered.append(0)
 
     US_data = pd.DataFrame({'Province/State': Locations,
                             'Confirmed': Confirmed,
                             'Deaths': Deaths,
-                            # 'Recovered':Recovered,
+                            'Recovered':Recovered,
                             })
 
     # Remove rows that are not data
+    US_data.drop(US_data[US_data['Confirmed'] == 'Confirmed'].index, axis=0, inplace=True)
     US_data.drop(US_data[US_data['Deaths'] == 'Deaths'].index, axis=0, inplace=True)
+    US_data.drop(US_data[US_data['Recovered'] == 'Recovered'].index, axis=0, inplace=True)
 
     # Remove rows that are not data
     US_data.drop(US_data[US_data['Province/State'] == 'United States'].index, axis=0, inplace=True)
@@ -460,8 +479,15 @@ try:
     if 0 in list(US_data['Province/State']):
         US_data.at[US_data.loc[US_data['Province/State'] == 0,].index, 'Province/State'] = 'Unassigned'
 
+    Locations1 = []
+    for index in range(0,len(US_data['Province/State'])):
+        Locations1.append(US_data['Province/State'].iloc[index].parent.find('div', class_=USindex).get_text().strip())
+
+    US_data['Province/State'] = Locations1
+
     # Remove comma for each element
     US_data['Confirmed'] = US_data['Confirmed'].apply(removeCommas)
+    US_data['Recovered'] = US_data['Recovered'].apply(removeCommas)
     US_data['Deaths'] = US_data['Deaths'].apply(removeCommas)
 
 
@@ -491,11 +517,15 @@ try:
     US_Can_data_EN.rename(columns={'English':'Province/State'}, inplace=True)
     US_Can_data_EN = US_Can_data_EN.drop(US_Can_data_EN[US_Can_data_EN['Province/State'] == 'Wuhan Evacuee'].index, axis=0)
     columnOrder = ['Province/State', 'Country/Region', 'Last Update','Confirmed', 'Deaths', 'Recovered']
+    # columnOrder1 = ['Province/State', 'Country/Region', 'Last Update','Confirmed', 'Deaths', 'Recovered_x']
 
-    US_Can_data_EN = US_Can_data_EN[columnOrder[:-1]]
+    # US_Can_data_EN = US_Can_data_EN[columnOrder1]
     # US_Can_data_EN
-
-
+    US_Can_data_EN = pd.DataFrame({'Province/State': US_Can_data_EN['Province/State'],
+                            'Confirmed': US_Can_data_EN['Confirmed'],
+                            'Deaths': US_Can_data_EN['Deaths'],
+                            'Recovered':US_Can_data_EN['Recovered_x'],
+                            })
 
 
 
@@ -638,31 +668,35 @@ china_index = worldometer_table.index[worldometer_table['Country/Region']=='Chin
 aus_index = worldometer_table.index[worldometer_table['Country/Region']=='Australia'].tolist()[0]
 canada_index = worldometer_table.index[worldometer_table['Country/Region']=='Canada'].tolist()[0]
 
-print(worldometer_table['Confirmed'].loc[us_index] ,USA_total_confirmed)
-print(worldometer_table['Confirmed'].loc[china_index] ,CHN_total_confirmed)
-print(worldometer_table['Recovered'].loc[china_index] ,CHN_total_recovered)
-print(worldometer_table['Confirmed'].loc[aus_index] , AUS_total_confirmed)
-print(worldometer_table['Confirmed'].loc[canada_index] ,CAN_total_confirmed)
-print(worldometer_table['Deaths'].loc[us_index] , USA_total_deaths)
-print(worldometer_table['Deaths'].loc[china_index] ,CHN_total_deaths)
-print(worldometer_table['Deaths'].loc[canada_index] ,CAN_total_deaths)
-
+try:
+    print(worldometer_table['Confirmed'].loc[us_index] ,USA_total_confirmed)
+    print(worldometer_table['Confirmed'].loc[china_index] ,CHN_total_confirmed)
+    print(worldometer_table['Recovered'].loc[china_index] ,CHN_total_recovered)
+    print(worldometer_table['Confirmed'].loc[aus_index] , AUS_total_confirmed)
+    print(worldometer_table['Confirmed'].loc[canada_index] ,CAN_total_confirmed)
+    print(worldometer_table['Deaths'].loc[us_index] , USA_total_deaths)
+    print(worldometer_table['Deaths'].loc[china_index] ,CHN_total_deaths)
+    print(worldometer_table['Deaths'].loc[canada_index] ,CAN_total_deaths)
+except:
+    pass
 
 
 
 #  updating worldmeter table with most recend data from different sources
+try:
+    worldometer_table.loc[worldometer_table['Country/Region'] == 'US', 'Confirmed'] = USA_total_confirmed
+    worldometer_table.loc[worldometer_table['Country/Region'] == 'US', 'Deaths'] = USA_total_deaths
 
-worldometer_table.loc[worldometer_table['Country/Region'] == 'US', 'Confirmed'] = USA_total_confirmed
-worldometer_table.loc[worldometer_table['Country/Region'] == 'US', 'Deaths'] = USA_total_deaths
+    worldometer_table.loc[worldometer_table['Country/Region'] == 'Canada', 'Confirmed'] = CAN_total_confirmed
+    worldometer_table.loc[worldometer_table['Country/Region'] == 'Canada', 'Deaths'] = CAN_total_deaths
 
-worldometer_table.loc[worldometer_table['Country/Region'] == 'Canada', 'Confirmed'] = CAN_total_confirmed
-worldometer_table.loc[worldometer_table['Country/Region'] == 'Canada', 'Deaths'] = CAN_total_deaths
+    worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'Confirmed'] = CHN_total_confirmed
+    worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'Recovered'] = CHN_total_recovered
+    worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'Deaths'] = CHN_total_deaths
 
-worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'Confirmed'] = CHN_total_confirmed
-worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'Recovered'] = CHN_total_recovered
-worldometer_table.loc[worldometer_table['Country/Region'] == 'China', 'Deaths'] = CHN_total_deaths
-
-worldometer_table.loc[worldometer_table['Country/Region'] == 'Australia', 'Confirmed'] = AUS_total_confirmed
+    worldometer_table.loc[worldometer_table['Country/Region'] == 'Australia', 'Confirmed'] = AUS_total_confirmed
+except:
+    pass
 
 
 # print(worldometer_table[worldometer_table['Country/Region'] == 'Australia', 'Confirmed'],AUS_total_confirmed)
@@ -685,7 +719,7 @@ for f in os.listdir('./worldmeter_data/'):
 
 list_of_files.sort(reverse=True)
 latest_file = list_of_files[0]
-
+print('reading {} data'.format(latest_file))
 previous_worldometer_table = pd.read_csv('./worldmeter_data/'+   latest_file)
 
 # previous_worldometer_table['increase_confirmed'] = np.where(worldometer_table['Confirmed'] == previous_worldometer_table['Confirmed'], 0, worldometer_table['Confirmed'] - previous_worldometer_table['Confirmed']) #create new column in df1 for price diff
@@ -717,8 +751,9 @@ try:
 
 
     comparison_df.to_csv('./daily_diff/{}_diff.csv'.format(today))
+    print(comparison_df.head(20))
     # diff_df = dataframe_difference(worldometer_table,previous_worldometer_table,'Confirmed',which='left_only')
     # diff_df = dataframe_difference(worldometer_table,previous_worldometer_table)
 except:
     print('failed to compare with previous day')
-    print(comparison_df.head(20))
+
