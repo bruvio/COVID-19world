@@ -233,7 +233,7 @@ def plot_data(Xdata, Ydata, country, label, color, logscale=False):
     # first the raw data as a scatter plot
     if logscale:
         plt.yscale("log")
-        plt.ylim(1, 1e4)
+        # plt.ylim(1, 1e4)
     plt.scatter(
         Xdata,
         Ydata,
@@ -249,7 +249,8 @@ def plot_model(
 
     if logscale:
         plt.yscale("log")
-        plt.ylim(1, 1e4)
+
+        # plt.ylim(1, 1e4)
     plt.scatter(
         xModel,
         yModel,
@@ -333,16 +334,16 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
     countrylist = []
     countrylist.append("Italy")
     # countrylist.append("Australia")
-    # countrylist.append("Germany")
+    countrylist.append("Germany")
     # countrylist.append("China")
     # countrylist.append("Australia")
-    # countrylist.append("US")
-    # countrylist.append("France")
-    # countrylist.append("Spain")
+    countrylist.append("US")
+    countrylist.append("France")
+    countrylist.append("Spain")
     # countrylist.append("Korea, South")
     # countrylist.append("Switzerland")
-    # countrylist.append("United Kingdom")
-    # countrylist.append("Japan")
+    countrylist.append("United Kingdom")
+    countrylist.append("Japan")
     # countrylist.append("Romania")
 
     exception_list = []
@@ -494,21 +495,30 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                     )
 
                 ################ PLOTTING DATA & FIT ###############
-                # plt.figure(num=country + "_fit")
-                # # ax1 = plt.subplot(211)
-                #
-                # plot_data(t_real, y, country, "confirmed cases", "r", logscale=logscale)
-                #
-                # plot_model(
-                #     t_real,
-                #     yModel_fit,
-                #     country,
-                #     " data fit - " + databasename + "  -  " + text_fit,
-                #     "b",
-                #     marker="x",
-                #     logscale=logscale,
-                # )
+                plt.figure(num=country + "_fit")
+                # ax1 = plt.subplot(211)
 
+                plot_data(t_real, y, country, "confirmed cases", "r", logscale=True)
+
+                plot_model(
+                    t_real,
+                    yModel_fit,
+                    country,
+                    " data fit - " + databasename + "  -  " + text_fit,
+                    "b",
+                    marker="x",
+                    logscale=True,
+                )
+                plt.savefig(
+                    "./Figures/"
+                    + country
+                    + "_"
+                    + databasename
+                    + "_fitted_log-{}.png".format(today),
+                    dpi=100,
+                )
+                # plt.ylim(1, 1e5)
+                plt.xticks(rotation=15, ha="right")
                 # figure  = plt.figure(num=country,figsize=(11, 8))
                 figure = plt.figure(num=country, figsize=(11, 8))
                 ax1 = plt.subplot(211)
@@ -1075,7 +1085,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
             # df = df_reshape.append( df_update, ignore_index=False)
             # df = df_reshape
             # df.fillna(0)
-            df.to_csv('test_database_before_interp.csv')
+            df.to_csv('./cumulative_data/cumulative_{}-{}.csv'.format(field,today))
 
             for p in range(3):
                 i = 0
@@ -1237,9 +1247,7 @@ if __name__ == "__main__":
         3: logging.ERROR,
     }
     logging.root.setLevel(level=debug_map[0])
-    # main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=False)
-    # main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=False)
-    # main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=True)
+
 
     main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=True)
     # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)

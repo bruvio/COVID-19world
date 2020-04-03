@@ -64,7 +64,7 @@ today = date.today()
 countrylist = []
 countrylist.append("Italy")
 # countrylist.append("Australia")
-# countrylist.append("Germany")
+countrylist.append("Germany")
 # countrylist.append("China")
 # countrylist.append("US")
 # countrylist.append("Finland")
@@ -120,6 +120,10 @@ REGIONS_FIT_PARAMS = {
         # 'exponential_fits': [(None, '2020-03-11'), ('2020-03-12', None)],
     },
     'France': {
+        'exponential_fits': [('2020-02-24', '2020-03-17'), ('2020-03-13', None)],
+        # 'exponential_fits': [(None, '2020-03-11'), ('2020-03-12', None)],
+    },
+    'Germany': {
         'exponential_fits': [('2020-02-24', '2020-03-17'), ('2020-03-13', None)],
         # 'exponential_fits': [(None, '2020-03-11'), ('2020-03-12', None)],
     },
