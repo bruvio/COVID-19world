@@ -132,14 +132,14 @@ countrylist = []
 # countrylist.append("Australia")
 # countrylist.append("US")
 # countrylist.append("France")
-# countrylist.append("Spain")
+countrylist.append("Spain")
 # countrylist.append("Korea, South")
 # countrylist.append("Switzerland")
 # countrylist.append("United Kingdom")
 # countrylist.append("Japan")
 # countrylist.append("Romania")
 
-for country in countrylist_df:
+for country in countrylist:
             if country in countrylist_df:
                 try:
                     print(country)
@@ -210,12 +210,12 @@ for country in countrylist_df:
 
 
 
-                    if os.path('./country_data/{}.csv'):
-                        country_df = pd.read_csv('./country_data/{}.csv')
+                    if os.path.isfile(os.getcwd()+'/country_data/{}.csv'.format(country)):
+                        country_df = pd.read_csv('./country_data/{}.csv'.format(country))
                         country_df = country_df.append(pd.Series(), ignore_index=True)
                         country_df['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
-                        country_df['Confirmed'].iloc[-1] = dataframe_recovered['counts'].iloc[-1]
-                        country_df['Deaths'].iloc[-1] = dataframe_recovered['counts'].iloc[-1]
+                        country_df['Confirmed'].iloc[-1] = dataframe['counts'].iloc[-1]
+                        country_df['Deaths'].iloc[-1] = dataframe_deaths['counts'].iloc[-1]
                         country_df['Recovered'].iloc[-1] = dataframe_recovered['counts'].iloc[-1]
 
 

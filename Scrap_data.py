@@ -278,62 +278,63 @@ caseTableSimple.tail(20)
 
 
 
-try:
+# try:
 # As the website changed to dynamic, using selenium to interact with the website vitually
-    from selenium import webdriver
+from selenium import webdriver
 
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
-    from selenium.webdriver.common.by import By
-    # Open vitual Chrome browser
-
-
-    driver = webdriver.Chrome()
-    # Direct the driver to open a webpage by calling the ‘get’ method, with a parameter of the page we want to visit.
-    driver.get("https://coronavirus.1point3acres.com/en")
-    # click tab button to let page lode new data (US data is the default)
-    python_button = driver.find_element(By.XPATH, "//span[text()='Canada']")
-    python_button.click()
-
-    # html_soup22 = BeautifulSoup(driver.page_source)
-    html_soup_CAN = BeautifulSoup(driver.page_source,  'html.parser')
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+# Open vitual Chrome browser
 
 
-    driver.get("https://coronavirus.1point3acres.com/en")
-    # click tab button to let page lode new data (US data is the default)
-    python_button = driver.find_element(By.XPATH, "//span[text()='United States']")
-    python_button.click()
+driver = webdriver.Chrome()
+# Direct the driver to open a webpage by calling the ‘get’ method, with a parameter of the page we want to visit.
+driver.get("https://coronavirus.1point3acres.com/en")
+# click tab button to let page lode new data (US data is the default)
+python_button = driver.find_element(By.XPATH, "//span[text()='Canada']")
+# python_button = driver.find_element(By.XPATH, "//div[text()='Canada']")
+python_button.click()
+# <div class="jsx-3293928362 tab-menu"><span class="jsx-3293928362 " style="cursor: pointer;">United States</span><span class="jsx-3293928362 active" style="cursor: pointer;">Canada</span></div>
+# html_soup22 = BeautifulSoup(driver.page_source)
+html_soup_CAN = BeautifulSoup(driver.page_source,  'html.parser')
+# driver.quit()
 
-    # html_soup22 = BeautifulSoup(driver.page_source)
-    html_soup_US = BeautifulSoup(driver.page_source,  'html.parser')
+# driver.get("https://coronavirus.1point3acres.com/en")
+# click tab button to let page lode new data (US data is the default)
+python_button = driver.find_element(By.XPATH, "//span[text()='United States']")
+# python_button = driver.find_element(By.XPATH, "//div[@class='jsx-3293928362 tab-menu']//div[contains(text(),'United States')]")
+python_button.click()
 
-    # Wait for the dynamically loaded elements to show up
-    # WebDriverWait(driver, 10).until(
-    #     EC.visibility_of_element_located((By.CLASS_NAME, CANindex)))
-    # # And grab the new page HTML source
-    html_page = driver.page_source
-    driver.quit()
-    indexList = []
-    for span in html_soup_CAN.find_all('span'):
-        # Only retain 'span' that has contents
-        if len(span.contents):
-            # Since we only need to find index for table, use one of the table head as target word to locate index
-            if span.contents[0] == 'Location':
-                # Store the index inside a list
-                indexList.append(span['class'][0])
+# html_soup22 = BeautifulSoup(driver.page_source)
+html_soup_US = BeautifulSoup(driver.page_source,  'html.parser')
 
-    indexList1 = []
-    for span in html_soup_US.find_all('span'):
-        # Only retain 'span' that has contents
-        if len(span.contents):
-            # Since we only need to find index for table, use one of the table head as target word to locate index
-            if span.contents[0] == 'Location':
-                # Store the index inside a list
-                indexList1.append(span['class'][0])
-    print(indexList)
-    print(indexList1)
-except:
-    print('failed to connect to US Canada database')
+# Wait for the dynamically loaded elements to show up
+# WebDriverWait(driver, 10).until(
+#     EC.visibility_of_element_located((By.CLASS_NAME, CANindex)))
+# # And grab the new page HTML source
+driver.quit()
+indexList = []
+for span in html_soup_CAN.find_all('span'):
+    # Only retain 'span' that has contents
+    if len(span.contents):
+        # Since we only need to find index for table, use one of the table head as target word to locate index
+        if span.contents[0] == 'Location':
+            # Store the index inside a list
+            indexList.append(span['class'][0])
+
+indexList1 = []
+for span in html_soup_US.find_all('span'):
+    # Only retain 'span' that has contents
+    if len(span.contents):
+        # Since we only need to find index for table, use one of the table head as target word to locate index
+        if span.contents[0] == 'Location':
+            # Store the index inside a list
+            indexList1.append(span['class'][0])
+print(indexList)
+print(indexList1)
+# except:
+#     print('failed to connect to US Canada database')
 
 print('scraping Canadian data')
 try:
@@ -444,11 +445,11 @@ try:
         else:
             Confirmed.append(0)
     for index in list3:
-        if len(html_soup_US.find_all('span', class_=CANindex)[index].contents):
+        if len(html_soup_US.find_all('span', class_=USindex)[index].contents):
             try:
-                Deaths.append(html_soup_US.find_all('span', class_=CANindex)[index].contents[1])
+                Deaths.append(html_soup_US.find_all('span', class_=USindex)[index].contents[1])
             except:
-                Deaths.append(html_soup_US.find_all('span', class_=CANindex)[index].contents[0])
+                Deaths.append(html_soup_US.find_all('span', class_=USindex)[index].contents[0])
         else:
             Deaths.append(0)
     for index in list4:
