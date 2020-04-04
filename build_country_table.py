@@ -208,12 +208,26 @@ for country in countrylist_df:
                             y_recovered.append(pd.Series(df_country[country].values[0]))
 
 
-                    country_df = pd.DataFrame({'date': dataframe['date'],
-                                            'Confirmed': dataframe['counts'],
-                                            'Deaths': dataframe_deaths['counts'],
-                                            'Recovered': dataframe_recovered['counts'],
-                                            })
-                    country_df.to_csv('./country_data/{}.csv'.format(country), index=False)
+
+
+                    if os.path('./country_data/{}.csv'):
+                        country_df = pd.read_csv('./country_data/{}.csv')
+                        country_df = country_df.append(pd.Series(), ignore_index=True)
+                        country_df['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
+                        country_df['Confirmed'].iloc[-1] = dataframe_recovered['counts'].iloc[-1]
+                        country_df['Deaths'].iloc[-1] = dataframe_recovered['counts'].iloc[-1]
+                        country_df['Recovered'].iloc[-1] = dataframe_recovered['counts'].iloc[-1]
+
+                        
+
+                        country_df.to_csv('./country_data/{}.csv'.format(country), index=False)
+                    else:
+                        country_df = pd.DataFrame({'date': dataframe['date'],
+                                                   'Confirmed': dataframe['counts'],
+                                                   'Deaths': dataframe_deaths['counts'],
+                                                   'Recovered': dataframe_recovered['counts'],
+                                                   })
+                        country_df.to_csv('./country_data/{}.csv'.format(country), index=False)
 
                 except:
                     print('failed to run for {}'.format(country))
