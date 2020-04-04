@@ -296,7 +296,7 @@ try:
     python_button.click()
 
     # html_soup22 = BeautifulSoup(driver.page_source)
-    html_soup2 = BeautifulSoup(driver.page_source,  'html.parser')
+    html_soup_CAN = BeautifulSoup(driver.page_source,  'html.parser')
 
 
     driver.get("https://coronavirus.1point3acres.com/en")
@@ -305,7 +305,7 @@ try:
     python_button.click()
 
     # html_soup22 = BeautifulSoup(driver.page_source)
-    html_soup22 = BeautifulSoup(driver.page_source,  'html.parser')
+    html_soup_US = BeautifulSoup(driver.page_source,  'html.parser')
 
     # Wait for the dynamically loaded elements to show up
     # WebDriverWait(driver, 10).until(
@@ -314,7 +314,7 @@ try:
     html_page = driver.page_source
     driver.quit()
     indexList = []
-    for span in html_soup2.find_all('span'):
+    for span in html_soup_CAN.find_all('span'):
         # Only retain 'span' that has contents
         if len(span.contents):
             # Since we only need to find index for table, use one of the table head as target word to locate index
@@ -323,14 +323,15 @@ try:
                 indexList.append(span['class'][0])
 
     indexList1 = []
-    for span in html_soup22.find_all('span'):
+    for span in html_soup_US.find_all('span'):
         # Only retain 'span' that has contents
         if len(span.contents):
             # Since we only need to find index for table, use one of the table head as target word to locate index
             if span.contents[0] == 'Location':
                 # Store the index inside a list
                 indexList1.append(span['class'][0])
-
+    print(indexList)
+    print(indexList1)
 except:
     print('failed to connect to US Canada database')
 
@@ -343,36 +344,39 @@ try:
     Confirmed = []
     Recovered = []
     Deaths = []
-    list1 = range(0, len(html_soup2.find_all('span', class_=CANindex)) - 4, 5)
-    list2 = range(1, len(html_soup2.find_all('span', class_=CANindex)) - 3, 5)
-    list3 = range(2, len(html_soup2.find_all('span', class_=CANindex)) - 2, 5)
-    list4 = range(4, len(html_soup2.find_all('span', class_=CANindex)) - 0, 5)
+    list1 = range(0, len(html_soup_CAN.find_all('span', class_=CANindex)) - 4, 5)
+    list2 = range(1, len(html_soup_CAN.find_all('span', class_=CANindex)) - 3, 5)
+    list3 = range(2, len(html_soup_CAN.find_all('span', class_=CANindex)) - 2, 5)
+    list4 = range(4, len(html_soup_CAN.find_all('span', class_=CANindex)) - 0, 5)
 
     for index in list1:
-        if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
-            Locations.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
+        if len(html_soup_CAN.find_all('span', class_=CANindex)[index].contents):
+            Locations.append(html_soup_CAN.find_all('span', class_=CANindex)[index].contents[0])
         else:
             Locations.append(0)
     for index in list2:
-        if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
+        if len(html_soup_CAN.find_all('span', class_=CANindex)[index].contents):
             try:
-                Confirmed.append(html_soup2.find_all('span', class_=CANindex)[index].contents[1])
+                Confirmed.append(html_soup_CAN.find_all('span', class_=CANindex)[index].contents[1])
             except:
-                Confirmed.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
+                Confirmed.append(html_soup_CAN.find_all('span', class_=CANindex)[index].contents[0])
         else:
             Confirmed.append(0)
     for index in list3:
-        # . They do not provide Recovered cases number
-        if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
-           Deaths.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
+        if len(html_soup_CAN.find_all('span', class_=CANindex)[index].contents):
+            try:
+                Deaths.append(html_soup_CAN.find_all('span', class_=CANindex)[index].contents[1])
+            except:
+                Deaths.append(html_soup_CAN.find_all('span', class_=CANindex)[index].contents[0])
         else:
             Deaths.append(0)
+
     for index in list4:
-        if len(html_soup2.find_all('span', class_=CANindex)[index].contents):
+        if len(html_soup_CAN.find_all('span', class_=CANindex)[index].contents):
             try:
-                Recovered.append(html_soup2.find_all('span', class_=CANindex)[index].contents[1])
+                Recovered.append(html_soup_CAN.find_all('span', class_=CANindex)[index].contents[1])
             except:
-                Recovered.append(html_soup2.find_all('span', class_=CANindex)[index].contents[0])
+                Recovered.append(html_soup_CAN.find_all('span', class_=CANindex)[index].contents[0])
         else:
             Recovered.append(0)
 
@@ -416,42 +420,43 @@ except:
 
 print('scraping US data')
 try:
-    html_soup2 = html_soup22
     USindex = indexList1[0]
     Locations = []
     Confirmed = []
     Recovered = []
     Deaths = []
-    list1 = range(1, len(html_soup2.find_all('span', class_=USindex)) - 4, 5)
-    list2 = range(2, len(html_soup2.find_all('span', class_=USindex)) - 3, 5)
-    list3 = range(3, len(html_soup2.find_all('span', class_=USindex)) - 2, 5)
-    list4 = range(5, len(html_soup2.find_all('span', class_=USindex)) - 0, 5)
+    list1 = range(1, len(html_soup_US.find_all('span', class_=USindex)) - 4, 5)
+    list2 = range(2, len(html_soup_US.find_all('span', class_=USindex)) - 3, 5)
+    list3 = range(3, len(html_soup_US.find_all('span', class_=USindex)) - 2, 5)
+    list4 = range(5, len(html_soup_US.find_all('span', class_=USindex)) - 0, 5)
 
     for index in list1:
-        if len(html_soup2.find_all('span', class_=USindex)[index].contents):
-            Locations.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
+        if len(html_soup_US.find_all('span', class_=USindex)[index].contents):
+            Locations.append(html_soup_US.find_all('span', class_=USindex)[index].contents[0])
         else:
             Locations.append(0)
     for index in list2:
-        if len(html_soup2.find_all('span', class_=USindex)[index].contents):
+        if len(html_soup_US.find_all('span', class_=USindex)[index].contents):
             try:
-                Confirmed.append(html_soup2.find_all('span', class_=USindex)[index].contents[1])
+                Confirmed.append(html_soup_US.find_all('span', class_=USindex)[index].contents[1])
             except:
-                Confirmed.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
+                Confirmed.append(html_soup_US.find_all('span', class_=USindex)[index].contents[0])
         else:
             Confirmed.append(0)
     for index in list3:
-        # They do not provide Recovered cases number anymore.
-        if len(html_soup2.find_all('span', class_=USindex)[index].contents):
-           Deaths.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
+        if len(html_soup_US.find_all('span', class_=CANindex)[index].contents):
+            try:
+                Deaths.append(html_soup_US.find_all('span', class_=CANindex)[index].contents[1])
+            except:
+                Deaths.append(html_soup_US.find_all('span', class_=CANindex)[index].contents[0])
         else:
             Deaths.append(0)
     for index in list4:
-        if len(html_soup2.find_all('span', class_=USindex)[index].contents):
+        if len(html_soup_US.find_all('span', class_=USindex)[index].contents):
             try:
-                Recovered.append(html_soup2.find_all('span', class_=USindex)[index].contents[1])
+                Recovered.append(html_soup_US.find_all('span', class_=USindex)[index].contents[1])
             except:
-                Recovered.append(html_soup2.find_all('span', class_=USindex)[index].contents[0])
+                Recovered.append(html_soup_US.find_all('span', class_=USindex)[index].contents[0])
         else:
             Recovered.append(0)
 
@@ -613,11 +618,11 @@ try:
     response2
 
     # Scrap all content from the website
-    html_soup2 = BeautifulSoup(response2.text, 'html.parser')
+    html_soup_aus = BeautifulSoup(response2.text, 'html.parser')
 
     confirmed_cases = []
 
-    for name in  html_soup2.find_all('td', class_='numeric'):
+    for name in  html_soup_aus.find_all('td', class_='numeric'):
         salary = name.parent.find_all('td')[-1]  # last cell in the row
         # value = int(name.get_text())
         # print(name.get_text())
@@ -629,7 +634,7 @@ try:
 
 
 
-    a = html_soup2.find("div", {"class":"health-table__responsive"}).findAll('p')
+    a = html_soup_aus.find("div", {"class":"health-table__responsive"}).findAll('p')
     locations = []
     for index, value in enumerate(a):
         # print(index,value)
