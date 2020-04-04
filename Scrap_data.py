@@ -321,6 +321,16 @@ try:
             if span.contents[0] == 'Location':
                 # Store the index inside a list
                 indexList.append(span['class'][0])
+
+    indexList1 = []
+    for span in html_soup22.find_all('span'):
+        # Only retain 'span' that has contents
+        if len(span.contents):
+            # Since we only need to find index for table, use one of the table head as target word to locate index
+            if span.contents[0] == 'Location':
+                # Store the index inside a list
+                indexList1.append(span['class'][0])
+
 except:
     print('failed to connect to US Canada database')
 
@@ -328,7 +338,7 @@ print('scraping Canadian data')
 try:
 
     # USindex, CANindex = indexList
-    CANindex = indexList[1]
+    CANindex = indexList[0]
     Locations = []
     Confirmed = []
     Recovered = []
@@ -400,14 +410,14 @@ try:
     CAN_total_confirmed = CAN_data['Confirmed'].astype(int).sum()
     CAN_total_deaths =CAN_data['Deaths'].astype(int).sum()
     CAN_total_recovered =CAN_data['Recovered'].astype(int).sum()
-    CAN_data
+    print(CAN_data.head(10))
 except:
     print('failed to scrap Canada data')
 
 print('scraping US data')
 try:
     html_soup2 = html_soup22
-    USindex = indexList[0]
+    USindex = indexList1[0]
     Locations = []
     Confirmed = []
     Recovered = []
@@ -494,6 +504,7 @@ try:
 
     USA_total_confirmed = US_data['Confirmed'].astype(int).sum()
     USA_total_deaths =US_data['Deaths'].astype(int).sum()
+    print(US_data.head(10))
 except:
     print('failed to scrap US data')
 
@@ -588,6 +599,7 @@ try:
     CHN_total_confirmed = CHN_data['Confirmed'].sum()
     CHN_total_deaths =CHN_data['Deaths'].sum()
     CHN_total_recovered =CHN_data['Recovered'].sum()
+    print(CHN_data.head(10))
 
 
     caseTableSimple = pd.concat([CHN_data, caseTableSimple], ignore_index=True)
@@ -648,9 +660,7 @@ try:
 
     AUS_total_confirmed =AUS_df['Confirmed'].sum()
 
-
-
-
+    print(AUS_df.head(10))
 
     caseTableSimple = pd.concat([AUS_df, caseTableSimple], ignore_index=True)
 except:
