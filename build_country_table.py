@@ -218,7 +218,7 @@ for country in countrylist_df:
                         country_df['Deaths'].iloc[-1] = dataframe_recovered['counts'].iloc[-1]
                         country_df['Recovered'].iloc[-1] = dataframe_recovered['counts'].iloc[-1]
 
-                        
+
 
                         country_df.to_csv('./country_data/{}.csv'.format(country), index=False)
                     else:

@@ -332,18 +332,17 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
 
     countrylist = []
-    # countrylist.append("Italy")
-    # countrylist.append("Australia")
-    # countrylist.append("Germany")
-    # countrylist.append("China")
-    # countrylist.append("Australia")
-    # countrylist.append("US")
-    # countrylist.append("France")
+    countrylist.append("Italy")
+    countrylist.append("Australia")
+    countrylist.append("Germany")
+    countrylist.append("China")
+    countrylist.append("US")
+    countrylist.append("France")
     countrylist.append("Spain")
     # countrylist.append("Korea, South")
-    # countrylist.append("Switzerland")
-    # countrylist.append("United Kingdom")
-    # countrylist.append("Japan")
+    countrylist.append("Switzerland")
+    countrylist.append("United Kingdom")
+    countrylist.append("Japan")
     # countrylist.append("Romania")
 
     exception_list = []
@@ -356,8 +355,8 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
     exception_list.append("Switzerland")
     # exception_list.append("United Kingdom")
     exception_list.append("Japan")
-    logscale= True
-    # logscale = False
+    # logscale= True
+    logscale = False
     if plot_fits:
         for country in countrylist:
             if country in countrylist_df:
@@ -368,67 +367,9 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                     # databasename = "Deaths cases"
 
 
+                    dataframe = pd.read_csv('./country_data/{}.csv'.format(country))
+                    y = dataframe['Confirmed']
 
-
-
-                    dataframe, x, y = select_database(
-                        dataframe_all_countries, country, "Confirmed"
-                    )
-                    dataframe_deaths, x_deaths, y_deaths = select_database(
-                        dataframe_all_countries, country, "Deaths"
-                    )
-                    dataframe_recovered, x_recovered, y_recovered = select_database(
-                        dataframe_all_countries, country, "Recovered"
-                    )
-                    #updating JH data base with latest daily data scraped from web
-                    database_updated = False
-                    for field in fields:
-                        dataframe_all_countries_last_update1 = dataframe_all_countries_last_update[
-                            ["Country/Region", field, "Last Update"]]
-
-                        dataframe_all_countries_last_update2 = pd.DataFrame(
-                            {'Country/Region': dataframe_all_countries_last_update1['Country/Region'],
-                             field: dataframe_all_countries_last_update1[field],
-                             'date': dataframe_all_countries_last_update1['Last Update'],
-                             })
-                        dataframe_all_countries_last_update2.reset_index()
-                        # df = pd.pivot_table(dataframe_all_countries_last_update2, values = 'confirmed', index=['date'], columns = 'confirmed').reset_index()
-                        # df = dataframe_all_countries_last_update2.pivot(values = 'confirmed', columns = 'Country/Region')
-                        df_last_update = dataframe_all_countries_last_update2.pivot(index="date", columns="Country/Region", values=field)
-
-                        df_country = df_last_update[[country]]
-
-
-
-
-                        if not database_updated:
-                        # dataframe.append(pd.Series(name=df_country.index[0]))
-                        # if field =='Confirmed':
-                            dataframe = dataframe.append(pd.Series(), ignore_index=True)
-                            dataframe['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
-                            dataframe['country'].iloc[-1] = country
-                            dataframe['quantity'].iloc[-1] = 'Confirmed'
-                            dataframe['counts'].iloc[-1] = df_country[country].values[0]
-                            x.append(pd.Series(pd.to_datetime(df_country.index[0])))
-                            y.append(pd.Series(df_country[country].values[0]))
-                        # if field == 'Deaths':
-                            dataframe_deaths = dataframe_deaths.append(pd.Series(), ignore_index=True)
-                            dataframe_deaths['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
-                            dataframe_deaths['country'].iloc[-1] = country
-                            dataframe_deaths['quantity'].iloc[-1] = 'Deaths'
-                            dataframe_deaths['counts'].iloc[-1] = df_country[country].values[0]
-                            x_deaths.append(pd.Series(pd.to_datetime(df_country.index[0])))
-                            y_deaths.append(pd.Series(df_country[country].values[0]))
-                        # if field == 'Recovered':
-                            dataframe_recovered = dataframe_recovered.append(pd.Series(), ignore_index=True)
-                            dataframe_recovered['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
-                            dataframe_recovered['country'].iloc[-1] = country
-                            dataframe_recovered['quantity'].iloc[-1] = 'Recovered'
-                            dataframe_recovered['counts'].iloc[-1] = df_country[country].values[0]
-                            x_recovered.append(pd.Series(pd.to_datetime(df_country.index[0])))
-                            y_recovered.append(pd.Series(df_country[country].values[0]))
-
-                            database_updated = True
 
 
 
@@ -467,8 +408,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
                     ###########################
 
-                    # italy Parameters: [1.06353071e+05 5.88260356e+01 2.08552443e-01]
-                    # UK Parameters: [0.00114855 0.26418431]
+
 
                     ################ FITTING LAST 10 DAYS OF THE DATA ###########################
 
@@ -501,7 +441,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                     plt.figure(num=country + "_fit")
                     # ax1 = plt.subplot(211)
 
-                    plot_data(t_real, y, country, "confirmed cases", "r", logscale=True)
+                    plot_data(t_real, y, country, "confirmed cases", "r", logscale=logscale)
 
                     plot_model(
                         t_real,
@@ -510,7 +450,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                         " data fit - " + databasename + "  -  " + text_fit,
                         "b",
                         marker="x",
-                        logscale=True,
+                        logscale=logscale,
                     )
                     plt.savefig(
                         "./Figures/"
@@ -547,10 +487,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                         marker="x",
                         logscale=logscale,
                     )
-                    # plt.legend(loc='best', fontsize=8)
-                    # plt.legend(loc=9, bbox_to_anchor=(0.5,-0.02), fontsize=8)
-                    # ax1.legend(bbox_to_anchor=(0.5, 1.1),
-                    #           fancybox=True, shadow=True, ncol=1, fontsize=8)
+
                     ax1.set_ylim([min(y), max(y)*1.05])
                     # plt.show()
                     ###########################
@@ -558,16 +495,10 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                     ################ PREDICTION ###########################
                     print("prediction from {} to {}".format(start, prediction))
                     #
-                    # fittedParameters_prediction, pcov = curve_fit(
-                    #     sigmoidal_func, x, y, maxfev=5000, p0=[1, fittedParameters_10[-1], 1]
-                    # )
 
-                    # start = datetime.datetime.strptime(
-                    #     dataframe["date"].loc[0], "%m/%d/%y"
-                    # )
-                    start = dataframe["date"].iloc[0]
+                    day1 = dataframe["date"].iloc[0]
 
-                    day_of_the_year_start = start.day
+                    day_of_the_year_start = datetime.datetime.strptime(day1, '%Y-%m-%d %H:%M:%S').day
                     # x = np.arange(day_of_the_year_start, len(y) + day_of_the_year_start)
                     x_prediction = np.arange(0, len(y) + day_of_the_year_start)
                     if country in exception_list:
@@ -641,12 +572,6 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                     plt.xlabel("days since it started")  # X axis data label
                     plt.ylabel(databasename)  # Y axis data label
 
-                    # plt.text(0.0, 0.1, 'matplotlib', horizontalalignment='center',
-                    # verticalalignment = 'center',
-                    # transform = ax1.transAxes)
-                    # fig.tight_layout(rect=[0, 0.1, 1, 0.95])
-                    # plt.legend(loc='best', bbox_to_anchor=(0.5, -1.02), fontsize=8)
-                    # plt.legend(loc="best", fontsize=8)
 
                     ###########################
                     ################ DAILY PREDICTION ###########################
@@ -725,89 +650,13 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                             dpi=100,
                         )
 
-                    # y = dataframe['counts']
-                    # x = np.arange(len(y))
-                    #
-                    #
-                    #
-                    #
-                    # plt.figure()
-                    # plt.scatter(x, y)
-                    # results = curve_fit(expo_func, x, y)
-                    # # results
-                    # plt.plot(x, expo_func(x, *results[0]))
-                    #
-                    #
-                    # linx = np.linspace(0, 50, 101)
-                    # fields = ['Confirmed', 'Deaths', 'Recovered']
-                    # plt.figure()
-                    # dataframe, x, Confirmed = select_database(dataframe_all_countries, country, 'Confirmed')
-                    # plt.scatter(x, Confirmed,label = 'Confirmed')
-                    # dataframe, x, Deaths = select_database(dataframe_all_countries, country, 'Deaths')
-                    # plt.scatter(x, Deaths,label = 'Deaths')
-                    # dataframe, x, Recovered = select_database(dataframe_all_countries, country, 'Recovered')
-                    # plt.scatter(x, Recovered,label = 'Recovered')
-                    # plt.legend(loc='best', fontsize = 8)
-                    # plt.figure()
-                    # dataframe, x, Confirmed = select_database(dataframe_all_countries, country, 'Confirmed',)
-                    # plt.plot(x, Confirmed,label = 'Confirmed',marker ='x')
-                    # dataframe, x, Deaths = select_database(dataframe_all_countries, country, 'Deaths')
-                    # plt.plot(x, Deaths,label = 'Deaths',marker ='x')
-                    # dataframe, x, Recovered = select_database(dataframe_all_countries, country, 'Recovered')
-                    # plt.plot(x, Recovered,label = 'Recovered',marker ='x')
-                    # plt.legend(loc='best', fontsize = 8)
-                    # # plt.plot(linx, expo_func(linx, *results[0]))
 
-                    # The Q-Q plot, or quantile-quantile plot, is a graphical tool
-                    # to help us assess if a set of data plausibly came from some theoretical distribution
-                    # from statsmodels.graphics.gofplots import qqplot
-                    # plt.figure()
-                    # qqplot(ydx, line='s')
-                    # plt.show()
-
-
-
-                    try:
-                        plt.figure(dpi=90, figsize=(8, 4))
-                        plot(
-                            dataframe_all_countries,
-                            [country],
-                            dtype="confirmed",
-                            xrange=(30, 56),
-                            yscale="log",
-                        )
-                        # fields = ['Confirmed', 'Deaths', 'Recovered']
-                        plt.savefig(
-                            "./Figures/"
-                            + country
-                            + "Confirmed_expo_fit_log_scale-{}.png".format(today),
-                            dpi=100,
-                        )
-                    except:
-                        print(
-                            "unable to fit {} data with {}".format(
-                                country, expo_func.__name__
-                            )
-                        )
-
-                    # plt.figure()
-                    # # the previous fit:
-                    # linx = np.linspace(0, 50, 101)
-                    # plt.scatter(x, y)
-                    # plt.plot(linx, expo_func(linx, *results[0]))
-                    # # multiplying the last count by 1.2:
-                    # y_p = y.copy()
-                    # y_p.iloc[-1] = y.iloc[-1] * 1.2
-                    # plt.scatter(x, y_p)
-                    # results_p = curve_fit(expo_func, x, y_p)
-                    # plt.plot(linx, expo_func(linx, *results_p[0]))
-                    # plt.xlim(30, 50)
 
                     fig_rate = go.Figure()
                     tickList = list(
                         np.arange(
                             0,
-                            (dataframe_deaths["counts"] / dataframe["counts"] * 100).max()
+                            (dataframe["Deaths"] / dataframe["Confirmed"] * 100).max()
                             + 0.2,
                             0.5,
                         )
@@ -815,8 +664,8 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
                     fig_rate.add_trace(
                         go.Scatter(
-                            x=dataframe_deaths["date"],
-                            y=dataframe_deaths["counts"] / dataframe["counts"] * 100,
+                            x=dataframe["date"],
+                            y=dataframe["Deaths"]  / dataframe["Confirmed"] * 100,
                             mode="lines+markers",
                             line_shape="spline",
                             name=country,
@@ -826,12 +675,12 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                             ),
                             text=[
                                 datetime.datetime.strftime(d, "%b %d %Y AEDT")
-                                for d in dataframe_deaths["date"]
+                                for d in dataframe["date"]
                             ],
                             hovertext=[
                                 country + " death rate (%) <br>{:.2f}%".format(i)
-                                for i in dataframe_deaths["counts"]
-                                / dataframe["counts"]
+                                for i in dataframe["Deaths"]
+                                / dataframe["Confirmed"]
                                 * 100
                             ],
                             hovertemplate="<b>%{text}</b><br></br>"
@@ -881,13 +730,7 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                         filename="Figures/death_rates_" + country ,
                         auto_open=False,
                     )
-                    # fig_rate.show()
-                    #
-                    # # Pseduo data for logplot
-                    #
-                    # daysOutbreak = (dataframe_confirmed['date'].iloc[0] -
-                    #                 datetime.datetime.strptime('12/31/2019', '%m/%d/%Y')).days
-                    # pseduoDay = np.arange(1, daysOutbreak + 1)
+
                     y1 = 100 * (1.10) ** (x - 1)  # 15% growth rate
                     y2 = 100 * (1.08) ** (x - 1)  # 8% growth rate
                     y3 = 100 * (1.07) ** (x - 1)  # 7% growth rate
@@ -918,119 +761,10 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
                         logscale=logscale,
                         linewidths=0.1,
                     )
-                    #
-                    # plot_model(
-                    #     t_real,
-                    #     y2,
-                    #     country,
-                    #     " 8% growth rate - " + databasename ,
-                    #     "g",
-                    #     marker="o",
-                    #     logscale=logscale,linewidths = 0.1
-                    # )
-                    # plot_model(
-                    #     t_real,
-                    #     y3,
-                    #     country,
-                    #     " 7% growth rate - " + databasename ,
-                    #     "y",
-                    #     marker=">",
-                    #     logscale=logscale,linewidths = 0.1
-                    # )
-                    # plot_model(
-                    #     t_real,
-                    #     y4,
-                    #     country,
-                    #     " 5% growth rate - " + databasename ,
-                    #     "r",
-                    #     marker="<",
-                    #     logscale=logscale,linewidths = 0.1
-                    # )
+
                     plt.ylim([min(y), max(y)*1.05])
                     plt.legend(loc="best", fontsize=8)
-                    # # Read cumulative data of a given region from ./cumulative_data folder
-                    # # dfs_curve = pd.read_csv('./lineplot_data/dfs_curve.csv')
-                    #
-                    # # Create empty figure canvas
-                    # fig_curve = go.Figure()
-                    # fig_curve.add_trace(go.Scatter(x=pseduoDay,
-                    #                                y=y1,
-                    #                                line=dict(color='#613262', width=4),
-                    #                                marker=dict(size=4, color='#f4f4f2',
-                    #                                            line=dict(width=1, color='#626262')),
-                    #                                text=[
-                    #                                    '85% growth rate' for i in pseduoDay],
-                    #                                hovertemplate='<b>%{text}</b><br></br>' +
-                    # '%{hovertext}' +
-                    # '<extra></extra>'
-                    #                                )
-                    #                     )
-                    # fig_curve.add_trace(go.Scatter(x=pseduoDay,
-                    #                                y=y2,
-                    #                                line=dict(color='#625462', width=4),
-                    #                                marker=dict(size=4, color='#f4f4f2',
-                    #                                            line=dict(width=1, color='#626262')),
-                    #                                text=[
-                    #                                    '35% growth rate' for i in pseduoDay],
-                    #                                hovertemplate='<b>%{text}</b><br></br>' +
-                    # '%{hovertext}' +
-                    # '<extra></extra>'
-                    #                                )
-                    #                     )
-                    # fig_curve.add_trace(go.Scatter(x=pseduoDay,
-                    #                                y=y3,
-                    #                                line=dict(color='#625462', width=4),
-                    #                                marker=dict(size=4, color='#f4f4f2',
-                    #                                            line=dict(width=1, color='#626262')),
-                    #                                text=[
-                    #                                    '15% growth rate' for i in pseduoDay],
-                    #                                hovertemplate='<b>%{text}</b><br></br>' +
-                    # '%{hovertext}' +
-                    # '<extra></extra>'
-                    #                                )
-                    #                     )
-                    # fig_curve.add_trace(go.Scatter(x=pseduoDay,
-                    #                                y=y4,
-                    #                                line=dict(color='#626262', width=4),
-                    #                                marker=dict(size=4, color='#f4f4f2',
-                    #                                            line=dict(width=1, color='#626262')),
-                    #                                text=[
-                    #                                    '5% growth rate' for i in pseduoDay],
-                    #                                hovertemplate='<b>%{text}</b><br></br>' +
-                    # '%{hovertext}' +
-                    # '<extra></extra>'
-                    #                                )
-                    #                     )
-                    # fig_curve.add_trace(go.Scatter(x=dfs_curve.loc[dfs_curve['Region'] == regionName]['DayElapsed'],
-                    #                                y=dfs_curve.loc[dfs_curve['Region'] == regionName]['Confirmed'],
-                    #                                mode='lines',
-                    #                                line_shape='spline',
-                    #                                name=regionName,
-                    #                                # opacity=0.5,
-                    #                                line=dict(color='rgba(0,0,0,.3)', width=1.5),
-                    #                                text=[
-                    #                                    i for i in
-                    #                                    dfs_curve.loc[dfs_curve['Region'] == regionName]['Region']],
-                    #                                hovertemplate='<b>%{text}</b><br>' +
-                    #                                              '<br>%{x} days after 100 cases<br>' +
-                    #                                              'with %{y:,d} cases<br>'
-                    #                                              '<extra></extra>'
-                    #                                )
-                    #                     )
-                    # fig_curve.add_trace(go.Scatter(x=dfs_curve.loc[dfs_curve['Region'] == Region]['DayElapsed'],
-                    #                            y=dfs_curve.loc[dfs_curve['Region'] == Region]['Confirmed'],
-                    #                            mode='lines',
-                    #                            line_shape='spline',
-                    #                            name=Region,
-                    #                            line=dict(color='#d7191c', width=3),
-                    #                            text=[
-                    #                                i for i in dfs_curve.loc[dfs_curve['Region'] == Region]['Region']],
-                    #                            hovertemplate='<b>%{text}</b><br>' +
-                    #                                          '<br>%{x} days after 100 cases<br>' +
-                    #                                          'with %{y:,d} cases<br>'
-                    #                                          '<extra></extra>'
-                    #                            )
-                    #                 )
+
 
                 except:
                     print('failed to run for {}'.format(country))
