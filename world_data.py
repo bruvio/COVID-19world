@@ -773,58 +773,18 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
         fields = []
         fields.append("Confirmed")
-        # fields.append("deaths")
-        # fields.append("recovered")
+        # fields.append("Deaths")
+        # fields.append("Recovered")
+
+
+
         for field in fields:
             # df = pd.read_csv(datatemplate.format(field))
-
-            df_reshape = dataframe_all_countries[(dataframe_all_countries["quantity"] == field)]
-            df_reshape = df_reshape.reset_index()
-
-            df_reshape = df_reshape[["country", "date", "counts"]]
-
-            df_reshape = df_reshape.pivot(index="country", columns="date", values="counts")
-            df_reshape = df_reshape.reset_index()
-
-            dataframe_all_countries_last_update1 = dataframe_all_countries_last_update[
-                ["Country/Region", field, "Last Update"]]
-
-
-            # dates = [x.replace('/', '-') for x in dataframe_all_countries_last_update1['Last Update']]
-            last_update = dataframe_all_countries_last_update1['Last Update'][0]
-            datetimeobject = datetime.datetime.strptime(last_update, '%m/%d/%Y %H:%M')
-            newformat = datetimeobject.strftime('%Y-%m-%d %H:%M:%S')
-            df_update = pd.DataFrame(
-                {'country': dataframe_all_countries_last_update1['Country/Region'],
-                 'date': newformat,
-                 'counts': dataframe_all_countries_last_update1[field],
-                 })
-
-
-            df_update = df_update.pivot(index="country", columns="date", values="counts")
-
-            # df_reshape = df_reshape.append(pd.Series(), ignore_index=True)
-            df_update = df_update.reset_index()
-
-            # df1 = pd.DataFrame({'A': ['A0', 'A1', 'A2', 'A3'],
-            #                      'B': ['B0', 'B1', 'B2', 'B3'],
-            #                     'C': ['C0', 'C1', 'C2', 'C3'],
-            #                      'D': ['D0', 'D1', 'D2', 'D3']},
-            #                      index = [0, 1, 2, 3])
-            # df4 = pd.DataFrame({'F': [ 'F3', 'F6', 'F7']},
-            #                      index = [ 1, 2, 3])
-            # df = pd.concat([df_reshape, df_update], axis=0, join='inner')
-            df = pd.merge(df_reshape, df_update, on='country')
-            # df = df_reshape.join( df_update, on=['country'], how='left', lsuffix='counts')
-            # df = pd.concat([df_reshape, df_update], ignore_index=True)
-
-
-
-
-            # df = df_reshape.append( df_update, ignore_index=False)
-            # df = df_reshape
-            # df.fillna(0)
-            df.to_csv('./cumulative_data/cumulative_{}-{}.csv'.format(field,today))
+            list_of_files = glob.glob('cumulative_data/*')  # * means all if need specific format then *.csv
+            latest_file = max(list_of_files, key=os.path.getctime)
+            date_suffix = latest_file[-14:-4]
+            df = pd.read_csv(
+                './cumulative_data/cumulative_{}-{}.csv'.format(field,date_suffix))
 
             for p in range(3):
                 i = 0
@@ -988,6 +948,6 @@ if __name__ == "__main__":
     logging.root.setLevel(level=debug_map[0])
 
 
-    # main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=True)
-    main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
+    main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=True)
+    # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
 

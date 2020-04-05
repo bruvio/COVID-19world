@@ -28,8 +28,8 @@ def plot_fit(ax, fit, label=None, extrapolate=(None, None), color=None):
     if label:
         label = f"{label} - $T_d={fit.T_d_days:.1f}$ days, $r^2={fit.r2:.3f}$"
     ax.plot(x_fit, y_fit, ".-", label=label, **plot_kwargs)
-
-    ax.set(xlim=(extrapolate_start, extrapolate_stop))
+    #
+    # ax.set(xlim=(extrapolate_start, extrapolate_stop))
 
 
 def plot_data(

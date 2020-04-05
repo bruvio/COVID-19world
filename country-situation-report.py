@@ -77,7 +77,7 @@ countrylist.append("United Kingdom")
 
 # dd/mm/YY
 today = today.strftime("%d-%m-%Y")
-# datatemplate = "time_series_19-covid-{}.csv"
+datatemplate = "time_series_19-covid-{}.csv"
 datatemplate = "./csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_{}_global.csv"
 fields = ["Confirmed", "Deaths", "Recovered"]
 
@@ -139,61 +139,9 @@ PALETTE = itertools.cycle(PALETTE_ONE)
 
 for country in countrylist:
     print("\n" + country + "\n")
-    dataframe, x, y = select_database(dataframe_all_countries, country, field)
-    # dataframe.reset_index()
-    # # In[4]:
-    #
-    #
-    # data_italy = pd.read_csv(dataframe, parse_dates=['date'], index_col=['date'])
-    # data_italy.index = data_italy.index.normalize()
-    # data_italy = dataframe.copy()
 
-    # for field in fields:
-    # updating JH data base with latest daily data scraped from web
-    dataframe_all_countries_last_update1 = dataframe_all_countries_last_update[
-        ["Country/Region", field, "Last Update"]]
-
-    dataframe_all_countries_last_update2 = pd.DataFrame(
-        {'Country/Region': dataframe_all_countries_last_update1['Country/Region'],
-         field: dataframe_all_countries_last_update1[field],
-         'date': dataframe_all_countries_last_update1['Last Update'],
-         })
-    dataframe_all_countries_last_update2.reset_index()
-    # df = pd.pivot_table(dataframe_all_countries_last_update2, values = 'confirmed', index=['date'], columns = 'confirmed').reset_index()
-    # df = dataframe_all_countries_last_update2.pivot(values = 'confirmed', columns = 'Country/Region')
-    df_last_update = dataframe_all_countries_last_update2.pivot(index="date", columns="Country/Region",
-                                                                values=field)
-
-    df_country = df_last_update[[country]]
-
-    # dataframe.append(pd.Series(name=df_country.index[0]))
-    if field == 'Confirmed':
-        dataframe = dataframe.append(pd.Series(), ignore_index=True)
-        dataframe['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
-        dataframe['country'].iloc[-1] = country
-        dataframe['quantity'].iloc[-1] = field
-        dataframe['counts'].iloc[-1] = df_country[country].values[0]
-        x.append(pd.Series(pd.to_datetime(df_country.index[0])))
-        y.append(pd.Series(df_country[country].values[0]))
-    if field == 'Deaths':
-        dataframe_deaths = dataframe_deaths.append(pd.Series(), ignore_index=True)
-        dataframe_deaths['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
-        dataframe_deaths['country'].iloc[-1] = country
-        dataframe_deaths['quantity'].iloc[-1] = field
-        dataframe_deaths['counts'].iloc[-1] = df_country[country].values[0]
-        x_deaths.append(pd.Series(pd.to_datetime(df_country.index[0])))
-        y_deaths.append(pd.Series(df_country[country].values[0]))
-    if field == 'Recovered':
-        dataframe_recovered = dataframe_recovered.append(pd.Series(), ignore_index=True)
-        dataframe_recovered['date'].iloc[-1] = pd.to_datetime(df_country.index[0])
-        dataframe_recovered['country'].iloc[-1] = country
-        dataframe_recovered['quantity'].iloc[-1] = field
-        dataframe_recovered['counts'].iloc[-1] = df_country[country].values[0]
-        x_recovered.append(pd.Series(pd.to_datetime(df_country.index[0])))
-        y_recovered.append(pd.Series(df_country[country].values[0]))
-
-    data_italy = dataframe.copy()
-    for column in ["counts"]:
+    data_italy = pd.read_csv('./country_data/{}.csv'.format(country))
+    for column in [field]:
         data_italy["variazione_" + column] = data_italy[column].diff(1)
 
 
@@ -209,19 +157,20 @@ for country in countrylist:
 
 
     data_italy.set_index("date", inplace=True)
+    data_italy.index = pd.to_datetime(data_italy.index)
     fits = {}
-    fits["counts"] = covid19.fit.ExponentialFit.from_frame(
-        "counts", data_italy, start=START_FIT, stop=STOP_FIT
+    fits[field] = covid19.fit.ExponentialFit.from_frame(
+        field, data_italy, start=START_FIT, stop=STOP_FIT
     )
 
-    ylim_df = data_italy["counts"].iloc[-1] * 1.20
+    ylim_df = data_italy[field].iloc[-1] * 1.20
 
     _, ax = plt.subplots(subplot_kw={"yscale": "log", "ylim": (50, ylim_df)})
 
 
 
-    covid19.plot.plot_fit(ax, fits["counts"], color=sns.color_palette()[2])
-    for kind, color in zip(["counts"], sns.color_palette()):
+    covid19.plot.plot_fit(ax, fits[field], color=sns.color_palette()[2])
+    for kind, color in zip([field], sns.color_palette()):
         covid19.plot.plot(
             ax,
             data_italy[kind],
@@ -250,8 +199,8 @@ for country in countrylist:
     # # _ = covid19.plot.add_events(ax, linestyle=':', offset=17, color='grey')
     #
 
-    covid19.plot.plot_fit(ax, fits["counts"], color=sns.color_palette()[2])
-    for kind, color in zip(["counts"], sns.color_palette()):
+    covid19.plot.plot_fit(ax, fits[field], color=sns.color_palette()[2])
+    for kind, color in zip([field], sns.color_palette()):
         covid19.plot.plot(
             ax,
             data_italy[kind],
@@ -275,7 +224,7 @@ for country in countrylist:
                         +country + "COVID-19 Model-{}.png".format(today), dpi=400)
     plt.close()
 
-    kinds = ["counts"]
+    kinds = [field]
     datetime_expected = '2020-03-31'
     expected_values = []
     for kind in kinds:
@@ -289,7 +238,7 @@ for country in countrylist:
     fits = {}
     for region, params in REGIONS_FIT_PARAMS.items():
         if region == country:
-            for kind in ['counts']:
+            for kind in [field]:
                 exponential_fits = params.get('exponential_fits',
                                               [(START_FIT, CHANGE_FIT_1), (CHANGE_FIT_1 + DAY, CHANGE_FIT_2),
                                                (CHANGE_FIT_2 + DAY, CHANGE_FIT_3), (CHANGE_FIT_3 + DAY, STOP_FIT)])
@@ -328,7 +277,7 @@ for country in countrylist:
     for region in REGIONS_FIT_PARAMS:
         if region == country:
         # select = (data_italy_regions['denominazione_regione'] == region)
-            for kind in ['counts']:
+            for kind in [field]:
                 _, ax = plt.subplots(subplot_kw={'yscale': 'log', 'ylim': (9, ylim_df)}, figsize=(14, 8))
                 _ = ax.yaxis.grid(color='lightgrey', linewidth=0.5)
                 if region == 'United Kingdom':

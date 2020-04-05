@@ -30,6 +30,7 @@ class ExponentialFit:
 
         data_fit = data[start:stop]
 
+        # x_norm = linear(data_fit.index.values.astype('datetime64[D]'), t_0_guess, T_d_guess)
         x_norm = linear(data_fit.index.values, t_0_guess, T_d_guess)
         log2_y = np.log2(data_fit[y].values)
 
