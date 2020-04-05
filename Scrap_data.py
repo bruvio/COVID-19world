@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-
+#!/Users/bruvio/python37/bin python
+# -*- coding: utf-8 -*-
 
 
 from bs4 import BeautifulSoup

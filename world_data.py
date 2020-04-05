@@ -1,3 +1,6 @@
+#!/Users/bruvio/python37/bin python
+# -*- coding: utf-8 -*-
+
 import pandas as pd
 from pandas.plotting import register_matplotlib_converters
 import subprocess
@@ -768,13 +771,13 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
                 except:
                     print('failed to run for {}'.format(country))
-    plt.show()
+    # plt.show()
     if plot_bar_plot:
 
         fields = []
         fields.append("Confirmed")
-        # fields.append("Deaths")
-        # fields.append("Recovered")
+        fields.append("Deaths")
+        fields.append("Recovered")
 
 
 
@@ -948,6 +951,6 @@ if __name__ == "__main__":
     logging.root.setLevel(level=debug_map[0])
 
 
-    main(plot_fits=False, plot_bar_plot=True, plot_bar_plot_video=True)
+    main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=True)
     # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
 

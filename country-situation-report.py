@@ -1,6 +1,5 @@
-#!/usr/bin/env python
-# coding: utf-8
-
+#!/Users/bruvio/python37/bin python
+# -*- coding: utf-8 -*-
 
 import itertools
 import numpy as np
@@ -77,19 +76,19 @@ countrylist.append("United Kingdom")
 
 # dd/mm/YY
 today = today.strftime("%d-%m-%Y")
-datatemplate = "time_series_19-covid-{}.csv"
-datatemplate = "./csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_{}_global.csv"
-fields = ["Confirmed", "Deaths", "Recovered"]
-
-dataframe_all_countries = pre_process_database(datatemplate, fields)
-# data_italy_path = 'dpc-covid19-ita-andamento-nazionale.csv'
-# data_italy_path = covid19.data.download('andamento-nazionale')
-
-list_of_files = glob.glob('worldmeter_data/*')  # * means all if need specific format then *.csv
-latest_file = max(list_of_files, key=os.path.getctime)
-
-dataframe_all_countries_last_update = pd.read_csv(
-    latest_file)
+# datatemplate = "time_series_19-covid-{}.csv"
+# datatemplate = "./csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_{}_global.csv"
+# fields = ["Confirmed", "Deaths", "Recovered"]
+#
+# dataframe_all_countries = pre_process_database(datatemplate, fields)
+# # data_italy_path = 'dpc-covid19-ita-andamento-nazionale.csv'
+# # data_italy_path = covid19.data.download('andamento-nazionale')
+#
+# list_of_files = glob.glob('worldmeter_data/*')  # * means all if need specific format then *.csv
+# latest_file = max(list_of_files, key=os.path.getctime)
+#
+# dataframe_all_countries_last_update = pd.read_csv(
+#     latest_file)
 
 
 field = 'Confirmed'
@@ -318,4 +317,4 @@ for country in countrylist:
         if len(value):
             print(f'{key[0]}:{" " * (14 - len(key[0]))} {str(value[-1])}')
 #
-plt.show()
+# plt.show()

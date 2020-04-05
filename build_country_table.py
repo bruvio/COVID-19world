@@ -1,3 +1,6 @@
+#!/Users/bruvio/python37/bin python
+# -*- coding: utf-8 -*-
+
 import pandas as pd
 from pandas.plotting import register_matplotlib_converters
 import subprocess
