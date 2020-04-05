@@ -674,6 +674,7 @@ except:
 
 
 # write to file table
+caseTableSimple.drop_duplicates(['date','Country/Region'], take_last=True, inplace = True)
 caseTableSimple.to_csv('./web_data/{}_webData.csv'.format(timeStampe), index=False)
 
 
@@ -741,6 +742,7 @@ previous_worldometer_table = pd.read_csv('./worldmeter_data/'+   latest_file)
 # previous_worldometer_table['increase_recovered'] = np.where(worldometer_table['Recovered'] == previous_worldometer_table['Recovered'], 0, worldometer_table['Recovered'] - previous_worldometer_table['Recovered']) #create new column in df1 for price diff
 # print(previous_worldometer_table.head(20))
 # writing table to csv
+worldometer_table.drop_duplicates(['date','Country/Region'], take_last=True, inplace = True)
 worldometer_table.to_csv('./worldmeter_data/{}_webData.csv'.format(timeStampe), index=False)
 
 
@@ -762,8 +764,7 @@ try:
     today = date.today()
     comparison_df = comparison_df.sort_values(by=['Confirmed_diff'], ascending=False)
 
-
-
+    comparison_df.drop_duplicates(['date','Country/Region'], take_last=True, inplace=True)
     comparison_df.to_csv('./daily_diff/{}_diff.csv'.format(today))
     print(comparison_df.head(20))
     # diff_df = dataframe_difference(worldometer_table,previous_worldometer_table,'Confirmed',which='left_only')

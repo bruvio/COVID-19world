@@ -135,7 +135,7 @@ countrylist = []
 # countrylist.append("Australia")
 # countrylist.append("US")
 # countrylist.append("France")
-#countrylist.append("Spain")
+# countrylist.append("Spain")
 # countrylist.append("Korea, South")
 # countrylist.append("Switzerland")
 # countrylist.append("United Kingdom")
@@ -186,6 +186,7 @@ for field in fields:
     # df = df_reshape.append( df_update, ignore_index=False)
     # df = df_reshape
     # df.fillna(0)
+    df.drop_duplicates('country', keep='last', inplace=True)
     df.to_csv('./cumulative_data/cumulative_{}-{}.csv'.format(field, today))
 
 ##############
@@ -274,8 +275,7 @@ for country in countrylist_df:
                         country_df['Deaths'].iloc[-1] = dataframe_deaths['counts'].iloc[-1]
                         country_df['Recovered'].iloc[-1] = dataframe_recovered['counts'].iloc[-1]
 
-
-
+                        country_df.drop_duplicates(keep='last', inplace=True)
                         country_df.to_csv('./country_data/{}.csv'.format(country), index=False)
                     else:
                         country_df = pd.DataFrame({'date': dataframe['date'],
@@ -283,6 +283,7 @@ for country in countrylist_df:
                                                    'Deaths': dataframe_deaths['counts'],
                                                    'Recovered': dataframe_recovered['counts'],
                                                    })
+                        country_df.drop_duplicates(keep='last', inplace=True)
                         country_df.to_csv('./country_data/{}.csv'.format(country), index=False)
 
                 except:
