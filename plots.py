@@ -352,7 +352,7 @@ for index, country in enumerate(countrylist):
         #                          color="grey"),
         #            )
         #        ],
-        yaxis_title="Cumulative cases numbers",
+        yaxis_title="Cumulative cases numbers - {}".format(country),
         yaxis=dict(
             showline=False, linecolor='#272e3e',
             zeroline=False,

@@ -24,11 +24,14 @@ os.chmod(run_world_fits, st3.st_mode | stat.S_IEXEC)
 os.chmod(run_doubling_time, st4.st_mode | stat.S_IEXEC)
 os.chmod(run_plots, st5.st_mode | stat.S_IEXEC)
 
-call('python {}'.format(run_scrap_data).split())
-call('python {}'.format(run_build_table).split())
-call('python {}'.format(run_world_fits).split())
-call('python {}'.format(run_doubling_time).split())
-call('python {}'.format(run_plots).split())
+ret = call('python {}'.format(run_scrap_data).split())
+if ret == 0:
+    call('python {}'.format(run_build_table).split())
+    call('python {}'.format(run_world_fits).split())
+    call('python {}'.format(run_doubling_time).split())
+    call('python {}'.format(run_plots).split())
+else:
+         print ("Command failed with return code ", ret)
 
 # os.system(cwd+'/'+run_scrap_data)
 # os.system(cwd+'/'+run_build_table)
