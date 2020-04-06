@@ -42,16 +42,18 @@ fields.append('Recovered')
 
 list_of_files = []
 now = time.time()
-for f in os.listdir('./worldmeter_data/'):
-    # mtime = path.stat().st_mtime
-    # timestamp_str = datetime.datetime.fromtimestamp(mtime).strftime('%Y-%m-%d-%H:%M')
-    if os.stat(os.path.join('./worldmeter_data/',f)).st_mtime < now - 0.5 * 86400:
-        list_of_files.append(f)
-
-list_of_files.sort(reverse=True)
-latest_file = list_of_files[0]
+# for f in os.listdir('./worldmeter_data/'):
+#     # mtime = path.stat().st_mtime
+#     # timestamp_str = datetime.datetime.fromtimestamp(mtime).strftime('%Y-%m-%d-%H:%M')
+#     if os.stat(os.path.join('./worldmeter_data/',f)).st_mtime < now - 0.5 * 86400:
+#         list_of_files.append(f)
+#
+# list_of_files.sort(reverse=True)
+# latest_file = list_of_files[0]
+list_of_files = glob.glob('worldmeter_data/*')  # * means all if need specific format then *.csv
+latest_file = max(list_of_files, key=os.path.getctime)
 print('reading {} data'.format(latest_file))
-previous_worldometer_table = pd.read_csv('./worldmeter_data/'+   latest_file)
+previous_worldometer_table = pd.read_csv(latest_file)
 
 
 num_of_elements = 10
@@ -199,7 +201,7 @@ for index, country in enumerate(df_frame["Country/Region"]):
                 size=4, color="#f4f4f2", line=dict(width=1, color=named_colorscales[index])
             ),
             text=[
-                datetime.strftime(d, "%b %d %Y AEDT")
+                datetime.strftime(d, "%b %d %Y ")
                 for d in dataframe["date"]
             ],
             hovertext=[
@@ -255,3 +257,133 @@ plotly.offline.plot(
     filename="Figures/death_rates_TOP10",
     auto_open=False,
 )
+
+countrylist = []
+countrylist.append("Italy")
+countrylist.append("Australia")
+countrylist.append("Germany")
+countrylist.append("China")
+countrylist.append("US")
+countrylist.append("France")
+countrylist.append("Spain")
+# countrylist.append("Korea, South")
+countrylist.append("Switzerland")
+countrylist.append("United Kingdom")
+countrylist.append("Japan")
+
+
+for index, country in enumerate(countrylist):
+    fig_cumulative_tab = go.Figure()
+    dataframe = pd.read_csv('./country_data/{}.csv'.format(country))
+
+    if max < (dataframe["Deaths"] / dataframe["Confirmed"] * 100).max():
+        max = (dataframe["Deaths"] / dataframe["Confirmed"] * 100).max()
+        print(country)
+        tickList = list(
+            np.arange(
+                0,
+                (dataframe["Deaths"] / dataframe["Confirmed"] * 100).max()
+                + 0.2,
+                3,
+            )
+        )
+        justone = False
+    dataframe['date'] = pd.to_datetime(dataframe['date'], infer_datetime_format=True)
+
+# Add trace to the figure
+    fig_cumulative_tab.add_trace(go.Scatter(x=dataframe['date'],
+                                           y=dataframe['Confirmed'],
+                                           mode='lines+markers',
+                                           # line_shape='spline',
+                                           name='Confirmed case',
+                                           line=dict(color='#d7191c', width=2),
+                                           # marker=dict(size=4, color='#f4f4f2',
+                                           #            line=dict(width=1,color='#921113')),
+                                           text=[datetime.strftime(d, '%b %d %Y ') for d in dataframe['date']],
+                                           hovertext=['{} Confirmed<br>{:,d} cases<br>'.format(country,int(i)) for i in dataframe['Confirmed']],
+                                           hovertemplate='<b>%{text}</b><br></br>' +
+                                                         '%{hovertext}' +
+                                                         '<extra></extra>'))
+    fig_cumulative_tab.add_trace(go.Scatter(x=dataframe['date'],
+                                           y=dataframe['Recovered'],
+                                           mode='lines+markers',
+                                           # line_shape='spline',
+                                           name='Recovered case',
+                                           line=dict(color='#1a9622', width=2),
+                                           # marker=dict(size=4, color='#f4f4f2',
+                                           #            line=dict(width=1,color='#168038')),
+                                           text=[datetime.strftime(d, '%b %d %Y ') for d in dataframe['date']],
+                                           hovertext=['{} Recovered<br>{:,d} cases<br>'.format(country, int(i)) for i in dataframe['Recovered']],
+                                           hovertemplate='<b>%{text}</b><br></br>' +
+                                                         '%{hovertext}' +
+                                                         '<extra></extra>'))
+    fig_cumulative_tab.add_trace(go.Scatter(x=dataframe['date'],
+                                           y=dataframe['Deaths'],
+                                           mode='lines+markers',
+                                           # line_shape='spline',
+                                           name='Death case',
+                                           line=dict(color='#626262', width=2),
+                                           # marker=dict(size=4, color='#f4f4f2',
+                                           #            line=dict(width=1,color='#626262')),
+                                           text=[datetime.strftime(d, '%b %d %Y ') for d in dataframe['date']],
+                                           hovertext=['{} Deaths<br>{:,d} cases<br>'.format(country, int(i)) for i in dataframe['Deaths']],
+                                           hovertemplate='<b>%{text}</b><br></br>' +
+                                                         '%{hovertext}' +
+                                                         '<extra></extra>'))
+# Customise layout
+    fig_cumulative_tab.update_layout(
+        margin=go.layout.Margin(
+            l=10,
+            r=10,
+            b=10,
+            t=5,
+            pad=0
+        ),
+        #        annotations=[
+        #            dict(
+        #                x=.5,
+        #                y=.4,
+        #                xref="paper",
+        #                yref="paper",
+        #                text='The World',
+        #                opacity=0.5,
+        #                font=dict(family='Arial, sans-serif',
+        #                          size=60,
+        #                          color="grey"),
+        #            )
+        #        ],
+        yaxis_title="Cumulative cases numbers",
+        yaxis=dict(
+            showline=False, linecolor='#272e3e',
+            zeroline=False,
+            # showgrid=False,
+            gridcolor='rgba(203, 210, 211,.3)',
+            gridwidth=.1,
+            tickmode='array',
+            # Set tick range based on the maximum number
+            # tickvals=tickList,
+            # Set tick label accordingly
+            # ticktext=["{:.0f}k".format(i/1000) for i in tickList]
+        ),
+        xaxis_title="Select A Location From Table",
+        xaxis=dict(
+            showline=False, linecolor='#272e3e',
+            showgrid=False,
+            gridcolor='rgba(203, 210, 211,.3)',
+            gridwidth=.1,
+            zeroline=False
+        ),
+        xaxis_tickformat='%b %d',
+        # transition = {'duration':500},
+        hovermode='x',
+        legend_orientation="h",
+        legend=dict(x=.02, y=.95, bgcolor="rgba(0,0,0,0)", ),
+        plot_bgcolor='#f4f4f2',
+        paper_bgcolor='#cbd2d3',
+        font=dict(color='#292929', size=10)
+    )
+    plotly.offline.plot(
+        fig_cumulative_tab,
+        filename="Figures/fig_cumulative_tab-{}".format(country),
+        auto_open=False,
+    )
