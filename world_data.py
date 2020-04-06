@@ -299,6 +299,26 @@ def plot(dataframe, countries, xrange, dtype="Confirmed", yrange=None, yscale="l
     plt.grid()
 
 
+
+import random
+
+def hex_code_colors():
+    a = hex(random.randrange(0,256))
+    b = hex(random.randrange(0,256))
+    c = hex(random.randrange(0,256))
+    a = a[2:]
+    b = b[2:]
+    c = c[2:]
+    if len(a)<2:
+        a = "0" + a
+    if len(b)<2:
+        b = "0" + b
+    if len(c)<2:
+        c = "0" + c
+    z = a + b + c
+    return "#" + z.upper()
+
+
 def transform_color(color, amount=0.5):
     try:
         c = mc.cnames[color]
@@ -655,84 +675,84 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
 
 
 
-                    fig_rate = go.Figure()
-                    tickList = list(
-                        np.arange(
-                            0,
-                            (dataframe["Deaths"] / dataframe["Confirmed"] * 100).max()
-                            + 0.2,
-                            0.5,
-                        )
-                    )
-
-                    fig_rate.add_trace(
-                        go.Scatter(
-                            x=dataframe["date"],
-                            y=dataframe["Deaths"]  / dataframe["Confirmed"] * 100,
-                            mode="lines+markers",
-                            line_shape="spline",
-                            name=country,
-                            line=dict(color="#626262", width=4),
-                            marker=dict(
-                                size=4, color="#f4f4f2", line=dict(width=1, color="#626262")
-                            ),
-                            text=[
-                                datetime.datetime.strftime(d, "%b %d %Y AEDT")
-                                for d in dataframe["date"]
-                            ],
-                            hovertext=[
-                                country + " death rate (%) <br>{:.2f}%".format(i)
-                                for i in dataframe["Deaths"]
-                                / dataframe["Confirmed"]
-                                * 100
-                            ],
-                            hovertemplate="<b>%{text}</b><br></br>"
-                            + "%{hovertext}"
-                            + "<extra></extra>",
-                        )
-                    )
-
-                    fig_rate.update_layout(
-                        # title=country + " death rate (%)",
-                        xaxis_title="days",
-                        yaxis_title=country + " death rate (%)",
-                        margin=go.layout.Margin(l=10, r=10, b=10, t=5, pad=0),
-                        yaxis=dict(
-                            showline=False,
-                            linecolor="#272e3e",
-                            zeroline=False,
-                            # showgrid=False,
-                            gridcolor="rgba(203, 210, 211,.3)",
-                            gridwidth=0.1,
-                            tickmode="array",
-                            # Set tick range based on the maximum number
-                            tickvals=tickList,
-                            # Set tick label accordingly
-                            ticktext=["{:.1f}".format(i) for i in tickList],
-                        ),
-                        #    yaxis_title="Total Confirmed Case Number",
-                        xaxis=dict(
-                            showline=False,
-                            linecolor="#272e3e",
-                            showgrid=False,
-                            gridcolor="rgba(203, 210, 211,.3)",
-                            gridwidth=0.1,
-                            zeroline=False,
-                        ),
-                        xaxis_tickformat="%b %d",
-                        hovermode="x",
-                        legend_orientation="h",
-                        # legend=dict(x=.02, y=.95, bgcolor="rgba(0,0,0,0)",),
-                        plot_bgcolor="#f4f4f2",
-                        paper_bgcolor="#cbd2d3",
-                        font=dict(color="#292929"),
-                    )
-                    # fig_rate.write_image("Figures/death_rates_" + country )
-                    plotly.offline.plot(
-                        fig_rate,
-                        filename="Figures/death_rates_" + country ,
-                        auto_open=False,
-                    )
+                    # fig_rate = go.Figure()
+                    # tickList = list(
+                    #     np.arange(
+                    #         0,
+                    #         (dataframe["Deaths"] / dataframe["Confirmed"] * 100).max()
+                    #         + 0.2,
+                    #         0.5,
+                    #     )
+                    # )
+                    # dataframe['date'] = pd.to_datetime(dataframe['date'], infer_datetime_format=True)
+                    # fig_rate.add_trace(
+                    #     go.Scatter(
+                    #         x=dataframe["date"],
+                    #         y=dataframe["Deaths"]  / dataframe["Confirmed"] * 100,
+                    #         mode="lines+markers",
+                    #         line_shape="spline",
+                    #         name=country,
+                    #         line=dict(color="#626262", width=4),
+                    #         marker=dict(
+                    #             size=4, color="#f4f4f2", line=dict(width=1, color="#626262")
+                    #         ),
+                    #         text=[
+                    #             datetime.datetime.strftime(d, "%b %d %Y AEDT")
+                    #             for d in dataframe["date"]
+                    #         ],
+                    #         hovertext=[
+                    #             country + " death rate (%) <br>{:.2f}%".format(i)
+                    #             for i in dataframe["Deaths"]
+                    #             / dataframe["Confirmed"]
+                    #             * 100
+                    #         ],
+                    #         hovertemplate="<b>%{text}</b><br></br>"
+                    #         + "%{hovertext}"
+                    #         + "<extra></extra>",
+                    #     )
+                    # )
+                    #
+                    # fig_rate.update_layout(
+                    #     # title=country + " death rate (%)",
+                    #     xaxis_title="days",
+                    #     yaxis_title=country + " death rate (%)",
+                    #     margin=go.layout.Margin(l=10, r=10, b=10, t=5, pad=0),
+                    #     yaxis=dict(
+                    #         showline=False,
+                    #         linecolor="#272e3e",
+                    #         zeroline=False,
+                    #         # showgrid=False,
+                    #         gridcolor="rgba(203, 210, 211,.3)",
+                    #         gridwidth=0.1,
+                    #         tickmode="array",
+                    #         # Set tick range based on the maximum number
+                    #         tickvals=tickList,
+                    #         # Set tick label accordingly
+                    #         ticktext=["{:.1f}".format(i) for i in tickList],
+                    #     ),
+                    #     #    yaxis_title="Total Confirmed Case Number",
+                    #     xaxis=dict(
+                    #         showline=False,
+                    #         linecolor="#272e3e",
+                    #         showgrid=False,
+                    #         gridcolor="rgba(203, 210, 211,.3)",
+                    #         gridwidth=0.1,
+                    #         zeroline=False,
+                    #     ),
+                    #     xaxis_tickformat="%b %d",
+                    #     hovermode="x",
+                    #     legend_orientation="h",
+                    #     # legend=dict(x=.02, y=.95, bgcolor="rgba(0,0,0,0)",),
+                    #     plot_bgcolor="#f4f4f2",
+                    #     paper_bgcolor="#cbd2d3",
+                    #     font=dict(color="#292929"),
+                    # )
+                    # # fig_rate.write_image("Figures/death_rates_" + country )
+                    # plotly.offline.plot(
+                    #     fig_rate,
+                    #     filename="Figures/death_rates_" + country ,
+                    #     auto_open=False,
+                    # )
 
                     y1 = 100 * (1.10) ** (x - 1)  # 15% growth rate
                     y2 = 100 * (1.08) ** (x - 1)  # 8% growth rate
@@ -818,7 +838,8 @@ def main(plot_fits, plot_bar_plot, plot_bar_plot_video):
             all_names = df["country"].unique().tolist()
             random_hex_colors = []
             for i in range(len(all_names)):
-                random_hex_colors.append("#" + "%06X" % randint(0, 0xFFFFFF))
+                # random_hex_colors.append("#" + "%06X" % randint(0, 0xFFFFFF))
+                random_hex_colors.append(hex_code_colors())
 
             rgb_colors = [transform_color(i, 1) for i in random_hex_colors]
             rgb_colors_opacity = [
@@ -951,6 +972,6 @@ if __name__ == "__main__":
     logging.root.setLevel(level=debug_map[0])
 
 
-    main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=True)
-    # main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
+    # main(plot_fits=True, plot_bar_plot=True, plot_bar_plot_video=True)
+    main(plot_fits=True, plot_bar_plot=False, plot_bar_plot_video=False)
 

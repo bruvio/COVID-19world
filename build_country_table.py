@@ -135,7 +135,7 @@ countrylist = []
 # countrylist.append("Australia")
 # countrylist.append("US")
 # countrylist.append("France")
-# countrylist.append("Spain")
+countrylist.append("Spain")
 # countrylist.append("Korea, South")
 # countrylist.append("Switzerland")
 # countrylist.append("United Kingdom")
@@ -195,7 +195,7 @@ for field in fields:
 for country in countrylist_df:
             if country in countrylist_df:
                 try:
-                    print(country)
+                    # print(country)
                     databasename = "Confirmed cases"
                     # databasename = "Recovered cases"
                     # databasename = "Deaths cases"
@@ -283,7 +283,7 @@ for country in countrylist_df:
                                                    'Deaths': dataframe_deaths['counts'],
                                                    'Recovered': dataframe_recovered['counts'],
                                                    })
-                        country_df.drop_duplicates(keep='last', inplace=True)
+                        country_df= country_df.drop_duplicates(keep='last', inplace=True)
                         country_df.to_csv('./country_data/{}.csv'.format(country), index=False)
 
                 except:
